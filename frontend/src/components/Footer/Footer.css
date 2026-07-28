@@ -1,0 +1,127 @@
+/* Footer Styling */
+.footer-section {
+  width: 100%;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-bs-theme="dark"] .footer-section {
+  background-color: #0b0c10;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-bs-theme="light"] .footer-section {
+  background-color: #f1f3f5;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Titolo Footer */
+.footer-title {
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+[data-bs-theme="dark"] .footer-title {
+  color: #ffffff;
+}
+
+[data-bs-theme="light"] .footer-title {
+  color: #1e2022;
+}
+
+/* Dati Aziendali */
+.company-info {
+  font-size: 0.95rem;
+  color: var(--bs-secondary-color);
+}
+
+.text-forest {
+  color: #2b593f; /* Verde bosco */
+}
+
+[data-bs-theme="dark"] .text-forest {
+  color: #3b7a57;
+}
+
+.info-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.info-link:hover {
+  color: #2b593f;
+}
+
+[data-bs-theme="dark"] .info-link:hover {
+  color: #3b7a57;
+}
+
+/* Pulsanti Social Rotondi ed Eleganti */
+.social-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  background-color: transparent;
+  color: var(--bs-secondary-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* Transizione specifica per l'icona SVG Mixcloud */
+.mixcloud-svg {
+  transition: fill 0.3s ease;
+}
+
+/* Effetti Hover Social Personalizzati */
+.social-btn:hover {
+  transform: translateY(-4px);
+  color: #ffffff !important;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Colori specifici al passaggio del mouse */
+.social-btn.spotify:hover {
+  background-color: #1db954;
+}
+
+.social-btn.instagram:hover {
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+}
+
+.social-btn.matrimonio:hover {
+  background-color: #e25c80; /* Colore brand Matrimonio.com */
+}
+
+.social-btn.tiktok:hover {
+  background-color: #000000;
+}
+
+[data-bs-theme="dark"] .social-btn.tiktok:hover {
+  background-color: #ffffff;
+  color: #000000 !important;
+}
+
+.social-btn.mixcloud:hover {
+  background-color: #52aad8; /* Celeste Mixcloud */
+}
+
+.social-btn.mixcloud:hover .mixcloud-svg {
+  fill: #ffffff;
+}
+
+/* Copyright Section */
+.copyright {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
