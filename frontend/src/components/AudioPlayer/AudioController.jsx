@@ -18,65 +18,16 @@ function AudioController() {
 
   const currentTrack = tracks[currentTrackIndex] || tracks[0];
 
-  // Inizializzazione al montaggio e tentato Autoplay con gestione della policy del browser
+  // Inizializzazione al montaggio: per rispettare la policy del browser, l'audio non parte finché l'utente non interagisce
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     audio.volume = volume;
-
-    // Tentativo di autoplay al montaggio
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          dispatch(setIsPlaying(true));
-          dispatch(setAutoplayBlocked(false));
-        })
-        .catch((error) => {
-          // Autoplay bloccato dalla policy di interazione del browser
-          console.warn("Autoplay audio bloccato dalle policy del browser:", error);
-          dispatch(setIsPlaying(false));
-          dispatch(setAutoplayBlocked(true));
-        });
-    }
+    dispatch(setAutoplayBlocked(true));
   }, []);
 
-  // Gestore per avviare il play al primo click/tocco dell'utente se l'autoplay è stato bloccato
-  useEffect(() => {
-    if (!autoplayBlocked) return;
 
-    const handleFirstUserInteraction = () => {
-      const audio = audioRef.current;
-      if (audio) {
-        audio
-          .play()
-          .then(() => {
-            dispatch(setIsPlaying(true));
-            dispatch(setAutoplayBlocked(false));
-          })
-          .catch((err) => {
-            console.error("Errore nel riprodurre l'audio dopo l'interazione:", err);
-          });
-      }
-    };
-
-    window.addEventListener("pointerdown", handleFirstUserInteraction, {
-      once: true,
-    });
-    window.addEventListener("click", handleFirstUserInteraction, {
-      once: true,
-    });
-    window.addEventListener("touchstart", handleFirstUserInteraction, {
-      once: true,
-    });
-
-    return () => {
-      window.removeEventListener("pointerdown", handleFirstUserInteraction);
-      window.removeEventListener("click", handleFirstUserInteraction);
-      window.removeEventListener("touchstart", handleFirstUserInteraction);
-    };
-  }, [autoplayBlocked, dispatch]);
 
   // Sincronizza stato isPlaying di Redux con l'elemento Audio HTML5
   useEffect(() => {

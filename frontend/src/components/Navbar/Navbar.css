@@ -12,8 +12,6 @@
   z-index: 1000;
   position: relative;
   transition: background-color var(--transition-speed), border-color var(--transition-speed);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Temi della Navbar */
@@ -27,11 +25,28 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-/* 1. Fascia Superiore */
+/* 1. Fascia Superiore Fixed (Sempre incollata in alto allo schermo in ogni media query) */
 .top-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   font-size: 0.85rem;
   letter-spacing: 0.05em;
-  position: relative;
+  z-index: 1050;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+[data-bs-theme="dark"] .top-banner {
+  background-color: rgba(14, 18, 15, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="light"] .top-banner {
+  background-color: rgba(248, 249, 250, 0.94);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* Selettore Lingue con Icone Bandiera SVG */
@@ -195,12 +210,31 @@
   }
 }
 
-/* 1.5 Mini Player al Centro della Top Banner */
-.top-center-player {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
+/* 1.5 Mini Player al Centro della Top Banner (Visibile solo da 820px in su) */
+@media (max-width: 819.98px) {
+  .top-center-player {
+    display: none !important;
+  }
+}
+
+@media (min-width: 820px) {
+  .top-center-player {
+    display: flex !important;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+  }
+}
+
+/* Immagine di Copertina Tonda nel Mini Player */
+.player-cover-thumb {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .top-player-btn {
@@ -257,7 +291,7 @@
   cursor: pointer;
   color: var(--bs-body-color);
   font-size: 0.8rem;
-  max-width: 220px;
+  max-width: 320px;
   overflow: hidden;
   white-space: nowrap;
   transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -304,7 +338,7 @@
   display: inline-flex;
   overflow: hidden;
   white-space: nowrap;
-  max-width: 170px;
+  max-width: 240px;
   mask-image: linear-gradient(
     to right,
     transparent 0%,
@@ -327,7 +361,8 @@
   font-weight: 500;
   letter-spacing: 0.02em;
   padding-right: 28px;
-  animation: marqueeScrollCycle 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  /* Animazione più lenta (15s) per simulare la lettura naturale ed il ritorno morbido */
+  animation: marqueeScrollCycle 15s cubic-bezier(0.35, 0, 0.25, 1) infinite;
 }
 
 .top-player-track-info:hover .track-marquee-text {
@@ -335,24 +370,26 @@
 }
 
 @keyframes marqueeScrollCycle {
-  /* 0% - 20% (0s - 1.6s): Pausa iniziale per lettura inizio titolo */
+  /* 0% - 20% (0s - 3s): Pausa iniziale per lettura inizio titolo */
   0%,
   20% {
     transform: translateX(0);
   }
-  /* 65% - 83.75% (5.2s - 6.7s): Scorrimento verso sinistra e 1.5s esatti di pausa finale */
+  /* 65% - 85% (9.75s - 12.75s): Scorrimento lento verso sinistra e pausa finale di lettura */
   65%,
-  83.75% {
-    transform: translateX(calc(-100% + 140px));
+  85% {
+    transform: translateX(min(0px, calc(-100% + 220px)));
   }
-  /* 95% - 100% (7.6s - 8s): Ritorno fluido all'inizio per il nuovo ciclo */
-  95%,
+  /* 96% - 100% (14.4s - 15s): Ritorno lento ed elegante alla posizione di partenza */
+  96%,
   100% {
     transform: translateX(0);
   }
 }
 
-
+.top-player-volume {
+  position: relative;
+}
 
 .top-volume-slider {
   width: 55px;
@@ -366,6 +403,9 @@
 }
 
 /* 2. Fascia Centrale - Logo e Animazione Ritmo Musicale */
+.logo-section {
+  margin-top: 38px;
+}
 .logo-container {
   position: relative;
   display: inline-flex;
@@ -670,4 +710,59 @@
     width: 2.5px;
   }
 }
+
+/* 4. Player Fixed in Basso per Mobile (< 768px) */
+.mobile-bottom-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  z-index: 1040;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+[data-bs-theme="dark"] .mobile-bottom-player {
+  background-color: rgba(14, 18, 15, 0.94);
+  border-top-color: rgba(255, 255, 255, 0.12);
+  color: #f8f9fa;
+}
+
+[data-bs-theme="light"] .mobile-bottom-player {
+  background-color: rgba(248, 249, 250, 0.95);
+  border-top-color: rgba(0, 0, 0, 0.08);
+  color: #212529;
+}
+
+.mobile-track-info {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 60%;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mobile-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Aggiunge spazio in fondo per evitare che il player mobile copra il footer */
+@media (max-width: 767.98px) {
+  body {
+    padding-bottom: 48px;
+  }
+}
+
 

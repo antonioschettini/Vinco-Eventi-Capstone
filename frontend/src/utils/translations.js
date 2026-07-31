@@ -52,10 +52,61 @@ export const translations = {
       },
     },
     services: {
-      title: "I Nostri Servizi",
-      subtitle:
-        "Soluzioni su misura per matrimoni, feste private ed eventi aziendali.",
-      content: "Questa è una pagina segnaposto per i Servizi Offerti.",
+      heroTitle: "Le proposte e i box formulati",
+      heroSubtitle:
+        "Tutti gli eventi musicali e i party privati possono essere personalizzati. Qui sono elencate alcune tipologie di box e i vari servizi offerti per rendere unico il tuo evento.",
+      packagesTitle: "I Nostri Pacchetti Esclusivi",
+      brochureBtn: "BROCHURE",
+      contactUs: "Richiedi Informazioni",
+      basic: {
+        title: "BASIC BOX",
+        badge: "BASIC",
+        subtitle: "Pacchetto essenziale per intrattenimento e service audio/luci professionale.",
+        features: [
+          "Service audio e luci professionale",
+          "DJ (a scelta dal team VINCO EVENTI)"
+        ]
+      },
+      plus: {
+        title: "PLUS BOX",
+        badge: "PLUS",
+        subtitle: "Soluzione completa con sottofondo musicale e accompagnamento dal vivo.",
+        features: [
+          "Service audio e luci professionale",
+          "DJ (a scelta dal team VINCO EVENTI)",
+          "Musica di sottofondo (Cerimonia, Aperitivo)",
+          "Musicista a scelta di accompagnamento al djset (violino, sax, percussioni ecc.)"
+        ]
+      },
+      full: {
+        title: "FULL BOX",
+        badge: "FULL",
+        subtitle: "L'esperienza totale con live band, scenografie luminose e attrazioni speciali.",
+        features: [
+          "Service audio e luci professionale",
+          "DJ (a scelta dal team VINCO EVENTI)",
+          "Musica di sottofondo (Cerimonia, Aperitivo)",
+          "Live Band",
+          "Musicisti a scelta di accompagnamento al djset (violino, sax, percussioni ecc.)",
+          "Photobooth, Videobooth 360°, Telefono degli Ospiti",
+          "Illuminazioni, Fontane luminose sparkular, Fuochi d’artificio e Fumogeni Colorati"
+        ],
+        brochureLinks: {
+          liveBand: "https://drive.google.com/file/d/1oXiV9ACF0xkTOiNtkyxHYVK0dVMDCvdw/view",
+          photobooth: "https://drive.google.com/file/d/1HvgP2FhspW0vhEdVjwfeBUqcT5wBNjHz/view",
+          lighting: "https://drive.google.com/file/d/1NgzIQw-3Tzhs9dIBsR4qlb1KW9xtLia9/view"
+        }
+      },
+      otherProposals: {
+        title: "ALTRE PROPOSTE",
+        text: "VINCO EVENTI dispone di numerose band di musicisti e cantanti di alto livello adatte ad ogni tipologia di evento e gusto musicale. L’obiettivo è quello di customizzare l’evento per ogni singolo cliente diventando così un vero e proprio consulente musicale. VINCO EVENTI collabora, inoltre con tanti Wedding Planner e Destination Wedding Planner per proporre e costruire insieme al cliente le soluzioni migliori in termini di gusto musicale e budget. Dall’accompagnamento musicale per riti civili, aperitivi, pranzi o cene nuziali, taglio torta e dj set post party."
+      },
+      adminActions: {
+        addService: "Aggiungi Nuovo Pacchetto",
+        editService: "Modifica",
+        deleteService: "Elimina",
+        confirmDelete: "Sei sicuro di voler eliminare questo pacchetto?"
+      }
     },
     gallery: {
       heroTitle: "Da eventi privati a djset per grandi serate!!!",
@@ -153,6 +204,7 @@ export const translations = {
       },
       eventDate: "Data Evento",
       eventLocation: "Luogo Evento",
+      eventLocationPlaceholder: "Es. Masseria Verdi, Bari",
       guestsCount: "Numero di ospiti",
       timeOfDay: "L'evento si svolgerà a:",
       selectTimeOfDay: "-- Seleziona Orario --",
@@ -242,10 +294,61 @@ export const translations = {
       },
     },
     services: {
-      title: "Our Services",
-      subtitle:
-        "Tailored solutions for weddings, private parties, and corporate events.",
-      content: "This is a placeholder page for Services Offered.",
+      heroTitle: "Formulated Proposals & Packages",
+      heroSubtitle:
+        "All musical events and private parties can be fully customized. Listed here are several types of boxes and offered services to make your event unique.",
+      packagesTitle: "Our Exclusive Packages",
+      brochureBtn: "BROCHURE",
+      contactUs: "Request Information",
+      basic: {
+        title: "BASIC BOX",
+        badge: "BASIC",
+        subtitle: "Essential package for entertainment and professional audio/lighting service.",
+        features: [
+          "Professional audio and lighting service",
+          "DJ (selected from VINCO EVENTI team)"
+        ]
+      },
+      plus: {
+        title: "PLUS BOX",
+        badge: "PLUS",
+        subtitle: "Complete solution with background music and live solo accompaniment.",
+        features: [
+          "Professional audio and lighting service",
+          "DJ (selected from VINCO EVENTI team)",
+          "Background music (Ceremony, Cocktail hour)",
+          "Musician of choice to accompany DJ set (violin, sax, percussion, etc.)"
+        ]
+      },
+      full: {
+        title: "FULL BOX",
+        badge: "FULL",
+        subtitle: "The total experience with live band, scenic lighting, and special attractions.",
+        features: [
+          "Professional audio and lighting service",
+          "DJ (selected from VINCO EVENTI team)",
+          "Background music (Ceremony, Cocktail hour)",
+          "Live Band",
+          "Musicians of choice to accompany DJ set (violin, sax, percussion, etc.)",
+          "Photobooth, 360° Videobooth, Guest Audio Guestbook",
+          "Lighting, Sparkular fountains, Fireworks & Colored smoke"
+        ],
+        brochureLinks: {
+          liveBand: "https://drive.google.com/file/d/1arWt9Ex8Wd7gDGAdKPkuKDNRMXiqBhIn/view",
+          photobooth: "https://drive.google.com/file/d/1g_lmoPW6OVXhE6iulojUO6GAc2v-HAJV/view",
+          lighting: "https://drive.google.com/file/d/1DLC1r9lIKFVNtYOBrYWG2qN8htaqT6lP/view"
+        }
+      },
+      otherProposals: {
+        title: "OTHER PROPOSALS",
+        text: "VINCO EVENTI features numerous top-tier music bands and singers suitable for every type of event and musical taste. Our goal is to customize the event for each client, acting as a dedicated musical consultant. VINCO EVENTI also collaborates with many Wedding Planners and Destination Wedding Planners to build optimal solutions for musical taste and budget, covering civil ceremonies, cocktail hours, wedding dinners, cake cutting, and post-party DJ sets."
+      },
+      adminActions: {
+        addService: "Add New Package",
+        editService: "Edit",
+        deleteService: "Delete",
+        confirmDelete: "Are you sure you want to delete this package?"
+      }
     },
     gallery: {
       heroTitle: "From private events to DJ sets for grand nights!!!",
@@ -343,6 +446,7 @@ export const translations = {
       },
       eventDate: "Event Date",
       eventLocation: "Event Location",
+      eventLocationPlaceholder: "E.g. Masseria Verdi, Bari",
       guestsCount: "Number of guests",
       timeOfDay: "The event will take place at:",
       selectTimeOfDay: "-- Select Time --",

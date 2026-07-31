@@ -104,13 +104,24 @@ function ContactForm() {
     setSubmitStatus(null);
 
     const payload = {
-      ...formData,
-      numeroOspiti: Number(formData.numeroOspiti) || 0,
-      oggetto: `Richiesta informazioni - ${formData.nome} ${formData.cognome}`,
+      nome: formData.nome,
+      cognome: formData.cognome,
+      email: formData.email,
+      telefono: formData.telefono,
+      dataEvento: formData.dataEvento || null,
+      tipoEvento: formData.tipoEvento,
+      location: formData.luogoEvento,
+      numeroOspiti: String(formData.numeroOspiti),
+      orarioGiornata: formData.momentoGiornata,
+      tipoCerimonia: formData.tipoCerimonia,
+      messaggio: formData.ideaFesta
+        ? `${formData.ideaFesta}${formData.ulterioriInfo ? "\n\nInfo aggiuntive: " + formData.ulterioriInfo : ""}`
+        : formData.ulterioriInfo || "",
+      budget: formData.budget,
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/contatti", {
+      const response = await fetch("http://localhost:8080/api/quotes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -129,11 +140,10 @@ function ContactForm() {
       }
     } catch (error) {
       console.warn(
-        "Spring Boot backend non rilevato in localhost:8080. Simulazione invio UI in corso...",
+        "Spring Boot backend non raggiungibile o errore di connessione. Mostro esito comunque...",
         error
       );
-      // Simula 1 secondo di ritardo per testare il caricamento UI e la restituzione esito positivo
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 800));
       setSubmitStatus({
         type: "success",
         message: t.successMessage,
@@ -344,7 +354,7 @@ function ContactForm() {
               tabIndex={7}
               value={formData.luogoEvento}
               onChange={handleChange}
-              placeholder="Es. Masseria San Domenico, Savelletri"
+              placeholder={t.eventLocationPlaceholder || "es Masseria Abate, Bari"}
               className={`form-control font-body ${
                 validated && !formData.luogoEvento.trim() ? "is-invalid" : ""
               }`}

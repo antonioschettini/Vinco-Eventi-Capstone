@@ -1,0 +1,314 @@
+/* AdminQuotes.css - Responsive Admin Dashboard Styling */
+
+.admin-quotes-page {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+  min-height: 85vh;
+}
+
+/* Header Card */
+.admin-header-card {
+  border-radius: 16px;
+  background: var(--bs-body-bg);
+  border: 1px solid rgba(128, 128, 128, 0.18);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.admin-header-title {
+  color: #198754;
+}
+
+/* KPI Summary Cards */
+.kpi-card {
+  border-radius: 12px;
+  background: var(--bs-body-bg);
+  border: 1px solid rgba(128, 128, 128, 0.18);
+  padding: 1rem 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+/* Filter Controls */
+.filter-btn-group .btn {
+  border-radius: 50rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.search-input-wrapper {
+  position: relative;
+  min-width: 240px;
+}
+
+.search-input-wrapper i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--bs-secondary-color);
+}
+
+.search-input-wrapper input {
+  padding-left: 36px;
+  border-radius: 50rem;
+  font-size: 0.875rem;
+}
+
+/* Table View (Desktop >= 992px) */
+.admin-table-container {
+  border-radius: 16px;
+  overflow-x: auto;
+  border: 1px solid rgba(128, 128, 128, 0.18);
+  background: var(--bs-body-bg);
+}
+
+.table-custom-admin {
+  margin-bottom: 0;
+  vertical-align: middle;
+  min-width: 900px;
+}
+
+.admin-table-head th {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: rgba(128, 128, 128, 0.06);
+  color: var(--bs-secondary-color);
+  padding: 1rem 0.75rem;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.table-custom-admin td {
+  padding: 0.85rem 0.75rem;
+}
+
+/* Client Name & Data High Contrast Classes */
+.client-name-text {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--bs-body-color);
+}
+
+.client-date-text {
+  color: var(--bs-secondary-color);
+  font-size: 0.825rem;
+}
+
+.client-location-text {
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+}
+
+/* Status Badges */
+.status-badge {
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 0.35em 0.8em;
+  border-radius: 50rem;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.badge-pending {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #b45309;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+}
+
+.badge-read {
+  background-color: rgba(13, 202, 240, 0.15);
+  color: #0369a1;
+  border: 1px solid rgba(13, 202, 240, 0.4);
+}
+
+.badge-processed {
+  background-color: rgba(25, 135, 84, 0.15);
+  color: #15803d;
+  border: 1px solid rgba(25, 135, 84, 0.4);
+}
+
+/* Card View for Mobile/Tablet (< 992px) */
+.quote-card-mobile {
+  border-radius: 14px;
+  background: var(--bs-body-bg);
+  border: 1px solid rgba(128, 128, 128, 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.quote-card-mobile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.quote-card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.12);
+  background: rgba(128, 128, 128, 0.03);
+}
+
+.quote-card-body {
+  padding: 1.25rem;
+}
+
+.quote-card-footer {
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid rgba(128, 128, 128, 0.12);
+  background: rgba(128, 128, 128, 0.02);
+}
+
+.contact-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-decoration: none;
+  background: var(--bs-tertiary-bg);
+  border: 1px solid rgba(128, 128, 128, 0.15);
+  color: var(--bs-body-color);
+  transition: background 0.2s ease;
+}
+
+.contact-chip:hover {
+  background: var(--bs-secondary-bg);
+}
+
+.contact-chip-email {
+  color: #0284c7;
+}
+
+.contact-chip-phone {
+  color: #16a34a;
+}
+
+/* ==========================================================================
+   DARK MODE OVERRIDES (data-bs-theme="dark")
+   ========================================================================== */
+[data-bs-theme="dark"] .admin-header-title {
+  color: #4ade80 !important;
+}
+
+[data-bs-theme="dark"] .admin-header-card,
+[data-bs-theme="dark"] .admin-table-container,
+[data-bs-theme="dark"] .quote-card-mobile,
+[data-bs-theme="dark"] .kpi-card {
+  background-color: #181d24;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+[data-bs-theme="dark"] .admin-table-head th {
+  background-color: #0f1319;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="dark"] .table-custom-admin td {
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-bs-theme="dark"] .client-name-text {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-bs-theme="dark"] .client-date-text {
+  color: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .client-location-text {
+  color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .contact-chip {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+}
+
+[data-bs-theme="dark"] .contact-chip-email {
+  color: #38bdf8 !important;
+}
+
+[data-bs-theme="dark"] .contact-chip-phone {
+  color: #4ade80 !important;
+}
+
+[data-bs-theme="dark"] .badge-pending {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+[data-bs-theme="dark"] .badge-read {
+  background-color: rgba(14, 165, 233, 0.2);
+  color: #38bdf8;
+  border-color: rgba(14, 165, 233, 0.45);
+}
+
+[data-bs-theme="dark"] .badge-processed {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+[data-bs-theme="dark"] .quote-card-header {
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .quote-card-footer {
+  background: rgba(0, 0, 0, 0.2);
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .search-input-wrapper input {
+  background-color: #0f1319;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .search-input-wrapper input::placeholder {
+  color: #64748b;
+}
+
+[data-bs-theme="dark"] .modal-content {
+  background-color: #181d24;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-bs-theme="dark"] .modal-footer {
+  background-color: #0f1319 !important;
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-bs-theme="dark"] .message-box-dark {
+  background-color: #0f1319 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #e2e8f0 !important;
+}

@@ -1,0 +1,146 @@
+/* Mobile Fixed Bottom Player (< 820px) - Indipendente e fisso in basso allo schermo */
+.mobile-bottom-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  z-index: 1040;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+/* Nasconde il player bottom da 820px in su (quando entra in funzione il player topbar) */
+@media (min-width: 820px) {
+  .mobile-bottom-player {
+    display: none !important;
+  }
+}
+
+/* Attiva il player bottom sotto gli 820px */
+@media (max-width: 819.98px) {
+  .mobile-bottom-player {
+    display: flex !important;
+  }
+
+  body {
+    padding-bottom: 54px !important;
+  }
+}
+
+[data-bs-theme="dark"] .mobile-bottom-player {
+  background-color: rgba(14, 18, 15, 0.94);
+  border-top-color: rgba(255, 255, 255, 0.12);
+  color: #f8f9fa;
+}
+
+[data-bs-theme="light"] .mobile-bottom-player {
+  background-color: rgba(248, 249, 250, 0.95);
+  border-top-color: rgba(0, 0, 0, 0.08);
+  color: #212529;
+}
+
+.mobile-track-info {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 60%;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mobile-bottom-player .track-marquee-wrapper {
+  display: inline-flex;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 180px;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 6px,
+    black calc(100% - 6px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 6px,
+    black calc(100% - 6px),
+    transparent 100%
+  );
+}
+
+.mobile-bottom-player .track-marquee-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding-right: 28px;
+  /* Animazione più lenta (15s) per simulare la lettura naturale ed il ritorno morbido */
+  animation: mobileMarqueeScrollXs 15s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+}
+
+.mobile-bottom-player:hover .track-marquee-text {
+  animation-play-state: paused;
+}
+
+/* Animazione per schermi molto piccoli (< 576px) */
+@keyframes mobileMarqueeScrollXs {
+  0%,
+  20% {
+    transform: translateX(0);
+  }
+  65%,
+  85% {
+    transform: translateX(min(0px, calc(-100% + 160px)));
+  }
+  96%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Da sm (>= 576px) a < 820px: abbiamo molto più spazio orizzontale */
+@media (min-width: 576px) and (max-width: 819.98px) {
+  .mobile-track-info {
+    max-width: 72%;
+  }
+
+  .mobile-bottom-player .track-marquee-wrapper {
+    max-width: 440px;
+  }
+
+  .mobile-bottom-player .track-marquee-text {
+    animation: mobileMarqueeScrollSm 15s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+  }
+}
+
+/* Animazione per schermi medi (sm, 576px - 819px) */
+@keyframes mobileMarqueeScrollSm {
+  0%,
+  20% {
+    transform: translateX(0);
+  }
+  65%,
+  85% {
+    transform: translateX(min(0px, calc(-100% + 400px)));
+  }
+  96%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.mobile-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

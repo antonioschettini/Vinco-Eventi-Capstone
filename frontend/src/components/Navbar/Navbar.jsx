@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme, setLanguage } from "../../redux/slices/uiSlice";
 import {
@@ -10,6 +10,12 @@ import {
   toggleMute,
   toggleModal,
 } from "../../redux/slices/audioSlice";
+import {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+  logout,
+} from "../../redux/slices/authSlice";
 import tracks from "../../data/tracksData";
 import AudioController from "../AudioPlayer/AudioController";
 import { translations } from "../../utils/translations";
@@ -54,8 +60,12 @@ const UKFlag = () => (
 
 function Navbar() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const theme = useSelector((state) => state.ui.theme);
   const lang = useSelector((state) => state.ui.language);
+  const { isAuthenticated, user, loading, error: authError } = useSelector(
+    (state) => state.auth
+  );
   const t = translations[lang].nav;
 
   // Redux audio state
@@ -69,6 +79,7 @@ function Navbar() {
   const [showLogin, setShowLogin] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
 
   // Stato per l'apertura/chiusura del menu mobile
   const [expanded, setExpanded] = useState(false);
@@ -90,12 +101,43 @@ function Navbar() {
     };
   }, [showLogin]);
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login Admin inviato:", { email, password });
-    setEmail("");
-    setPassword("");
+    setLoginError("");
+    dispatch(loginStart());
+
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        const msg = errData.message || "Credenziali non valide!";
+        setLoginError(msg);
+        dispatch(loginFailure(msg));
+        return;
+      }
+
+      const data = await response.json();
+      dispatch(loginSuccess(data));
+      setEmail("");
+      setPassword("");
+      setShowLogin(false);
+      navigate("/admin/preventivi");
+    } catch (err) {
+      const msg = "Impossibile connettersi al server di autenticazione.";
+      setLoginError(msg);
+      dispatch(loginFailure(msg));
+    }
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
     setShowLogin(false);
+    navigate("/");
   };
 
   return (
@@ -104,9 +146,9 @@ function Navbar() {
       <AudioController />
 
       {/* 1. Fascia Superiore (Top Banner) */}
-      <div className="top-banner d-flex justify-content-between align-items-center px-4 py-2 border-bottom border-secondary border-opacity-10">
+      <div className="top-banner d-flex justify-content-between align-items-center px-3 px-md-4 py-2 border-bottom border-secondary border-opacity-10">
         {/* Lato Sinistro: Lingua & Tema */}
-        <div className="top-left d-flex align-items-center gap-3">
+        <div className="top-left d-flex align-items-center gap-2 gap-md-3">
           {/* Switch Lingua con Bandiere */}
           <div className="language-selector d-flex align-items-center gap-2">
             <button
@@ -142,8 +184,8 @@ function Navbar() {
           </button>
         </div>
 
-        {/* CENTRO: CONTROLLI COMPATTI MINI PLAYER */}
-        <div className="top-center-player d-flex align-items-center gap-2">
+        {/* CENTRO: CONTROLLI COMPATTI MINI PLAYER (Visibili solo da 820px in su) */}
+        <div className="top-center-player align-items-center gap-2">
           {/* Pulsante Traccia Precedente */}
           <button
             onClick={() => dispatch(prevTrack(tracks.length))}
@@ -174,12 +216,17 @@ function Navbar() {
             <i className="bi bi-skip-end-fill"></i>
           </button>
 
-          {/* Titolo Brano Cliccabile che apre il Modale Info */}
+          {/* Titolo Brano Cliccabile con Immagine Cover che apre il Modale Info */}
           <button
             onClick={() => dispatch(toggleModal())}
             className="top-player-track-info d-flex align-items-center gap-2"
             title="Apri dettagli traccia"
           >
+            <img
+              src={currentTrack.cover}
+              alt={currentTrack.title}
+              className="player-cover-thumb rounded-circle"
+            />
             <i className={`bi bi-music-note-beamed track-note-icon ${isPlaying ? "playing" : ""}`}></i>
             <span className="track-marquee-wrapper">
               <span key={currentTrackIndex} className="track-marquee-text">
@@ -225,47 +272,95 @@ function Navbar() {
             onClick={() => setShowLogin(!showLogin)}
             className={`admin-login-btn-toggle d-flex align-items-center gap-2 ${
               showLogin ? "active" : ""
-            }`}
+            } ${isAuthenticated ? "border-success text-success" : ""}`}
             aria-expanded={showLogin}
           >
-            <i className="bi bi-lock-fill"></i>
-            <span>{t.adminLogin}</span>
+            <i className={`bi ${isAuthenticated ? "bi-shield-check" : "bi-lock-fill"}`}></i>
+            <span>{isAuthenticated ? "Admin Panel" : t.adminLogin}</span>
           </button>
 
-          {/* Modale Login Dropdown Popover */}
+          {/* Modale Login / Admin Menu Dropdown Popover */}
           {showLogin && (
             <div className="login-dropdown-popover p-3 shadow-lg rounded">
-              <form onSubmit={handleLoginSubmit}>
-                <div className="mb-2 text-start">
-                  <label className="form-label small mb-1 fw-semibold">
-                    {t.email}
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="form-control form-control-sm input-custom"
-                    required
-                    placeholder="name@example.com"
-                  />
+              {isAuthenticated ? (
+                <div className="text-start">
+                  <div className="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
+                    <i className="bi bi-person-circle fs-5 text-success"></i>
+                    <div>
+                      <div className="fw-bold small text-truncate" style={{ maxWidth: "160px" }}>
+                        {user?.email}
+                      </div>
+                      <span className="badge bg-success text-uppercase style-badge small" style={{ fontSize: "0.65rem" }}>
+                        {user?.role}
+                      </span>
+                    </div>
+                  </div>
+                  <Link
+                    to="/admin/preventivi"
+                    className="btn btn-outline-success btn-sm w-100 mb-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
+                    onClick={() => setShowLogin(false)}
+                  >
+                    <i className="bi bi-file-earmark-text"></i>
+                    <span>Dashboard Preventivi</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="btn btn-danger btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
+                  >
+                    <i className="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                  </button>
                 </div>
-                <div className="mb-3 text-start">
-                  <label className="form-label small mb-1 fw-semibold">
-                    {t.password}
-                  </label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="form-control form-control-sm input-custom"
-                    required
-                    placeholder="••••••••"
-                  />
-                </div>
-                <button type="submit" className="btn btn-forest-submit btn-sm w-100 fw-bold">
-                  {t.loginBtn}
-                </button>
-              </form>
+              ) : (
+                <form onSubmit={handleLoginSubmit}>
+                  {loginError && (
+                    <div className="alert alert-danger p-2 small mb-2 text-start" role="alert">
+                      <i className="bi bi-exclamation-triangle-fill me-1"></i>
+                      {loginError}
+                    </div>
+                  )}
+                  <div className="mb-2 text-start">
+                    <label className="form-label small mb-1 fw-semibold">
+                      {t.email}
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="form-control form-control-sm input-custom"
+                      required
+                      placeholder="vincoeventi@gmail.com"
+                    />
+                  </div>
+                  <div className="mb-3 text-start">
+                    <label className="form-label small mb-1 fw-semibold">
+                      {t.password}
+                    </label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="form-control form-control-sm input-custom"
+                      required
+                      placeholder="••••••••"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn btn-forest-submit btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <span className="spinner-border spinner-border-sm" role="status"></span>
+                    ) : (
+                      <>
+                        <i className="bi bi-box-arrow-in-right"></i>
+                        <span>{t.loginBtn}</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
             </div>
           )}
         </div>
