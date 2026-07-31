@@ -148,7 +148,7 @@ function MatrimonioWidgets() {
           <Col xs={12} sm={6} lg={3}>
             <div className="matrimonio-badge-card">
               <div className="matrimonio-badge-img-wrapper mb-3">
-                <div id="wp-ratedWA">
+                <div id="wp-ratedWA-2023">
                   <a
                     target="_blank"
                     href="https://www.matrimonio.com/musica-matrimonio/vinco-eventi--e283893"
@@ -178,7 +178,7 @@ function MatrimonioWidgets() {
           <Col xs={12} sm={6} lg={3}>
             <div className="matrimonio-badge-card">
               <div className="matrimonio-badge-img-wrapper mb-3">
-                <div id="wp-ratedWA">
+                <div id="wp-ratedWA-2024">
                   <a
                     target="_blank"
                     href="https://www.matrimonio.com/musica-matrimonio/vinco-eventi--e283893"
@@ -208,7 +208,7 @@ function MatrimonioWidgets() {
           <Col xs={12} sm={6} lg={3}>
             <div className="matrimonio-badge-card">
               <div className="matrimonio-badge-img-wrapper mb-3">
-                <div id="wp-ratedWA">
+                <div id="wp-ratedWA-2025">
                   <a
                     target="_blank"
                     href="https://www.matrimonio.com/musica-matrimonio/vinco-eventi--e283893"

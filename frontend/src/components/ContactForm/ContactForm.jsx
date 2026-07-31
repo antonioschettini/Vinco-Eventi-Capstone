@@ -139,16 +139,25 @@ function ContactForm() {
         throw new Error("Server error status: " + response.status);
       }
     } catch (error) {
-      console.warn(
-        "Spring Boot backend non raggiungibile o errore di connessione. Mostro esito comunque...",
-        error
-      );
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setSubmitStatus({
-        type: "success",
-        message: t.successMessage,
-      });
-      resetFormInputs();
+      // Se l'errore è stato lanciato da noi (status 4xx/5xx), mostralo come errore reale
+      if (error.message && error.message.startsWith("Server error status:")) {
+        setSubmitStatus({
+          type: "danger",
+          message: t.errorMessage || "Errore nel salvataggio. Riprova più tardi.",
+        });
+      } else {
+        // Errore di rete (backend non raggiungibile) — fallback per demo
+        console.warn(
+          "Spring Boot backend non raggiungibile. Mostro esito di demo...",
+          error
+        );
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        setSubmitStatus({
+          type: "success",
+          message: t.successMessage,
+        });
+        resetFormInputs();
+      }
     } finally {
       setIsSubmitting(false);
     }

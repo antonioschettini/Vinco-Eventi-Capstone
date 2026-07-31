@@ -207,3 +207,12 @@
     height: 320px;
   }
 }
+
+/* RESP-5: Breakpoint intermedio tablet per carousel */
+@media (min-width: 577px) and (max-width: 767.98px) {
+  .gallery-carousel-item,
+  .carousel-media-wrapper {
+    height: 360px;
+  }
+}
+

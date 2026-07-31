@@ -545,7 +545,7 @@ function AdminQuotes() {
                   <div className="col-md-6">
                     <label className="text-muted small fw-semibold">Telefono</label>
                     <p className="mb-0 fw-semibold">
-                      <a href={`tel:${selectedQuote.telefono}`} className="text-decoration-none text-dark dark-text-white">
+                      <a href={`tel:${selectedQuote.telefono}`} className="text-decoration-none text-body">
                         {selectedQuote.telefono}
                       </a>
                     </p>

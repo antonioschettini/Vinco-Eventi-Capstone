@@ -239,7 +239,9 @@ function Services() {
     },
   ];
 
-  const packagesToRender = dbServices.length > 0 ? dbServices : defaultStaticPackages;
+  const packagesToRender = dbServices.length > 0
+    ? [...dbServices].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+    : defaultStaticPackages;
 
   return (
     <div className="services-page-wrapper">

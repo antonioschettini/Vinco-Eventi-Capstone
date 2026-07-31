@@ -31,7 +31,7 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
         dispatch(setIsPlaying(true));
       }
     }
-  }, [show, currentMedia?.type, currentMedia?.id]);
+  }, [show, currentMedia?.type, currentMedia?.id, dispatch]);
 
   useEffect(() => {
     if (!show) return;

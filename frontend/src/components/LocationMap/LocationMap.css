@@ -126,6 +126,7 @@
 @media (max-width: 991.98px) {
   .map-iframe-container {
     min-height: 320px;
+    aspect-ratio: 4 / 3;
   }
   
   .map-info-card {

@@ -179,7 +179,7 @@
   font-size: 1.05rem;
   font-weight: 600;
   letter-spacing: 2px;
-  text-uppercase: uppercase;
+  text-transform: uppercase;
   color: var(--primary-forest, #204a35);
 }
 
@@ -323,5 +323,15 @@
   
   .cta-banner {
     padding: 2.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .about-quote-text {
+    font-size: 1.3rem;
+  }
+
+  .stat-number {
+    font-size: 1.7rem;
   }
 }

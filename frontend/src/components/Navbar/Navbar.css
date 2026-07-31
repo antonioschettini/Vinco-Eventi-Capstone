@@ -711,58 +711,6 @@
   }
 }
 
-/* 4. Player Fixed in Basso per Mobile (< 768px) */
-.mobile-bottom-player {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 44px;
-  z-index: 1040;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(128, 128, 128, 0.2);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
-  transition: background-color var(--transition-speed), border-color var(--transition-speed);
-}
 
-[data-bs-theme="dark"] .mobile-bottom-player {
-  background-color: rgba(14, 18, 15, 0.94);
-  border-top-color: rgba(255, 255, 255, 0.12);
-  color: #f8f9fa;
-}
-
-[data-bs-theme="light"] .mobile-bottom-player {
-  background-color: rgba(248, 249, 250, 0.95);
-  border-top-color: rgba(0, 0, 0, 0.08);
-  color: #212529;
-}
-
-.mobile-track-info {
-  background: none;
-  border: none;
-  color: inherit;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 60%;
-  overflow: hidden;
-  text-align: left;
-  cursor: pointer;
-}
-
-.mobile-controls {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* Aggiunge spazio in fondo per evitare che il player mobile copra il footer */
-@media (max-width: 767.98px) {
-  body {
-    padding-bottom: 48px;
-  }
-}
 
 

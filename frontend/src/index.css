@@ -332,6 +332,37 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   }
 }
 
+/* RESP-1: Hero title/subtitle ridimensionati per schermi molto piccoli */
+@media (max-width: 575.98px) {
+  .hero-gallery-title {
+    font-size: 2rem !important;
+  }
 
+  .hero-gallery-subtitle,
+  .hero-gallery-subtitle p {
+    font-size: 1rem !important;
+  }
+}
 
+/* RESP-6: Entertainment wrapper sotto 400px */
+@media (max-width: 400px) {
+  .entertainment-img-wrapper {
+    height: 200px;
+  }
+}
+
+/* RESP-7: Container più largo su schermi ultra-wide */
+@media (min-width: 1920px) {
+  .container,
+  .container-xxl {
+    max-width: 1600px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .container,
+  .container-xxl {
+    max-width: 1920px;
+  }
+}
 

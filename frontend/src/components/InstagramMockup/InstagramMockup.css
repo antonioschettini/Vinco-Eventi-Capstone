@@ -12,6 +12,7 @@
   width: 100%;
   max-width: 360px;
   height: 720px;
+  max-height: min(720px, 85vh);
   background-color: #0b0f0d;
   border: 12px solid #1a1f1c;
   border-radius: 48px;
@@ -157,10 +158,6 @@
   transform: scale(1.25);
 }
 
-.fs-7 {
-  font-size: 0.78rem;
-}
-
 .ig-caption-text {
   line-height: 1.35;
 }
@@ -193,3 +190,16 @@
     height: 280px;
   }
 }
+
+/* RESP-2: Breakpoint intermedio 401-575px */
+@media (min-width: 401px) and (max-width: 575.98px) {
+  .phone-chassis {
+    height: 680px;
+    border-width: 10px;
+    border-radius: 40px;
+  }
+  .ig-carousel-container {
+    height: 300px;
+  }
+}
+

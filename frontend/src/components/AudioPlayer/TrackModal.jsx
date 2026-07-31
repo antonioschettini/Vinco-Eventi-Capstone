@@ -29,8 +29,8 @@ function TrackModal() {
   // Inizializza o recupera la posizione del modale
   const [position, setPosition] = useState(() => {
     if (modalPosition) return modalPosition;
-    const defaultX = Math.max(16, window.innerWidth - 270);
-    const defaultY = 90;
+    const defaultX = Math.max(8, Math.min(window.innerWidth - 270, window.innerWidth - 260));
+    const defaultY = Math.max(8, Math.min(90, window.innerHeight - 340));
     return { x: defaultX, y: defaultY };
   });
 
