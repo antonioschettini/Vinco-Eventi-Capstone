@@ -1,0 +1,110 @@
+.audio-consent-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 330px;
+  z-index: 2100;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  animation: slideUpToast 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-bs-theme="dark"] .audio-consent-toast {
+  background-color: rgba(20, 24, 22, 0.94);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f8f9fa;
+}
+
+[data-bs-theme="light"] .audio-consent-toast {
+  background-color: rgba(255, 255, 255, 0.96);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #212529;
+}
+
+.audio-toast-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(32, 74, 53, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-bs-theme="dark"] .audio-toast-icon-wrapper {
+  background: rgba(76, 166, 121, 0.2);
+}
+
+.btn-close-toast {
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  font-size: 1.2rem;
+  padding: 0 4px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-close-toast:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.toast-description {
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.toast-legend-info {
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+
+.btn-forest-activate {
+  background-color: #204a35;
+  border-color: #204a35;
+  color: #ffffff;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-bs-theme="dark"] .btn-forest-activate {
+  background-color: #3b7a57;
+  border-color: #3b7a57;
+}
+
+.btn-forest-activate:hover {
+  background-color: #163324;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(32, 74, 53, 0.35);
+  color: #ffffff;
+}
+
+[data-bs-theme="dark"] .btn-forest-activate:hover {
+  background-color: #4ca679;
+  box-shadow: 0 4px 14px rgba(76, 166, 121, 0.4);
+  color: #ffffff;
+}
+
+@keyframes slideUpToast {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 576px) {
+  .audio-consent-toast {
+    right: 16px;
+    left: 16px;
+    bottom: 16px;
+    width: auto;
+  }
+}

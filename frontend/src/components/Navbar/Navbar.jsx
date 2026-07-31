@@ -2,6 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme, setLanguage } from "../../redux/slices/uiSlice";
+import {
+  togglePlay,
+  nextTrack,
+  prevTrack,
+  setVolume,
+  toggleMute,
+  toggleModal,
+} from "../../redux/slices/audioSlice";
+import tracks from "../../data/tracksData";
+import AudioController from "../AudioPlayer/AudioController";
 import { translations } from "../../utils/translations";
 import "./Navbar.css";
 
@@ -33,11 +43,11 @@ const UKFlag = () => (
       <rect width="60" height="30" />
     </clipPath>
     <g clipPath="url(#uj-clip)">
-      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#00247D" stroke-width="60" />
-      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#FFFFFF" stroke-width="6" />
-      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#CF142B" stroke-width="4" />
-      <path d="M30,0 L30,30 M0,15 L60,15" stroke="#FFFFFF" stroke-width="10" />
-      <path d="M30,0 L30,30 M0,15 L60,15" stroke="#CF142B" stroke-width="6" />
+      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#00247D" strokeWidth="60" />
+      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#FFFFFF" strokeWidth="6" />
+      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#CF142B" strokeWidth="4" />
+      <path d="M30,0 L30,30 M0,15 L60,15" stroke="#FFFFFF" strokeWidth="10" />
+      <path d="M30,0 L30,30 M0,15 L60,15" stroke="#CF142B" strokeWidth="6" />
     </g>
   </svg>
 );
@@ -47,6 +57,13 @@ function Navbar() {
   const theme = useSelector((state) => state.ui.theme);
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].nav;
+
+  // Redux audio state
+  const { isPlaying, volume, currentTrackIndex, isMuted } = useSelector(
+    (state) => state.audio
+  );
+
+  const currentTrack = tracks[currentTrackIndex] || tracks[0];
 
   // Stati per il popover di Login Admin
   const [showLogin, setShowLogin] = useState(false);
@@ -75,7 +92,6 @@ function Navbar() {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    // Placeholder logico per il login admin (verrà implementato in seguito)
     console.log("Login Admin inviato:", { email, password });
     setEmail("");
     setPassword("");
@@ -84,8 +100,12 @@ function Navbar() {
 
   return (
     <header className="navbar-container">
-      {/* 1. Fascia Superiore */}
+      {/* Elemento Audio Globale Sincronizzato con Redux */}
+      <AudioController />
+
+      {/* 1. Fascia Superiore (Top Banner) */}
       <div className="top-banner d-flex justify-content-between align-items-center px-4 py-2 border-bottom border-secondary border-opacity-10">
+        {/* Lato Sinistro: Lingua & Tema */}
         <div className="top-left d-flex align-items-center gap-3">
           {/* Switch Lingua con Bandiere */}
           <div className="language-selector d-flex align-items-center gap-2">
@@ -122,7 +142,84 @@ function Navbar() {
           </button>
         </div>
 
-        {/* Area Privata con Modale/Popover a comparsa */}
+        {/* CENTRO: CONTROLLI COMPATTI MINI PLAYER */}
+        <div className="top-center-player d-flex align-items-center gap-2">
+          {/* Pulsante Traccia Precedente */}
+          <button
+            onClick={() => dispatch(prevTrack(tracks.length))}
+            className="top-player-btn"
+            title="Traccia precedente (<<)"
+            aria-label="Traccia precedente"
+          >
+            <i className="bi bi-skip-start-fill"></i>
+          </button>
+
+          {/* Pulsante Play / Pause */}
+          <button
+            onClick={() => dispatch(togglePlay())}
+            className="top-player-btn play-btn"
+            title={isPlaying ? "Pausa" : "Riproduci"}
+            aria-label={isPlaying ? "Pausa" : "Riproduci"}
+          >
+            <i className={`bi ${isPlaying ? "bi-pause-fill" : "bi-play-fill"}`}></i>
+          </button>
+
+          {/* Pulsante Traccia Successiva */}
+          <button
+            onClick={() => dispatch(nextTrack(tracks.length))}
+            className="top-player-btn"
+            title="Traccia successiva (>>)"
+            aria-label="Traccia successiva"
+          >
+            <i className="bi bi-skip-end-fill"></i>
+          </button>
+
+          {/* Titolo Brano Cliccabile che apre il Modale Info */}
+          <button
+            onClick={() => dispatch(toggleModal())}
+            className="top-player-track-info d-flex align-items-center gap-2"
+            title="Apri dettagli traccia"
+          >
+            <i className={`bi bi-music-note-beamed track-note-icon ${isPlaying ? "playing" : ""}`}></i>
+            <span className="track-marquee-wrapper">
+              <span key={currentTrackIndex} className="track-marquee-text">
+                {currentTrack.artist} - {currentTrack.title}
+              </span>
+            </span>
+          </button>
+
+          {/* Icona & Barra Volume */}
+          <div className="top-player-volume d-flex align-items-center gap-1 ms-1">
+            <button
+              onClick={() => dispatch(toggleMute())}
+              className="top-player-btn volume-btn"
+              title={isMuted || volume === 0 ? "Attiva audio" : "Muto"}
+              aria-label="Volume audio"
+            >
+              <i
+                className={`bi ${
+                  isMuted || volume === 0
+                    ? "bi-volume-mute-fill text-danger"
+                    : volume < 0.5
+                    ? "bi-volume-down-fill"
+                    : "bi-volume-up-fill"
+                }`}
+              ></i>
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={isMuted ? 0 : volume}
+              onChange={(e) => dispatch(setVolume(parseFloat(e.target.value)))}
+              className="top-volume-slider"
+              title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
+            />
+          </div>
+        </div>
+
+        {/* Lato Destro: Area Privata con Modale/Popover Login */}
         <div className="top-right position-relative" ref={popoverRef}>
           <button
             onClick={() => setShowLogin(!showLogin)}
@@ -176,7 +273,11 @@ function Navbar() {
 
       {/* 2. Fascia Centrale - Logo con Animazione Ritmo Musicale */}
       <div className="logo-section d-flex justify-content-center align-items-center py-3">
-        <Link to="/" className="logo-container" aria-label="Vinco Eventi Home">
+        <Link
+          to="/"
+          className={`logo-container ${isPlaying ? "is-playing" : ""}`}
+          aria-label="Vinco Eventi Home"
+        >
           {/* Animazione del ritmo musicale attorno al logo */}
           <div className="musical-rhythm-wrapper" aria-hidden="true">
             {/* Onde sonore concentriche */}

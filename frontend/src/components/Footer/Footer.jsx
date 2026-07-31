@@ -87,6 +87,16 @@ function Footer() {
                 <i className="bi bi-tiktok"></i>
               </button>
 
+              {/* WhatsApp */}
+              <button
+                onClick={() => handleSocialClick("https://wa.me/393492949669")}
+                className="social-btn whatsapp"
+                aria-label="WhatsApp"
+                title="WhatsApp"
+              >
+                <i className="bi bi-whatsapp"></i>
+              </button>
+
               {/* Mixcloud (SVG personalizzato per fedeltà al brand) */}
               <button
                 onClick={() => handleSocialClick("https://www.mixcloud.com/djcolaluca/")}

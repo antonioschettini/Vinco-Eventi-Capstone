@@ -182,7 +182,8 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 }
 
 .hero-gallery-section:hover .hero-gallery-title,
-.hero-gallery-section:hover .hero-gallery-subtitle {
+.hero-gallery-section:hover .hero-gallery-subtitle,
+.hero-gallery-section:hover .hero-gallery-subtitle p {
   color: #ffffff !important;
   text-shadow: 0 3px 10px rgba(0, 0, 0, 0.95);
 }
@@ -213,6 +214,8 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   border: none !important;
   border-radius: 16px;
   overflow: hidden;
+  /* Le card sono SEMPRE verticali — nessun layout orizzontale */
+  flex-direction: column !important;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   height: 100%;
 }
@@ -239,17 +242,28 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   box-shadow: 0 16px 36px rgba(32, 74, 53, 0.12) !important;
 }
 
+/* Wrapper immagine: altezza base per mobile e tablet */
 .entertainment-img-wrapper {
   position: relative;
   width: 100%;
   height: 250px;
   overflow: hidden;
+  flex-shrink: 0;
+  /* Garantisce che l'immagine figlio si ancori sempre al centro */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .entertainment-card-img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Ancoraggio esplicito al centro — mantiene il soggetto centrato
+     su qualsiasi larghezza/altezza del wrapper */
+  object-position: center center;
+  transform-origin: center center;
   filter: grayscale(100%);
   transition: filter 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
@@ -257,6 +271,65 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 .entertainment-card:hover .entertainment-card-img {
   filter: grayscale(0%);
   transform: scale(1.06);
+}
+
+/*
+  Posizionamento soggetto personalizzato per card specifiche.
+  Nel breakpoint lg (992–1399px) le card sono più larghe (2 colonne)
+  ma più corte in proporzione: i soggetti a sinistra nelle foto 2 e 3
+  vengono tagliati con il centramento di default.
+*/
+@media (min-width: 992px) and (max-width: 1399px) {
+  .entertainment-card-img--aperitivo {
+    object-position: left center;
+  }
+
+  .entertainment-card-img--pranzoCena {
+    object-position: left center;
+  }
+}
+
+/* Card 3 (pranzoCena): soggetto riposizionato anche su 4 colonne (≥1400px) */
+@media (min-width: 1400px) {
+  .entertainment-card-img--pranzoCena {
+    object-position: 35% center;
+  }
+}
+
+/*
+  Desktop lg (992px – 1399px): griglia 2×2, card verticali larghe.
+  L'immagine più alta sfrutta la maggiore larghezza della card.
+*/
+@media (min-width: 992px) and (max-width: 1399px) {
+  .entertainment-img-wrapper {
+    height: 320px;
+  }
+}
+
+/*
+  Desktop xl (1400px – 1599px): 4 colonne.
+  Immagine ridotta per bilanciare la minor larghezza della card.
+*/
+@media (min-width: 1400px) and (max-width: 1599px) {
+  .entertainment-img-wrapper {
+    height: 195px;
+  }
+}
+
+/*
+  Desktop xxl (1600px – 1919px): 4 colonne più larghe.
+*/
+@media (min-width: 1600px) and (max-width: 1919px) {
+  .entertainment-img-wrapper {
+    height: 215px;
+  }
+}
+
+/* 4K e oltre */
+@media (min-width: 1920px) {
+  .entertainment-img-wrapper {
+    height: 240px;
+  }
 }
 
 

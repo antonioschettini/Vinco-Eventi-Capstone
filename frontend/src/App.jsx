@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom
 import { useSelector } from "react-redux";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
+import TrackModal from "./components/AudioPlayer/TrackModal";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 import Gallery from "./pages/Gallery";
@@ -14,6 +15,7 @@ function Layout() {
   return (
     <div className="d-flex flex-column min-vh-100">
       <Navbar />
+      <TrackModal />
       <main className="flex-grow-1 d-flex flex-column">
         <Outlet />
       </main>

@@ -195,6 +195,176 @@
   }
 }
 
+/* 1.5 Mini Player al Centro della Top Banner */
+.top-center-player {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.top-player-btn {
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  color: var(--bs-body-color);
+  opacity: 0.75;
+  cursor: pointer;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.top-player-btn:hover {
+  opacity: 1;
+  transform: scale(1.15);
+  color: #204a35;
+}
+
+[data-bs-theme="dark"] .top-player-btn:hover {
+  color: #4ca679;
+}
+
+.top-player-btn.play-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #204a35;
+  color: #ffffff;
+  opacity: 1;
+}
+
+[data-bs-theme="dark"] .top-player-btn.play-btn {
+  background-color: #3b7a57;
+}
+
+.top-player-btn.play-btn:hover {
+  transform: scale(1.1);
+  background-color: #163324;
+}
+
+[data-bs-theme="dark"] .top-player-btn.play-btn:hover {
+  background-color: #4ca679;
+}
+
+.top-player-track-info {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(128, 128, 128, 0.18);
+  border-radius: 20px;
+  padding: 3px 12px;
+  cursor: pointer;
+  color: var(--bs-body-color);
+  font-size: 0.8rem;
+  max-width: 220px;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+[data-bs-theme="dark"] .top-player-track-info {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.top-player-track-info:hover {
+  background-color: rgba(32, 74, 53, 0.1);
+  border-color: #204a35;
+}
+
+[data-bs-theme="dark"] .top-player-track-info:hover {
+  background-color: rgba(76, 166, 121, 0.15);
+  border-color: #4ca679;
+}
+
+.track-note-icon {
+  transition: color 0.2s ease;
+}
+
+.track-note-icon.playing {
+  animation: notePulse 1.2s infinite alternate ease-in-out;
+  color: #204a35;
+}
+
+[data-bs-theme="dark"] .track-note-icon.playing {
+  color: #4ca679;
+}
+
+@keyframes notePulse {
+  0% {
+    transform: scale(1) rotate(-6deg);
+  }
+  100% {
+    transform: scale(1.25) rotate(6deg);
+  }
+}
+
+.track-marquee-wrapper {
+  display: inline-flex;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 170px;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 6px,
+    black calc(100% - 6px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 6px,
+    black calc(100% - 6px),
+    transparent 100%
+  );
+}
+
+.track-marquee-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding-right: 28px;
+  animation: marqueeScrollCycle 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.top-player-track-info:hover .track-marquee-text {
+  animation-play-state: paused;
+}
+
+@keyframes marqueeScrollCycle {
+  /* 0% - 20% (0s - 1.6s): Pausa iniziale per lettura inizio titolo */
+  0%,
+  20% {
+    transform: translateX(0);
+  }
+  /* 65% - 83.75% (5.2s - 6.7s): Scorrimento verso sinistra e 1.5s esatti di pausa finale */
+  65%,
+  83.75% {
+    transform: translateX(calc(-100% + 140px));
+  }
+  /* 95% - 100% (7.6s - 8s): Ritorno fluido all'inizio per il nuovo ciclo */
+  95%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
+
+
+.top-volume-slider {
+  width: 55px;
+  height: 4px;
+  accent-color: #204a35;
+  cursor: pointer;
+}
+
+[data-bs-theme="dark"] .top-volume-slider {
+  accent-color: #4ca679;
+}
+
 /* 2. Fascia Centrale - Logo e Animazione Ritmo Musicale */
 .logo-container {
   position: relative;
@@ -215,7 +385,8 @@
   z-index: 2;
 }
 
-.logo-container:hover .logo-wrapper {
+.logo-container:hover .logo-wrapper,
+.logo-container.is-playing .logo-wrapper {
   transform: scale(1.06);
 }
 
@@ -228,7 +399,8 @@
   transition: width 0.3s ease, height 0.3s ease;
 }
 
-.logo-container:hover .logo-img {
+.logo-container:hover .logo-img,
+.logo-container.is-playing .logo-img {
   animation: logoRhythmBeat 0.8s ease-in-out infinite alternate;
 }
 
@@ -261,11 +433,13 @@
   color: #4ca679;
 }
 
-[data-bs-theme="dark"] .logo-container:hover .logo-wrapper {
+[data-bs-theme="dark"] .logo-container:hover .logo-wrapper,
+[data-bs-theme="dark"] .logo-container.is-playing .logo-wrapper {
   box-shadow: 0 0 25px rgba(76, 166, 121, 0.45);
 }
 
-[data-bs-theme="light"] .logo-container:hover .logo-wrapper {
+[data-bs-theme="light"] .logo-container:hover .logo-wrapper,
+[data-bs-theme="light"] .logo-container.is-playing .logo-wrapper {
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
 }
 
@@ -286,15 +460,18 @@
   transition: opacity 0.3s ease;
 }
 
-.logo-container:hover .ring-1 {
+.logo-container:hover .ring-1,
+.logo-container.is-playing .ring-1 {
   animation: rhythmWavePulse 1.8s infinite ease-out 0s;
 }
 
-.logo-container:hover .ring-2 {
+.logo-container:hover .ring-2,
+.logo-container.is-playing .ring-2 {
   animation: rhythmWavePulse 1.8s infinite ease-out 0.6s;
 }
 
-.logo-container:hover .ring-3 {
+.logo-container:hover .ring-3,
+.logo-container.is-playing .ring-3 {
   animation: rhythmWavePulse 1.8s infinite ease-out 1.2s;
 }
 
@@ -334,7 +511,8 @@
   right: -22px;
 }
 
-.logo-container:hover .equalizer-bars {
+.logo-container:hover .equalizer-bars,
+.logo-container.is-playing .equalizer-bars {
   opacity: 1;
 }
 
@@ -348,23 +526,28 @@
 }
 
 /* Animazioni ritmiche differenziate per l'equalizzatore */
-.logo-container:hover .bar-1 {
+.logo-container:hover .bar-1,
+.logo-container.is-playing .bar-1 {
   animation: eqBounce1 0.65s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0s;
 }
 
-.logo-container:hover .bar-2 {
+.logo-container:hover .bar-2,
+.logo-container.is-playing .bar-2 {
   animation: eqBounce2 0.48s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.12s;
 }
 
-.logo-container:hover .bar-3 {
+.logo-container:hover .bar-3,
+.logo-container.is-playing .bar-3 {
   animation: eqBounce3 0.75s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.25s;
 }
 
-.logo-container:hover .bar-4 {
+.logo-container:hover .bar-4,
+.logo-container.is-playing .bar-4 {
   animation: eqBounce4 0.52s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.18s;
 }
 
-.logo-container:hover .bar-5 {
+.logo-container:hover .bar-5,
+.logo-container.is-playing .bar-5 {
   animation: eqBounce5 0.68s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.3s;
 }
 

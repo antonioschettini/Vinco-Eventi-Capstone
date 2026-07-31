@@ -26,30 +26,27 @@ function Home() {
 
   return (
     <div className="homepage">
-      {/* Hero Section Biografia */}
+      {/* Hero Section Biografia (Testo Sovrapposto Direttamente allo Sfondo) */}
       <section
-        className="hero-bio-section py-5 position-relative"
+        className="hero-gallery-section py-5 position-relative"
         style={{ backgroundImage: `url("${bioBgImage}")` }}
       >
-        <div className="hero-bio-overlay"></div>
+        <div className="hero-gallery-overlay"></div>
 
-        <div className="container hero-bio-content py-3 py-md-5">
-          <div className="row justify-content-center">
-            <div className="col-12 col-md-10 col-lg-8 col-xl-7">
-              <div className="hero-bio-card p-4 p-md-5 rounded-4">
-                <h1 className="display-4 fw-bold mb-3 font-heading text-body border-bottom border-success border-opacity-25 pb-3">
-                  {t.title}
-                </h1>
-
-                <div className="fs-5 lh-lg font-body text-body-secondary mt-4">
-                  <p className="mb-4 lead fw-normal text-body">{t.bioParagraph1}</p>
-                  <p className="mb-4">{t.bioParagraph2}</p>
-                  <p className="mb-0">{t.bioParagraph3}</p>
-                </div>
+        <Container className="hero-gallery-content text-center py-4 py-md-5">
+          <Row className="justify-content-center">
+            <Col xs={12} lg={10} xl={9}>
+              <h1 className="display-3 fw-bold mb-4 font-heading text-body hero-gallery-title">
+                {t.title}
+              </h1>
+              <div className="fs-5 lh-lg font-body text-body-secondary hero-gallery-subtitle max-w-800 mx-auto">
+                <p className="mb-4 lead fw-normal text-body">{t.bioParagraph1}</p>
+                <p className="mb-4">{t.bioParagraph2}</p>
+                <p className="mb-0">{t.bioParagraph3}</p>
               </div>
-            </div>
-          </div>
-        </div>
+            </Col>
+          </Row>
+        </Container>
       </section>
 
       {/* Intrattenimento su Misura e Artisti Section */}
@@ -67,23 +64,23 @@ function Home() {
             </div>
           </div>
 
-          <div className="row g-4 d-flex align-items-stretch">
+          <div className="row g-4 g-xl-3 align-items-stretch">
             {cardKeys.map((key) => {
               const card = t.cards[key];
               const image = cardImages[key];
               return (
-                <div key={key} className="col-12 col-md-6 col-lg-3 d-flex">
+                <div key={key} className="col-12 col-md-6 col-lg-6 col-xl-3 d-flex">
                   <div className="entertainment-card card border-0 rounded-4 w-100 d-flex flex-column">
-                    <div className="entertainment-img-wrapper">
+                    <div className={`entertainment-img-wrapper entertainment-img-wrapper--${key}`}>
                       <img
                         src={image}
                         alt={card.title}
-                        className="entertainment-card-img"
+                        className={`entertainment-card-img entertainment-card-img--${key}`}
                         loading="lazy"
                       />
                     </div>
-                    <div className="card-body p-4 d-flex flex-column flex-grow-1">
-                      <h3 className="h4 font-heading fw-bold text-body mb-3">
+                    <div className="card-body p-3 p-xl-4 d-flex flex-column flex-grow-1">
+                      <h3 className="h4 font-heading fw-bold text-body mb-2 mb-xl-3">
                         {card.title}
                       </h3>
                       <p className="font-body text-body-secondary fs-6 mb-0 lh-base flex-grow-1">

@@ -126,6 +126,10 @@
   color: #000000 !important;
 }
 
+.social-btn.whatsapp:hover {
+  background-color: #25d366; /* Verde brand WhatsApp */
+}
+
 .social-btn.mixcloud:hover {
   background-color: #52aad8; /* Celeste Mixcloud */
 }

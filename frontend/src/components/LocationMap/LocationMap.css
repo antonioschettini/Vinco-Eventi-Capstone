@@ -1,0 +1,134 @@
+/* Stili Sezione Mappa e Dove Siamo */
+.location-map-section {
+  position: relative;
+}
+
+.map-card-wrapper {
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-bs-theme="dark"] .map-card-wrapper {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="light"] .map-card-wrapper {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(32, 74, 53, 0.12);
+  box-shadow: 0 16px 40px rgba(32, 74, 53, 0.08);
+}
+
+/* Wrapper Iframe Google Maps */
+.map-iframe-container {
+  position: relative;
+  width: 100%;
+  min-height: 380px;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.map-iframe-container iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  border: 0;
+  display: block;
+}
+
+/* Card Info Indirizzo e Contatti */
+.map-info-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 16px;
+  padding: 2.25rem 2rem;
+  transition: all 0.3s ease;
+}
+
+[data-bs-theme="dark"] .map-info-card {
+  background: linear-gradient(145deg, rgba(24, 35, 28, 0.95), rgba(16, 24, 19, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="light"] .map-info-card {
+  background: linear-gradient(145deg, rgba(245, 248, 246, 0.95), rgba(235, 242, 238, 0.95));
+  border: 1px solid rgba(32, 74, 53, 0.12);
+}
+
+.info-item-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+[data-bs-theme="dark"] .info-item-icon {
+  background-color: rgba(32, 74, 53, 0.35);
+  color: #58bc82;
+  border: 1px solid rgba(88, 188, 130, 0.3);
+}
+
+[data-bs-theme="light"] .info-item-icon {
+  background-color: rgba(32, 74, 53, 0.1);
+  color: var(--primary-forest, #204a35);
+  border: 1px solid rgba(32, 74, 53, 0.2);
+}
+
+.map-info-card:hover .info-item-icon {
+  transform: scale(1.08);
+}
+
+/* Pulsante Indicazioni Stradali */
+.btn-directions {
+  background-color: var(--primary-forest, #204a35);
+  color: #ffffff !important;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 0.85rem 1.5rem;
+  letter-spacing: 0.3px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  box-shadow: 0 8px 20px rgba(32, 74, 53, 0.25);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.btn-directions:hover {
+  background-color: var(--primary-forest-hover, #163324);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(32, 74, 53, 0.35);
+  color: #ffffff !important;
+}
+
+.btn-directions i {
+  font-size: 1.15rem;
+  transition: transform 0.3s ease;
+}
+
+.btn-directions:hover i {
+  transform: translateX(4px);
+}
+
+@media (max-width: 991.98px) {
+  .map-iframe-container {
+    min-height: 320px;
+  }
+  
+  .map-info-card {
+    padding: 1.75rem 1.5rem;
+  }
+}

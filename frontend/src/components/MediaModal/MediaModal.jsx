@@ -1,14 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Modal } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setIsPlaying } from "../../redux/slices/audioSlice";
 import { translations } from "../../utils/translations";
 import "./MediaModal.css";
 
 function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
+  const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
+  const isAudioPlaying = useSelector((state) => state.audio.isPlaying);
   const t = translations[lang].gallery;
 
   const currentMedia = items && items[currentIndex] ? items[currentIndex] : null;
+
+  // Ref per ricordare se l'audio di sottofondo era attivo prima che partisse il video
+  const wasAudioPlayingRef = useRef(false);
+
+  // Gestione Mute/Pausa dell'audio di sottofondo alla riproduzione video nella gallery
+  useEffect(() => {
+    const isVideoModalOpen = show && currentMedia && currentMedia.type === "video";
+
+    if (isVideoModalOpen) {
+      if (isAudioPlaying) {
+        wasAudioPlayingRef.current = true;
+        dispatch(setIsPlaying(false));
+      }
+    } else {
+      if (wasAudioPlayingRef.current) {
+        wasAudioPlayingRef.current = false;
+        dispatch(setIsPlaying(true));
+      }
+    }
+  }, [show, currentMedia?.type, currentMedia?.id]);
 
   useEffect(() => {
     if (!show) return;

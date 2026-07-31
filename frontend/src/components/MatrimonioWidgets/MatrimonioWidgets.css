@@ -1,0 +1,189 @@
+/* Stili Sezione Riprova Sociale (Matrimonio.com) */
+.matrimonio-section {
+  position: relative;
+}
+
+.matrimonio-badge-card {
+  border-radius: 18px;
+  padding: 1.5rem 1.25rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+}
+
+[data-bs-theme="dark"] .matrimonio-badge-card {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="light"] .matrimonio-badge-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(32, 74, 53, 0.12);
+  box-shadow: 0 10px 30px rgba(32, 74, 53, 0.06);
+}
+
+.matrimonio-badge-card:hover {
+  transform: translateY(-6px);
+}
+
+[data-bs-theme="dark"] .matrimonio-badge-card:hover {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+[data-bs-theme="light"] .matrimonio-badge-card:hover {
+  box-shadow: 0 18px 40px rgba(32, 74, 53, 0.14);
+  border-color: rgba(32, 74, 53, 0.3);
+}
+
+/* Immagini dei Badge */
+.matrimonio-badge-img-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
+  width: 100%;
+}
+
+.matrimonio-badge-img-wrapper img {
+  max-width: 135px;
+  max-height: 135px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.matrimonio-badge-card:hover .matrimonio-badge-img-wrapper img {
+  transform: scale(1.05);
+}
+
+/* Card Recensione Singola - Stessa UI/UX e traslucenza delle Badge Card */
+.review-item-card {
+  border-radius: 18px;
+  padding: 1.75rem 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+}
+
+[data-bs-theme="dark"] .review-item-card {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="light"] .review-item-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(32, 74, 53, 0.12);
+  box-shadow: 0 10px 30px rgba(32, 74, 53, 0.06);
+}
+
+.review-item-card:hover {
+  transform: translateY(-5px);
+}
+
+[data-bs-theme="dark"] .review-item-card:hover {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+[data-bs-theme="light"] .review-item-card:hover {
+  box-shadow: 0 18px 40px rgba(32, 74, 53, 0.14);
+  border-color: rgba(32, 74, 53, 0.3);
+}
+
+.review-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #204a35, #58bc82);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(32, 74, 53, 0.3);
+}
+
+.review-stars {
+  color: #ffc107;
+  font-size: 1rem;
+}
+
+/* Pulsante Tutte le Recensioni */
+.btn-matrimonio-all {
+  background-color: transparent;
+  border: 1px solid var(--primary-forest, #204a35);
+  color: var(--bs-body-color);
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 0.85rem 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Logo Matrimonio.com Adattivo per Light e Dark Mode */
+.matrimonio-logo-img {
+  height: 18px;
+  width: auto;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+[data-bs-theme="light"] .matrimonio-logo-img {
+  filter: none;
+  opacity: 0.85;
+}
+
+[data-bs-theme="dark"] .matrimonio-logo-img {
+  filter: brightness(0) invert(1);
+  opacity: 0.95;
+}
+
+[data-bs-theme="dark"] .btn-matrimonio-all {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+[data-bs-theme="dark"] .btn-matrimonio-all:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+[data-bs-theme="light"] .btn-matrimonio-all:hover {
+  background-color: rgba(32, 74, 53, 0.08);
+  border-color: var(--primary-forest, #204a35);
+  transform: translateY(-2px);
+}
+
+/* Adattamenti Mobile */
+@media (max-width: 575.98px) {
+  .matrimonio-badge-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .matrimonio-badge-img-wrapper {
+    min-height: 110px;
+  }
+
+  .matrimonio-badge-img-wrapper img {
+    max-width: 110px;
+    max-height: 110px;
+  }
+
+  .review-item-card {
+    padding: 1.25rem 1rem;
+  }
+}
