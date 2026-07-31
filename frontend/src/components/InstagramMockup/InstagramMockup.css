@@ -1,0 +1,195 @@
+/* Instagram Mockup Component Styling */
+
+.instagram-mockup-wrapper {
+  width: 100%;
+  padding: 1rem 0;
+  perspective: 1000px;
+}
+
+/* Smartphone Chassis (Cornice Smartphone) */
+.phone-chassis {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  height: 720px;
+  background-color: #0b0f0d;
+  border: 12px solid #1a1f1c;
+  border-radius: 48px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.phone-chassis:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(32, 74, 53, 0.4);
+}
+
+/* Status Bar & Notch */
+.phone-top-bar {
+  height: 38px;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  position: relative;
+  z-index: 10;
+  user-select: none;
+}
+
+.phone-clock {
+  font-size: 0.85rem;
+  letter-spacing: -0.5px;
+}
+
+.phone-notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 24px;
+  background-color: #000000;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  z-index: 20;
+}
+
+.camera-lens {
+  width: 10px;
+  height: 10px;
+  background-color: #111;
+  border: 1px solid #333;
+  border-radius: 50%;
+}
+
+.speaker {
+  width: 36px;
+  height: 4px;
+  background-color: #222;
+  border-radius: 2px;
+}
+
+/* Phone Screen */
+.phone-screen {
+  flex: 1;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  overflow: hidden;
+  font-size: 0.85rem;
+}
+
+/* IG Avatar Ring Gradient */
+.ig-avatar-ring {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ig-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--bs-body-bg);
+}
+
+.ig-username {
+  font-size: 0.85rem;
+  letter-spacing: -0.2px;
+}
+
+.ig-location {
+  font-size: 0.72rem;
+}
+
+/* Carousel Container & Slides */
+.ig-carousel-container {
+  width: 100%;
+  height: 330px;
+  background-color: #000000;
+}
+
+.ig-carousel-track {
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.ig-carousel-slide {
+  height: 100%;
+}
+
+.ig-post-img {
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dot Indicators */
+.ig-dot-btn {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  background-color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.ig-dot-btn.active {
+  width: 8px;
+  height: 8px;
+  background-color: #3897f0;
+}
+
+/* Action Bar & Caption */
+.ig-action-bar button i {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.ig-action-bar button:active i {
+  transform: scale(1.25);
+}
+
+.fs-7 {
+  font-size: 0.78rem;
+}
+
+.ig-caption-text {
+  line-height: 1.35;
+}
+
+.ig-hashtags {
+  word-break: break-word;
+}
+
+/* IG Bottom Nav */
+.ig-bottom-nav button {
+  color: var(--bs-body-color);
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ig-bottom-nav button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Media Queries for Small Screens */
+@media (max-width: 400px) {
+  .phone-chassis {
+    max-width: 100%;
+    height: 650px;
+    border-width: 8px;
+    border-radius: 36px;
+  }
+  .ig-carousel-container {
+    height: 280px;
+  }
+}

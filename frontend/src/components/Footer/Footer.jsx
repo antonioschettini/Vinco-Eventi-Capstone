@@ -32,7 +32,7 @@ function Footer() {
               </p>
               <p className="mb-0">
                 <i className="bi bi-telephone-fill me-2 text-forest"></i>
-                <a href={`tel:${t.phone.replace(/\s+/g, "")}`} className="info-link">
+                <a href={`tel:${t.phone.replace(/[^\d+]/g, "")}`} className="info-link">
                   {t.phone}
                 </a>
               </p>

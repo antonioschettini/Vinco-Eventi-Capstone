@@ -51,3 +51,214 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(43, 89, 63, 0.7);
 }
+
+/* Stili Hero Section Bio */
+.hero-bio-section {
+  position: relative;
+  background-size: cover;
+  background-position: center 22%;
+  background-repeat: no-repeat;
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  margin-top: 0;
+  transition: background-position 0.5s ease;
+}
+
+.hero-bio-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.6s ease;
+}
+
+[data-bs-theme="dark"] .hero-bio-overlay {
+  background: linear-gradient(135deg, rgba(12, 18, 14, 0.88) 0%, rgba(8, 12, 10, 0.78) 100%);
+}
+
+[data-bs-theme="light"] .hero-bio-overlay {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(240, 245, 242, 0.75) 100%);
+}
+
+/* Al passaggio del mouse sullo sfondo (hover), viene ripristinato il colore nativo dell'immagine */
+.hero-bio-section:hover .hero-bio-overlay {
+  opacity: 0.08;
+}
+
+.hero-bio-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Card Biografia Eterea e Trasparente in stile Glassmorphism Elegante */
+.hero-bio-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-bs-theme="dark"] .hero-bio-card {
+  background-color: rgba(18, 26, 21, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+[data-bs-theme="light"] .hero-bio-card {
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(32, 74, 53, 0.15);
+  box-shadow: 0 20px 40px rgba(32, 74, 53, 0.08);
+}
+
+/* Effetto al passaggio del mouse sulla Hero Section */
+.hero-bio-section:hover .hero-bio-card {
+  background-color: rgba(10, 15, 12, 0.65) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.hero-bio-section:hover .hero-bio-card h1,
+.hero-bio-section:hover .hero-bio-card p {
+  color: #ffffff !important;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
+}
+
+/* Stili Hero Section Galleria (Testo Sovrapposto Direttamente allo Sfondo) */
+.hero-gallery-section {
+  position: relative;
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  min-height: 65vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 0;
+  transition: background-position 0.5s ease;
+}
+
+.hero-gallery-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.6s ease;
+}
+
+[data-bs-theme="dark"] .hero-gallery-overlay {
+  background: linear-gradient(135deg, rgba(12, 18, 14, 0.85) 0%, rgba(8, 12, 10, 0.72) 100%);
+}
+
+[data-bs-theme="light"] .hero-gallery-overlay {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(240, 245, 242, 0.70) 100%);
+}
+
+.hero-gallery-section:hover .hero-gallery-overlay {
+  opacity: 0.08;
+}
+
+.hero-gallery-content {
+  position: relative;
+  z-index: 2;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-gallery-title {
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+.hero-gallery-subtitle {
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+.hero-gallery-section:hover .hero-gallery-title,
+.hero-gallery-section:hover .hero-gallery-subtitle {
+  color: #ffffff !important;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.95);
+}
+
+/* Stili Sezione Intrattenimento su Misura e Artisti */
+.entertainment-section {
+  position: relative;
+  background-color: var(--bs-body-bg);
+}
+
+.entertainment-title {
+  position: relative;
+  display: inline-block;
+}
+
+.entertainment-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: var(--primary-forest, #204a35);
+  margin: 12px auto 0 auto;
+  border-radius: 2px;
+}
+
+/* Card Senza Bordi e Immagine Grayscale -> Colori su Hover */
+.entertainment-card {
+  border: none !important;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  height: 100%;
+}
+
+[data-bs-theme="dark"] .entertainment-card {
+  background-color: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="light"] .entertainment-card {
+  background-color: rgba(0, 0, 0, 0.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.entertainment-card:hover {
+  transform: translateY(-8px);
+}
+
+[data-bs-theme="dark"] .entertainment-card:hover {
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-bs-theme="light"] .entertainment-card:hover {
+  box-shadow: 0 16px 36px rgba(32, 74, 53, 0.12) !important;
+}
+
+.entertainment-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+}
+
+.entertainment-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);
+  transition: filter 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.entertainment-card:hover .entertainment-card-img {
+  filter: grayscale(0%);
+  transform: scale(1.06);
+}
+
+
+
+

@@ -53,6 +53,9 @@ function Navbar() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Stato per l'apertura/chiusura del menu mobile
+  const [expanded, setExpanded] = useState(false);
+
   const popoverRef = useRef(null);
 
   // Chiude il popover se si clicca all'esterno di esso
@@ -171,14 +174,42 @@ function Navbar() {
         </div>
       </div>
 
-      {/* 2. Fascia Centrale - Logo */}
+      {/* 2. Fascia Centrale - Logo con Animazione Ritmo Musicale */}
       <div className="logo-section d-flex justify-content-center align-items-center py-3">
-        <Link to="/" className="logo-wrapper">
-          <img
-            src="/logoVincoEventi.jpeg"
-            alt="Vinco Eventi Logo"
-            className="logo-img"
-          />
+        <Link to="/" className="logo-container" aria-label="Vinco Eventi Home">
+          {/* Animazione del ritmo musicale attorno al logo */}
+          <div className="musical-rhythm-wrapper" aria-hidden="true">
+            {/* Onde sonore concentriche */}
+            <span className="rhythm-ring ring-1"></span>
+            <span className="rhythm-ring ring-2"></span>
+            <span className="rhythm-ring ring-3"></span>
+
+            {/* Barrette equalizzatore sinistro */}
+            <div className="equalizer-bars left-eq">
+              <span className="eq-bar bar-1"></span>
+              <span className="eq-bar bar-2"></span>
+              <span className="eq-bar bar-3"></span>
+              <span className="eq-bar bar-4"></span>
+              <span className="eq-bar bar-5"></span>
+            </div>
+
+            {/* Barrette equalizzatore destro */}
+            <div className="equalizer-bars right-eq">
+              <span className="eq-bar bar-5"></span>
+              <span className="eq-bar bar-4"></span>
+              <span className="eq-bar bar-3"></span>
+              <span className="eq-bar bar-2"></span>
+              <span className="eq-bar bar-1"></span>
+            </div>
+          </div>
+
+          <div className="logo-wrapper">
+            <img
+              src="/logoVincoEventi.jpeg"
+              alt="Vinco Eventi Logo"
+              className="logo-img"
+            />
+          </div>
         </Link>
       </div>
 
@@ -188,22 +219,22 @@ function Navbar() {
           <button
             className="navbar-toggler mb-2"
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
+            onClick={() => setExpanded(!expanded)}
             aria-controls="navbarNav"
-            aria-expanded="false"
+            aria-expanded={expanded}
             aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon"></span>
           </button>
 
-          <div className="collapse navbar-collapse justify-content-center" id="navbarNav">
+          <div className={`collapse navbar-collapse justify-content-center ${expanded ? "show" : ""}`} id="navbarNav">
             <ul className="navbar-nav gap-lg-4 text-center">
               <li className="nav-item">
                 <NavLink
                   to="/"
                   end
                   className={({ isActive }) => `nav-link custom-nav-link ${isActive ? "active" : ""}`}
+                  onClick={() => setExpanded(false)}
                 >
                   {t.home}
                 </NavLink>
@@ -212,6 +243,7 @@ function Navbar() {
                 <NavLink
                   to="/servizi"
                   className={({ isActive }) => `nav-link custom-nav-link ${isActive ? "active" : ""}`}
+                  onClick={() => setExpanded(false)}
                 >
                   {t.services}
                 </NavLink>
@@ -220,6 +252,7 @@ function Navbar() {
                 <NavLink
                   to="/galleria"
                   className={({ isActive }) => `nav-link custom-nav-link ${isActive ? "active" : ""}`}
+                  onClick={() => setExpanded(false)}
                 >
                   {t.gallery}
                 </NavLink>
@@ -228,6 +261,7 @@ function Navbar() {
                 <NavLink
                   to="/chi-siamo"
                   className={({ isActive }) => `nav-link custom-nav-link ${isActive ? "active" : ""}`}
+                  onClick={() => setExpanded(false)}
                 >
                   {t.about}
                 </NavLink>

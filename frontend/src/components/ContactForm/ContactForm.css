@@ -1,0 +1,95 @@
+/* Contact Form Styling */
+
+.contact-form-wrapper {
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+[data-bs-theme="dark"] .contact-form-wrapper {
+  background-color: rgba(20, 28, 23, 0.65);
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-bs-theme="light"] .contact-form-wrapper {
+  background-color: #ffffff;
+  border-color: rgba(32, 74, 53, 0.15) !important;
+  box-shadow: 0 20px 40px rgba(32, 74, 53, 0.06) !important;
+}
+
+/* Custom Forest Green Button */
+.btn-forest {
+  background-color: var(--primary-forest, #204a35);
+  color: #ffffff;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-forest:hover,
+.btn-forest:focus {
+  background-color: var(--primary-forest-hover, #163324);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(32, 74, 53, 0.3);
+}
+
+.btn-forest:active {
+  transform: translateY(0);
+}
+
+/* Form Inputs & Selects Focus States */
+.contact-form-wrapper .form-control,
+.contact-form-wrapper .form-select {
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-form-wrapper .form-control:focus,
+.contact-form-wrapper .form-select:focus {
+  border-color: var(--primary-forest, #204a35);
+  box-shadow: 0 0 0 0.25rem rgba(32, 74, 53, 0.2);
+}
+
+[data-bs-theme="dark"] .contact-form-wrapper .form-control,
+[data-bs-theme="dark"] .contact-form-wrapper .form-select {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f0f0f0;
+}
+
+[data-bs-theme="dark"] .contact-form-wrapper .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-bs-theme="dark"] .contact-form-wrapper .form-select option {
+  background-color: #18221c;
+  color: #ffffff;
+}
+
+/* Validation Highlights */
+.contact-form-wrapper .form-control.is-invalid,
+.contact-form-wrapper .form-select.is-invalid,
+.contact-form-wrapper .form-check-input.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.contact-form-wrapper .form-control.is-invalid:focus,
+.contact-form-wrapper .form-select.is-invalid:focus {
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.fs-7 {
+  font-size: 0.85rem;
+}
+
+/* Modal Styling */
+.reset-confirmation-modal .modal-content {
+  border-radius: 16px;
+}
+
+[data-bs-theme="dark"] .reset-confirmation-modal .modal-content {
+  background-color: #16201a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}

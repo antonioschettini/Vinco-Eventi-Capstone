@@ -46,15 +46,29 @@
 .info-link {
   color: inherit;
   text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.company-info p:has(.info-link) i {
   transition: color 0.2s ease;
 }
 
 .info-link:hover {
   color: #2b593f;
+  text-decoration: underline;
+}
+
+.company-info p:has(.info-link:hover) i {
+  color: #2b593f !important;
 }
 
 [data-bs-theme="dark"] .info-link:hover {
   color: #3b7a57;
+}
+
+[data-bs-theme="dark"] .company-info p:has(.info-link:hover) i {
+  color: #3b7a57 !important;
 }
 
 /* Pulsanti Social Rotondi ed Eleganti */
