@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Modal, Button, Spinner, Alert } from "react-bootstrap";
 import { translations } from "../../utils/translations";
@@ -36,8 +36,16 @@ const isValidFutureDate = (dateString) => {
   return selectedDate >= today;
 };
 
+// Valida Luogo Evento (deve contenere la virgola per separare luogo e località: es. Masseria Coccaro, Monopoli)
+const isValidLocation = (location) => {
+  if (!location) return false;
+  const parts = location.split(",");
+  return parts.length >= 2 && parts[0].trim().length > 0 && parts[1].trim().length > 0;
+};
+
 
 function ContactForm() {
+  const formRef = useRef(null);
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang]?.contactForm || translations.it.contactForm;
 
@@ -47,6 +55,12 @@ function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // { type: 'success' | 'danger', message: string }
   const [showResetModal, setShowResetModal] = useState(false);
+
+  const scrollToTop = () => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -66,7 +80,6 @@ function ContactForm() {
       "nome",
       "cognome",
       "tipoEvento",
-      "luogoEvento",
       "momentoGiornata",
       "budget",
     ];
@@ -77,6 +90,7 @@ function ContactForm() {
 
     const emailOk = isValidEmail(formData.email);
     const phoneOk = isValidPhone(formData.telefono);
+    const locationOk = isValidLocation(formData.luogoEvento);
     const guestsOk = Number(formData.numeroOspiti) > 0;
     const dateOk = isValidFutureDate(formData.dataEvento);
 
@@ -84,6 +98,7 @@ function ContactForm() {
       allBasicFilled &&
       emailOk &&
       phoneOk &&
+      locationOk &&
       guestsOk &&
       dateOk &&
       formData.accettaTermini
@@ -96,6 +111,7 @@ function ContactForm() {
 
     if (!isFormValid()) {
       setShowValidationBanner(true);
+      scrollToTop();
       return;
     }
 
@@ -160,6 +176,7 @@ function ContactForm() {
       }
     } finally {
       setIsSubmitting(false);
+      scrollToTop();
     }
   };
 
@@ -173,10 +190,11 @@ function ContactForm() {
     resetFormInputs();
     setShowResetModal(false);
     setSubmitStatus(null);
+    scrollToTop();
   };
 
   return (
-    <div className="contact-form-wrapper p-4 p-md-5 rounded-4 shadow-lg border">
+    <div ref={formRef} className="contact-form-wrapper p-4 p-md-5 rounded-4 shadow-lg border">
       <div className="mb-4 text-center text-md-start">
         <h2 className="display-6 font-heading fw-bold text-body mb-2">
           {t.title}
@@ -356,20 +374,36 @@ function ContactForm() {
             <label htmlFor="luogoEvento" className="form-label font-body fw-semibold text-body fs-7">
               {t.eventLocation} <span className="text-danger">*</span>
             </label>
-            <input
-              type="text"
-              id="luogoEvento"
-              name="luogoEvento"
-              tabIndex={7}
-              value={formData.luogoEvento}
-              onChange={handleChange}
-              placeholder={t.eventLocationPlaceholder || "es Masseria Abate, Bari"}
-              className={`form-control font-body ${
-                validated && !formData.luogoEvento.trim() ? "is-invalid" : ""
-              }`}
-              required
-            />
-            <div className="invalid-feedback">Il {t.eventLocation} è obbligatorio.</div>
+
+            <div className="position-relative">
+              {validated && !isValidLocation(formData.luogoEvento) && (
+                <div className="location-fumetto-speech-bubble" role="alert">
+                  <i className="bi bi-info-circle-fill me-2 text-warning fs-6"></i>
+                  <span>
+                    {t.locationFumettoHint ||
+                      "Inserisci sia il Luogo che la Località separati da una virgola (es. Masseria Coccaro, Monopoli)"}
+                  </span>
+                </div>
+              )}
+
+              <input
+                type="text"
+                id="luogoEvento"
+                name="luogoEvento"
+                tabIndex={7}
+                value={formData.luogoEvento}
+                onChange={handleChange}
+                placeholder={t.eventLocationPlaceholder || "Es. Masseria Coccaro, Monopoli"}
+                className={`form-control font-body ${
+                  validated && !isValidLocation(formData.luogoEvento) ? "is-invalid" : ""
+                }`}
+                required
+              />
+            </div>
+            <div className="invalid-feedback">
+              {t.locationInvalidError ||
+                "Inserisci il Luogo e la Località separati da una virgola (es. Masseria Coccaro, Monopoli)."}
+            </div>
           </div>
 
           <div className="col-12 col-md-6">

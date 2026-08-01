@@ -1,0 +1,16 @@
+{
+  "name": "vinco-eventi-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "upload-gallery": "node scripts/upload-gallery-to-cloudinary.mjs"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "cloudinary": "^2.10.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "form-data": "^4.0.0",
+    "node-fetch": "^3.3.2"
+  }
+}

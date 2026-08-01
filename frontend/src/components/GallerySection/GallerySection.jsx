@@ -1,28 +1,93 @@
-import { useState } from "react";
-import { Container, Row, Col, Carousel, Nav } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Container, Row, Col, Carousel, Nav, Modal } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { translations } from "../../utils/translations";
-import { galleryItems } from "./galleryData";
+import { galleryItems as staticGalleryItems } from "./galleryData";
 import MediaModal from "../MediaModal/MediaModal";
 import "./GallerySection.css";
 
 function GallerySection() {
   const lang = useSelector((state) => state.ui.language);
+  const { isAuthenticated, token } = useSelector((state) => state.auth);
   const t = translations[lang].gallery;
 
+  const [dbItems, setDbItems] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("all");
+
+  // Lightbox Modal State
   const [modalShow, setModalShow] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  // Admin CRUD Modal State
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+
+  const [formData, setFormData] = useState({
+    titleIta: "",
+    titleEng: "",
+    subtitleIta: "",
+    subtitleEng: "",
+    type: "image",
+    src: "",
+    category: "djset",
+    featured: false,
+    startTime: "",
+    displayOrder: 1,
+  });
+
+  const fetchGalleryItems = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:8080/api/gallery");
+      if (response.ok) {
+        const data = await response.json();
+        setDbItems(data);
+      }
+    } catch (err) {
+      console.log("Database gallery non raggiungibile. Uso fallback locali per visualizzazione.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGalleryItems();
+  }, []);
+
+  // Formatta l'elenco dei media da renderizzare
+  const rawList = dbItems.length > 0 ? dbItems : staticGalleryItems;
+
+  const getItemSrc = (item) => {
+    // DB items hanno sempre URL Cloudinary (https://...)
+    if (item.src && item.src.startsWith("http")) {
+      return item.src;
+    }
+    // Fallback: cerca nella lista statica per ID
+    const staticMatch = staticGalleryItems.find((s) => s.id === item.id);
+    return staticMatch ? staticMatch.src : item.src;
+  };
+
+  const allItems = rawList.map((item) => {
+    const isEng = lang === "en";
+    return {
+      ...item,
+      src: getItemSrc(item),
+      title: isEng ? item.titleEng || item.titleIta || item.title : item.titleIta || item.title,
+      subtitle: isEng ? item.subtitleEng || item.subtitleIta || item.subtitle : item.subtitleIta || item.subtitle,
+    };
+  });
+
   // Filter items based on active tab
-  const filteredItems = galleryItems.filter((item) => {
+  const filteredItems = allItems.filter((item) => {
     if (activeFilter === "photos") return item.type === "image";
     if (activeFilter === "videos") return item.type === "video";
     return true;
   });
 
   // Featured items for top carousel
-  const featuredItems = galleryItems.filter((item) => item.featured);
+  const featuredItems = allItems.filter((item) => item.featured);
 
   const handleCardClick = (index) => {
     setSelectedIndex(index);
@@ -34,66 +99,223 @@ function GallerySection() {
     if (foundIndex !== -1) {
       setSelectedIndex(foundIndex);
     } else {
-      // If currently filtered out, switch to all and open
       setActiveFilter("all");
-      const indexInAll = galleryItems.findIndex((gi) => gi.id === item.id);
+      const indexInAll = allItems.findIndex((gi) => gi.id === item.id);
       setSelectedIndex(indexInAll >= 0 ? indexInAll : 0);
     }
     setModalShow(true);
   };
 
+  // Handlers Admin CRUD
+  const handleOpenCreateModal = () => {
+    setEditingItem(null);
+    setFormData({
+      titleIta: "",
+      titleEng: "",
+      subtitleIta: "",
+      subtitleEng: "",
+      type: "image",
+      src: "",
+      category: "djset",
+      featured: false,
+      startTime: "",
+      displayOrder: allItems.length + 1,
+    });
+    setShowAdminModal(true);
+  };
+
+  const handleOpenEditModal = (e, item) => {
+    e.stopPropagation();
+    setEditingItem(item);
+    setFormData({
+      titleIta: item.titleIta || item.title || "",
+      titleEng: item.titleEng || item.title || "",
+      subtitleIta: item.subtitleIta || item.subtitle || "",
+      subtitleEng: item.subtitleEng || item.subtitle || "",
+      type: item.type || "image",
+      src: item.src || "",
+      category: item.category || "djset",
+      featured: item.featured || false,
+      startTime: item.startTime !== null && item.startTime !== undefined ? item.startTime : "",
+      displayOrder: item.displayOrder || 1,
+    });
+    setShowAdminModal(true);
+  };
+
+  const handleMediaUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingMedia(true);
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+
+    try {
+      const res = await fetch("http://localhost:8080/api/admin/gallery/upload-media", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: uploadData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormData((prev) => ({
+          ...prev,
+          src: data.url,
+        }));
+        alert("File multimediale caricato su Cloudinary con successo!");
+      } else {
+        alert("Errore durante l'upload del file su Cloudinary.");
+      }
+    } catch (err) {
+      alert("Errore di connessione durante l'upload multimediale.");
+    } finally {
+      setUploadingMedia(false);
+    }
+  };
+
+  const handleCreateOrUpdate = async (e) => {
+    e.preventDefault();
+
+    if (!formData.src) {
+      alert("Inserisci un URL o carica un file multimediale prima di salvare.");
+      return;
+    }
+
+    const payload = {
+      ...formData,
+      startTime: formData.startTime !== "" ? parseFloat(formData.startTime) : null,
+      displayOrder: parseInt(formData.displayOrder) || 1,
+    };
+
+    try {
+      const isEdit = editingItem && editingItem.id && !String(editingItem.id).startsWith("v_") && !String(editingItem.id).startsWith("p_") && !String(editingItem.id).startsWith("v1");
+      const url = isEdit
+        ? `http://localhost:8080/api/admin/gallery/${editingItem.id}`
+        : "http://localhost:8080/api/admin/gallery";
+      const method = isEdit ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        setShowAdminModal(false);
+        setEditingItem(null);
+        fetchGalleryItems();
+      } else {
+        alert("Errore nel salvataggio dell'elemento della galleria.");
+      }
+    } catch (err) {
+      alert("Errore di connessione con il server backend.");
+    }
+  };
+
+  const handleDeleteItem = async (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm(t.confirmDeleteMedia)) return;
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/admin/gallery/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        fetchGalleryItems();
+      } else {
+        alert("Impossibile eliminare l'elemento selezionato.");
+      }
+    } catch (err) {
+      alert("Errore di connessione durante l'eliminazione.");
+    }
+  };
+
   return (
     <section className="gallery-section py-5">
       <Container>
-        {/* Carosello In Evidenza */}
-        <div className="carousel-highlight-container mb-5 p-3 p-md-4 rounded-4">
-          <div className="text-center mb-4">
-            <h2 className="display-6 font-heading fw-bold text-body mb-2">
-              {t.carouselTitle}
-            </h2>
-            <p className="font-body text-body-secondary mb-0 fs-6">
-              {t.carouselSubtitle}
-            </p>
+        {/* Admin Action Control Bar */}
+        {isAuthenticated && (
+          <div className="bg-success-subtle border border-success border-opacity-25 p-3 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <span className="fw-bold text-success d-flex align-items-center gap-2">
+              <i className="bi bi-shield-lock-fill fs-5"></i>
+              {t.adminMode}
+            </span>
+            <button
+              onClick={handleOpenCreateModal}
+              className="btn btn-success btn-sm fw-bold d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm"
+            >
+              <i className="bi bi-plus-circle-fill"></i>
+              <span>{t.addMedia}</span>
+            </button>
           </div>
+        )}
 
-          <Carousel fade interval={4000} className="gallery-top-carousel rounded-4 overflow-hidden shadow">
-            {featuredItems.map((item) => (
-              <Carousel.Item
-                key={item.id}
-                onClick={() => handleCarouselClick(item)}
-                className="gallery-carousel-item cursor-pointer"
-              >
-                <div className="carousel-media-wrapper">
-                  {item.type === "video" ? (
-                    <video
-                      src={item.src}
-                      muted
-                      loop
-                      playsInline
-                      autoPlay
-                      className="carousel-media-content"
-                    />
-                  ) : (
-                    <img
-                      src={item.src}
-                      alt={item.title}
-                      className="carousel-media-content"
-                    />
-                  )}
-                  <div className="carousel-overlay-caption p-4">
-                    <span className="badge bg-success px-3 py-2 rounded-pill mb-2">
-                      {item.type === "video" ? t.videoBadge : t.photoBadge}
-                    </span>
-                    <h3 className="h3 font-heading text-white mb-1 fw-bold">
-                      {item.title}
-                    </h3>
-                    <p className="text-white-50 fs-6 mb-0">{item.subtitle}</p>
+        {/* Carosello In Evidenza */}
+        {featuredItems.length > 0 && (
+          <div className="carousel-highlight-container mb-5 p-3 p-md-4 rounded-4 position-relative">
+            <div className="text-center mb-4">
+              <h2 className="display-6 font-heading fw-bold text-body mb-2">
+                {t.carouselTitle}
+              </h2>
+              <p className="font-body text-body-secondary mb-0 fs-6">
+                {t.carouselSubtitle}
+              </p>
+            </div>
+
+            <Carousel fade interval={4000} className="gallery-top-carousel rounded-4 overflow-hidden shadow">
+              {featuredItems.map((item) => (
+                <Carousel.Item
+                  key={item.id}
+                  onClick={() => handleCarouselClick(item)}
+                  className="gallery-carousel-item cursor-pointer position-relative"
+                >
+
+                  <div className="carousel-media-wrapper">
+                    {item.type === "video" ? (
+                      <video
+                        src={item.startTime ? `${item.src}#t=${item.startTime}` : item.src}
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                        onLoadedMetadata={(e) => {
+                          if (item.startTime && e.target) {
+                            e.target.currentTime = item.startTime;
+                          }
+                        }}
+                        className="carousel-media-content"
+                      />
+                    ) : (
+                      <img
+                        src={item.src}
+                        alt={item.title}
+                        className="carousel-media-content"
+                      />
+                    )}
+                    <div className="carousel-overlay-caption p-4">
+                      <span className="badge bg-success px-3 py-2 rounded-pill mb-2">
+                        {item.type === "video" ? t.videoBadge : t.photoBadge}
+                      </span>
+                      <h3 className="h3 font-heading text-white mb-1 fw-bold">
+                        {item.title}
+                      </h3>
+                      <p className="text-white-50 fs-6 mb-0">{item.subtitle}</p>
+                    </div>
                   </div>
-                </div>
-              </Carousel.Item>
-            ))}
-          </Carousel>
-        </div>
+                </Carousel.Item>
+              ))}
+            </Carousel>
+          </div>
+        )}
 
         {/* Section Heading & Filters */}
         <div className="text-center mb-4">
@@ -113,19 +335,19 @@ function GallerySection() {
             <Nav.Item>
               <Nav.Link eventKey="all" className="filter-btn rounded-pill px-4 py-2">
                 <i className="bi bi-grid-fill me-2"></i>
-                {t.filterAll} ({galleryItems.length})
+                {t.filterAll} ({allItems.length})
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
               <Nav.Link eventKey="photos" className="filter-btn rounded-pill px-4 py-2">
                 <i className="bi bi-camera-fill me-2"></i>
-                {t.filterPhotos} ({galleryItems.filter((i) => i.type === "image").length})
+                {t.filterPhotos} ({allItems.filter((i) => i.type === "image").length})
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
               <Nav.Link eventKey="videos" className="filter-btn rounded-pill px-4 py-2">
                 <i className="bi bi-film me-2"></i>
-                {t.filterVideos} ({galleryItems.filter((i) => i.type === "video").length})
+                {t.filterVideos} ({allItems.filter((i) => i.type === "video").length})
               </Nav.Link>
             </Nav.Item>
           </Nav>
@@ -139,19 +361,46 @@ function GallerySection() {
                 className="gallery-card rounded-4 overflow-hidden position-relative"
                 onClick={() => handleCardClick(index)}
               >
-                {/* Media Container with controlled vertical aspect ratio */}
+                {/* Admin action buttons overlay on card (Top-Right) */}
+                {isAuthenticated && (
+                  <div
+                    className="position-absolute top-0 end-0 p-2 z-3 d-flex gap-1"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={(e) => handleOpenEditModal(e, item)}
+                      className="btn btn-warning btn-sm py-1 px-2 fw-bold shadow"
+                      title={t.editMedia}
+                    >
+                      <i className="bi bi-pencil-fill"></i>
+                    </button>
+                    <button
+                      onClick={(e) => handleDeleteItem(e, item.id)}
+                      className="btn btn-danger btn-sm py-1 px-2 shadow"
+                      title={t.deleteMedia}
+                    >
+                      <i className="bi bi-trash-fill"></i>
+                    </button>
+                  </div>
+                )}
+
+                {/* Media Container */}
                 <div className="gallery-media-wrapper">
                   {item.type === "video" ? (
                     <>
                       <video
-                        src={item.src}
+                        src={item.startTime ? `${item.src}#t=${item.startTime}` : item.src}
                         muted
                         loop
                         playsInline
                         autoPlay
+                        onLoadedMetadata={(e) => {
+                          if (item.startTime && e.target) {
+                            e.target.currentTime = item.startTime;
+                          }
+                        }}
                         className="gallery-media-thumb"
                       />
-                      {/* Play Icon Badge overlay for video */}
                       <div className="play-icon-overlay">
                         <i className="bi bi-play-circle-fill"></i>
                       </div>
@@ -164,14 +413,13 @@ function GallerySection() {
                         className="gallery-media-thumb"
                         loading="lazy"
                       />
-                      {/* Expand Icon Badge overlay for photo */}
                       <div className="expand-icon-overlay">
                         <i className="bi bi-arrows-angle-expand"></i>
                       </div>
                     </>
                   )}
-                  
-                  {/* Badge top-left */}
+
+                  {/* Badge top-left (Foto/Video) */}
                   <span className="media-type-tag badge rounded-pill">
                     {item.type === "video" ? (
                       <>
@@ -184,12 +432,22 @@ function GallerySection() {
                     )}
                   </span>
 
+                  {/* Badge "In Evidenza" - VISIBILE SOLO ALL'ADMIN in BASSO A DESTRA della card */}
+                  {isAuthenticated && item.featured && (
+                    <span
+                      className="badge bg-warning text-dark rounded-pill position-absolute bottom-0 end-0 m-2 z-3 shadow-sm px-2 py-1"
+                      style={{ fontSize: "0.72rem", border: "1px solid rgba(0,0,0,0.15)" }}
+                    >
+                      <i className="bi bi-star-fill me-1"></i> Evidenza
+                    </span>
+                  )}
+
                   {/* Hover Info Bottom Bar */}
                   <div className="gallery-card-info p-3">
-                    <h4 className="h6 font-heading text-white fw-bold mb-1">
+                    <h4 className="h6 font-heading text-white fw-bold mb-1 pe-4">
                       {item.title}
                     </h4>
-                    <p className="small text-white-50 mb-0">{item.subtitle}</p>
+                    <p className="small text-white-50 mb-0 pe-4">{item.subtitle}</p>
                   </div>
                 </div>
               </div>
@@ -197,7 +455,7 @@ function GallerySection() {
           ))}
         </Row>
 
-        {/* Modal Window */}
+        {/* Lightbox Modal Window */}
         <MediaModal
           show={modalShow}
           onHide={() => setModalShow(false)}
@@ -205,6 +463,191 @@ function GallerySection() {
           currentIndex={selectedIndex}
           onNavigate={(newIndex) => setSelectedIndex(newIndex)}
         />
+
+        {/* Admin Modal (Aggiungi / Modifica Foto e Video con Cloudinary) */}
+        {showAdminModal && (
+          <Modal
+            show={showAdminModal}
+            onHide={() => setShowAdminModal(false)}
+            centered
+            size="lg"
+            className="admin-gallery-modal"
+          >
+            <Modal.Header closeButton className="bg-success text-white">
+              <Modal.Title className="font-heading fw-bold">
+                <i className="bi bi-pencil-square me-2"></i>
+                {editingItem ? t.editMedia : t.addMedia}
+              </Modal.Title>
+            </Modal.Header>
+            <form onSubmit={handleCreateOrUpdate}>
+              <Modal.Body className="p-4">
+                <Row className="g-3">
+                  {/* Titoli ITA e ENG */}
+                  <Col md={6}>
+                    <label className="form-label fw-semibold">Titolo (ITA)*</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.titleIta}
+                      onChange={(e) => setFormData({ ...formData, titleIta: e.target.value })}
+                      required
+                      placeholder="es. DJ Set Exclusive Live"
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <label className="form-label fw-semibold">Titolo (ENG)*</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.titleEng}
+                      onChange={(e) => setFormData({ ...formData, titleEng: e.target.value })}
+                      required
+                      placeholder="es. Exclusive Live DJ Set"
+                    />
+                  </Col>
+
+                  {/* Sottotitoli ITA e ENG */}
+                  <Col md={12}>
+                    <label className="form-label fw-semibold">Sottotitolo (ITA)</label>
+                    <textarea
+                      rows="2"
+                      className="form-control"
+                      value={formData.subtitleIta}
+                      onChange={(e) => setFormData({ ...formData, subtitleIta: e.target.value })}
+                      placeholder="Descrizione del momento..."
+                    />
+                  </Col>
+                  <Col md={12}>
+                    <label className="form-label fw-semibold">Sottotitolo (ENG)</label>
+                    <textarea
+                      rows="2"
+                      className="form-control"
+                      value={formData.subtitleEng}
+                      onChange={(e) => setFormData({ ...formData, subtitleEng: e.target.value })}
+                      placeholder="Description of the moment..."
+                    />
+                  </Col>
+
+                  {/* Tipo Media e Categoria */}
+                  <Col md={6}>
+                    <label className="form-label fw-semibold">{t.mediaTypeLabel}*</label>
+                    <select
+                      className="form-select"
+                      value={formData.type}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                    >
+                      <option value="image">{t.mediaTypeImage}</option>
+                      <option value="video">{t.mediaTypeVideo}</option>
+                    </select>
+                  </Col>
+                  <Col md={6}>
+                    <label className="form-label fw-semibold">Categoria</label>
+                    <select
+                      className="form-select"
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    >
+                      <option value="djset">DJ Set</option>
+                      <option value="band">Live Band</option>
+                      <option value="wedding">Matrimonio / Wedding</option>
+                      <option value="lightshow">Service & Luci</option>
+                      <option value="live">Live Show</option>
+                      <option value="effects">Effetti Scenografici</option>
+                    </select>
+                  </Col>
+
+                  {/* Upload Cloudinary & Direct URL */}
+                  <Col md={12}>
+                    <label className="form-label fw-semibold">{t.uploadCloudinary}</label>
+                    <input
+                      type="file"
+                      accept={formData.type === "video" ? "video/*" : "image/*"}
+                      onChange={handleMediaUpload}
+                      className="form-control"
+                      disabled={uploadingMedia}
+                    />
+                    {uploadingMedia && (
+                      <small className="text-primary d-block mt-1">
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                        {t.uploading}
+                      </small>
+                    )}
+                  </Col>
+
+                  <Col md={12}>
+                    <label className="form-label fw-semibold">URL Risorsa Multimediale (Cloudinary o Link)</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.src}
+                      onChange={(e) => setFormData({ ...formData, src: e.target.value })}
+                      required
+                      placeholder="https://res.cloudinary.com/..."
+                    />
+                  </Col>
+
+                  {/* Video Start Time (Offset) & Display Order */}
+                  {formData.type === "video" && (
+                    <Col md={6}>
+                      <label className="form-label fw-semibold">{t.startTimeLabel}</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        className="form-control"
+                        value={formData.startTime}
+                        onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                        placeholder="es. 60 per iniziare a 1:00"
+                      />
+                    </Col>
+                  )}
+
+                  <Col md={formData.type === "video" ? 6 : 12}>
+                    <label className="form-label fw-semibold">Ordine di Visualizzazione</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={formData.displayOrder}
+                      onChange={(e) => setFormData({ ...formData, displayOrder: e.target.value })}
+                    />
+                  </Col>
+
+                  {/* Toggle Featured */}
+                  <Col md={12}>
+                    <div className="form-check form-switch mt-2">
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="featuredSwitch"
+                        checked={formData.featured}
+                        onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                      />
+                      <label className="form-check-input-label fw-bold text-success ms-2" htmlFor="featuredSwitch">
+                        <i className="bi bi-star-fill text-warning me-1"></i>
+                        {t.featuredLabel}
+                      </label>
+                    </div>
+                  </Col>
+                </Row>
+              </Modal.Body>
+              <Modal.Footer className="bg-body-tertiary">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowAdminModal(false)}
+                >
+                  Annulla
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-success fw-bold"
+                  disabled={uploadingMedia}
+                >
+                  {uploadingMedia ? t.uploading : t.saveMedia}
+                </button>
+              </Modal.Footer>
+            </form>
+          </Modal>
+        )}
       </Container>
     </section>
   );

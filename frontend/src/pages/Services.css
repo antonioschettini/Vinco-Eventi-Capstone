@@ -22,7 +22,7 @@
 .service-card-box {
   border: 1px solid rgba(128, 128, 128, 0.2);
   border-radius: 16px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   overflow: hidden;
   background: var(--bs-body-bg);
   height: 100%;
@@ -30,7 +30,8 @@
 
 .service-card-box:hover {
   transform: translateY(-6px);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+  border-color: #198754;
+  box-shadow: 0 16px 32px rgba(25, 135, 84, 0.25);
 }
 
 .service-card-img-wrapper {

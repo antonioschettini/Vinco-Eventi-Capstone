@@ -425,7 +425,10 @@
   z-index: 2;
 }
 
-.logo-container:hover .logo-wrapper,
+.logo-container:hover .logo-wrapper {
+  transform: scale(1.03);
+}
+
 .logo-container.is-playing .logo-wrapper {
   transform: scale(1.06);
 }
@@ -439,7 +442,6 @@
   transition: width 0.3s ease, height 0.3s ease;
 }
 
-.logo-container:hover .logo-img,
 .logo-container.is-playing .logo-img {
   animation: logoRhythmBeat 0.8s ease-in-out infinite alternate;
 }
@@ -473,12 +475,10 @@
   color: #4ca679;
 }
 
-[data-bs-theme="dark"] .logo-container:hover .logo-wrapper,
 [data-bs-theme="dark"] .logo-container.is-playing .logo-wrapper {
   box-shadow: 0 0 25px rgba(76, 166, 121, 0.45);
 }
 
-[data-bs-theme="light"] .logo-container:hover .logo-wrapper,
 [data-bs-theme="light"] .logo-container.is-playing .logo-wrapper {
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
 }
@@ -500,17 +500,14 @@
   transition: opacity 0.3s ease;
 }
 
-.logo-container:hover .ring-1,
 .logo-container.is-playing .ring-1 {
   animation: rhythmWavePulse 1.8s infinite ease-out 0s;
 }
 
-.logo-container:hover .ring-2,
 .logo-container.is-playing .ring-2 {
   animation: rhythmWavePulse 1.8s infinite ease-out 0.6s;
 }
 
-.logo-container:hover .ring-3,
 .logo-container.is-playing .ring-3 {
   animation: rhythmWavePulse 1.8s infinite ease-out 1.2s;
 }
@@ -551,7 +548,6 @@
   right: -22px;
 }
 
-.logo-container:hover .equalizer-bars,
 .logo-container.is-playing .equalizer-bars {
   opacity: 1;
 }
@@ -566,27 +562,22 @@
 }
 
 /* Animazioni ritmiche differenziate per l'equalizzatore */
-.logo-container:hover .bar-1,
 .logo-container.is-playing .bar-1 {
   animation: eqBounce1 0.65s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0s;
 }
 
-.logo-container:hover .bar-2,
 .logo-container.is-playing .bar-2 {
   animation: eqBounce2 0.48s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.12s;
 }
 
-.logo-container:hover .bar-3,
 .logo-container.is-playing .bar-3 {
   animation: eqBounce3 0.75s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.25s;
 }
 
-.logo-container:hover .bar-4,
 .logo-container.is-playing .bar-4 {
   animation: eqBounce4 0.52s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.18s;
 }
 
-.logo-container:hover .bar-5,
 .logo-container.is-playing .bar-5 {
   animation: eqBounce5 0.68s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.3s;
 }

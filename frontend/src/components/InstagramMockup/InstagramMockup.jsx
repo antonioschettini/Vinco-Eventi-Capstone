@@ -24,17 +24,18 @@ function InstagramMockup() {
   const t = translations[lang]?.instagramMockup || translations.it.instagramMockup;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [likeCount, setLikeCount] = useState(1482);
+  const [isLiked, setIsLiked] = useState(true);
+  const [isBookmarked, setIsBookmarked] = useState(true);
+  const [likeCount, setLikeCount] = useState(1483);
   const [isPaused, setIsPaused] = useState(false);
+  const [showHeartAnim, setShowHeartAnim] = useState(false);
 
   // Scorrimento immagini automatico in loop
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % slideImages.length);
-    }, 3500);
+    }, 3800);
 
     return () => clearInterval(timer);
   }, [isPaused]);
@@ -46,33 +47,52 @@ function InstagramMockup() {
     });
   };
 
+  const handleDoubleTap = () => {
+    if (!isLiked) {
+      setIsLiked(true);
+      setLikeCount((count) => count + 1);
+    }
+    setShowHeartAnim(true);
+    setTimeout(() => setShowHeartAnim(false), 800);
+  };
+
+  const handlePrevSlide = (e) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev === 0 ? slideImages.length - 1 : prev - 1));
+  };
+
+  const handleNextSlide = (e) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % slideImages.length);
+  };
+
   const handleBookmarkToggle = () => {
     setIsBookmarked((prev) => !prev);
   };
 
   return (
-    <div className="instagram-mockup-wrapper d-flex justify-content-center align-items-center">
+    <div className="instagram-mockup-wrapper">
       {/* Smartphone Chassis */}
       <div className="phone-chassis">
         {/* Top Notch & Status Bar */}
-        <div className="phone-top-bar d-flex justify-content-between align-items-center px-4 pt-2">
-          <span className="phone-clock font-body fw-bold fs-6">21:49</span>
+        <div className="phone-top-bar d-flex justify-content-between align-items-center">
+          <span className="phone-clock font-body fw-bold">21:49</span>
           <div className="phone-notch">
             <span className="camera-lens"></span>
             <span className="speaker"></span>
           </div>
-          <div className="phone-status-icons d-flex align-items-center gap-2">
-            <i className="bi bi-reception-4 fs-6"></i>
-            <i className="bi bi-wifi fs-6"></i>
-            <i className="bi bi-battery-full fs-5"></i>
+          <div className="phone-status-icons d-flex align-items-center gap-1">
+            <i className="bi bi-reception-4 fs-7"></i>
+            <i className="bi bi-wifi fs-7"></i>
+            <i className="bi bi-battery-full fs-6"></i>
           </div>
         </div>
 
         {/* Screen Content */}
-        <div className="phone-screen d-flex flex-column">
+        <div className="phone-screen">
           {/* Instagram Top Header */}
-          <div className="ig-header d-flex justify-content-between align-items-center p-3 border-bottom border-secondary border-opacity-10">
-            <div className="d-flex align-items-center gap-2">
+          <div className="ig-header d-flex justify-content-between align-items-center border-bottom border-secondary border-opacity-10">
+            <div className="d-flex align-items-center gap-2 overflow-hidden">
               <div className="ig-avatar-ring">
                 <img
                   src={logoEnzo}
@@ -80,45 +100,75 @@ function InstagramMockup() {
                   className="ig-avatar-img"
                 />
               </div>
-              <div className="d-flex flex-column lh-1">
-                <span className="ig-username fw-bold">vincoeventi</span>
-                <span className="ig-location text-body-secondary">{t.location}</span>
+              <div className="d-flex flex-column lh-1 overflow-hidden">
+                <div className="d-flex align-items-center gap-1">
+                  <span className="ig-username fw-bold text-truncate">vincoeventi</span>
+                  <i className="bi bi-patch-check-fill text-primary fs-7" title="Account Verificato"></i>
+                </div>
+                <span className="ig-location text-body-secondary text-truncate">{t.location}</span>
               </div>
             </div>
             <button className="btn btn-link p-0 text-body" aria-label="Option menu">
-              <i className="bi bi-three-dots fs-5"></i>
+              <i className="bi bi-three-dots fs-6"></i>
             </button>
           </div>
 
-          {/* Central Image Carousel */}
+          {/* Central Image Carousel (Square 1:1 Aspect Ratio) */}
           <div
-            className="ig-carousel-container position-relative overflow-hidden"
+            className="ig-carousel-container"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
+            onDoubleClick={handleDoubleTap}
           >
+            {/* Animated Double-Tap Heart */}
+            {showHeartAnim && (
+              <div className="ig-heart-overlay">
+                <i className="bi bi-heart-fill"></i>
+              </div>
+            )}
+
             <div
-              className="ig-carousel-track d-flex transition-transform"
+              className="ig-carousel-track"
               style={{
                 transform: `translateX(-${currentIndex * 100}%)`,
               }}
             >
               {slideImages.map((img) => (
-                <div key={img.id} className="ig-carousel-slide flex-shrink-0 w-100">
+                <div key={img.id} className="ig-carousel-slide">
                   <img
                     src={img.src}
                     alt={img.alt}
-                    className="ig-post-img w-100 object-fit-cover"
+                    className="ig-post-img"
                   />
                 </div>
               ))}
             </div>
 
-            {/* Pagination Indicators Dots */}
-            <div className="ig-carousel-dots d-flex justify-content-center gap-1 position-absolute bottom-0 start-50 translate-middle-x mb-2">
+            {/* Navigation Chevron Buttons */}
+            <button
+              className="ig-carousel-nav-btn prev"
+              onClick={handlePrevSlide}
+              aria-label="Immagine precedente"
+            >
+              <i className="bi bi-chevron-left"></i>
+            </button>
+            <button
+              className="ig-carousel-nav-btn next"
+              onClick={handleNextSlide}
+              aria-label="Immagine successiva"
+            >
+              <i className="bi bi-chevron-right"></i>
+            </button>
+
+            {/* Pagination Dots */}
+            <div className="ig-carousel-dots d-flex justify-content-center gap-1 position-absolute bottom-0 start-50 translate-middle-x mb-2 z-3">
               {slideImages.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setCurrentIndex(idx)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentIndex(idx);
+                  }}
                   className={`ig-dot-btn border-0 rounded-circle ${
                     idx === currentIndex ? "active" : ""
                   }`}
@@ -129,20 +179,20 @@ function InstagramMockup() {
           </div>
 
           {/* Post Action Bar */}
-          <div className="ig-action-bar d-flex justify-content-between align-items-center px-3 pt-2 pb-1">
+          <div className="ig-action-bar d-flex justify-content-between align-items-center">
             <div className="d-flex align-items-center gap-3">
               <button
                 className={`btn btn-link p-0 ${isLiked ? "text-danger" : "text-body"}`}
                 onClick={handleLikeToggle}
                 aria-label="Like post"
               >
-                <i className={`bi ${isLiked ? "bi-heart-fill" : "bi-heart"} fs-4`}></i>
+                <i className={`bi ${isLiked ? "bi-heart-fill" : "bi-heart"}`}></i>
               </button>
               <button className="btn btn-link p-0 text-body" aria-label="Comment">
-                <i className="bi bi-chat fs-4"></i>
+                <i className="bi bi-chat"></i>
               </button>
               <button className="btn btn-link p-0 text-body" aria-label="Share">
-                <i className="bi bi-send fs-4"></i>
+                <i className="bi bi-send"></i>
               </button>
             </div>
             <button
@@ -150,45 +200,45 @@ function InstagramMockup() {
               onClick={handleBookmarkToggle}
               aria-label="Bookmark post"
             >
-              <i className={`bi ${isBookmarked ? "bi-bookmark-fill" : "bi-bookmark"} fs-4`}></i>
+              <i className={`bi ${isBookmarked ? "bi-bookmark-fill" : "bi-bookmark"}`}></i>
             </button>
           </div>
 
-          {/* Likes & Caption */}
-          <div className="ig-caption-section px-3 pb-3">
-            <div className="fw-bold mb-1 fs-7">
-              Piace a <span className="fw-bold">vincoeventi</span> e a{" "}
-              <span className="fw-bold">{likeCount.toLocaleString()} altri</span>
+          {/* Likes & Caption Section (Fixed Fitted Height) */}
+          <div className="ig-caption-section">
+            <div className="fw-bold mb-1">
+              Piace a <span className="fw-bold">vincoeventi</span> altri{" "}
+              <span className="fw-bold">{likeCount}</span>
             </div>
-            <div className="ig-caption-text fs-7">
+            <div className="ig-caption-text">
               <span className="fw-bold me-1">vincoeventi</span>
               {t.caption}
             </div>
-            <div className="ig-hashtags text-primary fw-medium mt-1 fs-7">
+            <div className="ig-hashtags text-primary fw-medium mt-1">
               {t.hashtags}
             </div>
           </div>
 
           {/* Bottom IG Navigation Bar */}
-          <div className="ig-bottom-nav d-flex justify-content-around align-items-center p-2 mt-auto border-top border-secondary border-opacity-10">
+          <div className="ig-bottom-nav d-flex justify-content-around align-items-center border-top border-secondary border-opacity-10">
             <button className="btn btn-link p-0 text-body" aria-label="Home">
-              <i className="bi bi-house-door-fill fs-5"></i>
+              <i className="bi bi-house-door-fill"></i>
             </button>
             <button className="btn btn-link p-0 text-body" aria-label="Search">
-              <i className="bi bi-search fs-5"></i>
+              <i className="bi bi-search"></i>
             </button>
             <button className="btn btn-link p-0 text-body" aria-label="Add">
-              <i className="bi bi-plus-square fs-5"></i>
+              <i className="bi bi-plus-square"></i>
             </button>
             <button className="btn btn-link p-0 text-body" aria-label="Reels">
-              <i className="bi bi-play-btn fs-5"></i>
+              <i className="bi bi-play-btn"></i>
             </button>
             <button className="btn btn-link p-0 text-body" aria-label="Profile">
               <img
                 src={logoEnzo}
                 alt="Profile"
                 className="rounded-circle"
-                style={{ width: "24px", height: "24px", objectFit: "cover" }}
+                style={{ width: "22px", height: "22px", objectFit: "cover" }}
               />
             </button>
           </div>

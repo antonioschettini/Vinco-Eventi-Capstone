@@ -2,6 +2,7 @@ package antonioschettini.backend.recordsDTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 
@@ -21,6 +22,12 @@ public record QuoteRequestDTO(
 
         LocalDate dataEvento,
         String tipoEvento,
+
+        @NotEmpty(message = "Il luogo dell'evento è obbligatorio")
+        @Pattern(
+                regexp = "^[^,]+,.+$",
+                message = "Il luogo dell'evento deve contenere sia il luogo che la località separati da una virgola (es. Masseria Coccaro, Monopoli)"
+        )
         String location,
         String numeroOspiti,
         String orarioGiornata,

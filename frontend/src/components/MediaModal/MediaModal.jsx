@@ -114,10 +114,15 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
           {currentMedia.type === "video" ? (
             <video
               key={currentMedia.id || currentMedia.src}
-              src={currentMedia.src}
+              src={currentMedia.startTime ? `${currentMedia.src}#t=${currentMedia.startTime}` : currentMedia.src}
               controls
               autoPlay
               loop
+              onLoadedMetadata={(e) => {
+                if (currentMedia.startTime && e.target) {
+                  e.target.currentTime = currentMedia.startTime;
+                }
+              }}
               className="media-player-element rounded-3"
             />
           ) : (

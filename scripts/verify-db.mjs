@@ -1,0 +1,10 @@
+import fetch from "node-fetch";
+const res = await fetch("http://localhost:8080/api/gallery");
+const items = await res.json();
+const cloud = items.filter(i => i.src.startsWith("http"));
+const local = items.filter(i => !i.src.startsWith("http"));
+console.log("Totale item nel DB:", items.length);
+console.log("Su Cloudinary (https):", cloud.length);
+console.log("Ancora con src locale:", local.length);
+if (local.length > 0) local.forEach(i => console.log("  - LOCALE:", i.titleIta, "->", i.src));
+else console.log("\nTutti i 31 media hanno URL Cloudinary. DB completamente migrato!");

@@ -1,46 +1,73 @@
-/* Instagram Mockup Component Styling */
+/* Instagram Mockup Component Styling - Pixel-Perfect & Identical Across Views */
 
 .instagram-mockup-wrapper {
   width: 100%;
-  padding: 1rem 0;
-  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 0;
 }
 
-/* Smartphone Chassis (Cornice Smartphone) */
+/* Smartphone Chassis (Dimensioni Fisse e Proporzioni Rigorose) */
 .phone-chassis {
   position: relative;
-  width: 100%;
-  max-width: 360px;
-  height: 720px;
-  max-height: min(720px, 85vh);
-  background-color: #0b0f0d;
-  border: 12px solid #1a1f1c;
-  border-radius: 48px;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  width: 340px;
+  height: 670px;
+  background-color: #121714;
+  border: 10px solid #222824;
+  border-radius: 44px;
+  box-shadow: 
+    0 20px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  user-select: none;
+  margin: 0 auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dynamic Glass Gloss Reflection */
+.phone-chassis::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.01) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 30;
 }
 
 .phone-chassis:hover {
   transform: translateY(-4px);
-  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(32, 74, 53, 0.4);
+  box-shadow: 
+    0 28px 56px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(32, 120, 75, 0.4);
 }
 
 /* Status Bar & Notch */
 .phone-top-bar {
-  height: 38px;
+  flex: 0 0 34px;
+  height: 34px;
   background-color: var(--bs-body-bg);
   color: var(--bs-body-color);
   position: relative;
-  z-index: 10;
+  z-index: 20;
   user-select: none;
+  padding: 0 1rem;
 }
 
 .phone-clock {
-  font-size: 0.85rem;
-  letter-spacing: -0.5px;
+  font-size: 0.8rem;
+  letter-spacing: -0.3px;
 }
 
 .phone-notch {
@@ -48,52 +75,61 @@
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 120px;
-  height: 24px;
+  width: 96px;
+  height: 19px;
   background-color: #000000;
-  border-bottom-left-radius: 14px;
-  border-bottom-right-radius: 14px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  z-index: 20;
+  gap: 8px;
+  z-index: 25;
 }
 
 .camera-lens {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   background-color: #111;
   border: 1px solid #333;
   border-radius: 50%;
 }
 
 .speaker {
-  width: 36px;
-  height: 4px;
+  width: 28px;
+  height: 3px;
   background-color: #222;
   border-radius: 2px;
 }
 
-/* Phone Screen */
+/* Phone Screen Container */
 .phone-screen {
-  flex: 1;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   background-color: var(--bs-body-bg);
   color: var(--bs-body-color);
   overflow: hidden;
-  font-size: 0.85rem;
+  min-height: 0;
 }
 
-/* IG Avatar Ring Gradient */
+/* Header */
+.ig-header {
+  flex: 0 0 44px;
+  height: 44px;
+  padding: 0 0.75rem;
+}
+
 .ig-avatar-ring {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   padding: 2px;
   background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .ig-avatar-img {
@@ -101,105 +137,204 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--bs-body-bg);
+  border: 1.5px solid var(--bs-body-bg);
 }
 
 .ig-username {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   letter-spacing: -0.2px;
 }
 
 .ig-location {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
 }
 
-/* Carousel Container & Slides */
+/* Carousel Container (Square 1:1 Aspect Ratio) */
 .ig-carousel-container {
-  width: 100%;
-  height: 330px;
+  flex: 0 0 320px;
+  width: 320px;
+  height: 320px;
   background-color: #000000;
+  position: relative;
+  overflow: hidden;
 }
 
 .ig-carousel-track {
+  width: 100%;
   height: 100%;
-  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  display: flex;
+  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .ig-carousel-slide {
-  height: 100%;
+  width: 320px;
+  height: 320px;
+  flex-shrink: 0;
 }
 
 .ig-post-img {
+  width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Dot Indicators */
+/* Navigation Chevrons */
+.ig-carousel-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.25s ease, background 0.2s ease;
+  z-index: 15;
+  cursor: pointer;
+}
+
+.ig-carousel-container:hover .ig-carousel-nav-btn {
+  opacity: 0.85;
+}
+
+.ig-carousel-nav-btn:hover {
+  opacity: 1 !important;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.ig-carousel-nav-btn.prev {
+  left: 6px;
+}
+
+.ig-carousel-nav-btn.next {
+  right: 6px;
+}
+
+/* Dots */
 .ig-dot-btn {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   padding: 0;
-  background-color: rgba(255, 255, 255, 0.5);
-  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.45);
+  transition: all 0.25s ease;
+  cursor: pointer;
 }
 
 .ig-dot-btn.active {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background-color: #3897f0;
 }
 
-/* Action Bar & Caption */
+/* Action Bar */
+.ig-action-bar {
+  flex: 0 0 38px;
+  height: 38px;
+  padding: 0 0.75rem;
+}
+
 .ig-action-bar button i {
-  transition: transform 0.2s ease, color 0.2s ease;
+  font-size: 1.15rem;
+  transition: transform 0.2s ease;
 }
 
 .ig-action-bar button:active i {
-  transform: scale(1.25);
+  transform: scale(1.3);
+}
+
+/* Caption Section (Altezza Fissa Perfetta) */
+.ig-caption-section {
+  flex: 0 0 134px;
+  height: 134px;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.74rem;
+  overflow: hidden;
 }
 
 .ig-caption-text {
-  line-height: 1.35;
+  line-height: 1.25;
 }
 
 .ig-hashtags {
+  font-size: 0.7rem;
+  line-height: 1.25;
   word-break: break-word;
+  color: #3897f0 !important;
 }
 
-/* IG Bottom Nav */
-.ig-bottom-nav button {
-  color: var(--bs-body-color);
-  opacity: 0.85;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+/* Bottom IG Nav */
+.ig-bottom-nav {
+  flex: 0 0 42px;
+  height: 42px;
+  padding: 0 0.5rem;
+  margin-top: auto;
 }
 
-.ig-bottom-nav button:hover {
-  opacity: 1;
-  transform: scale(1.1);
+.ig-bottom-nav button i {
+  font-size: 1.05rem;
 }
 
-/* Media Queries for Small Screens */
-@media (max-width: 400px) {
+/* Double-Tap Floating Heart Animation */
+.ig-heart-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 3.8rem;
+  color: #ff3040;
+  pointer-events: none;
+  z-index: 25;
+  animation: igHeartPop 0.8s ease-out forwards;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+
+@keyframes igHeartPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.95;
+  }
+  80% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 0;
+  }
+}
+
+/* Scaling per schermi di ampiezza ridotta per mantenere l'intero telefono integro e visibile */
+@media (max-width: 991.98px) {
   .phone-chassis {
-    max-width: 100%;
-    height: 650px;
-    border-width: 8px;
-    border-radius: 36px;
+    transform: scale(0.92);
+    transform-origin: top center;
+    margin-bottom: -40px;
   }
-  .ig-carousel-container {
-    height: 280px;
+
+  .phone-chassis:hover {
+    transform: scale(0.92) translateY(-4px);
   }
 }
 
-/* RESP-2: Breakpoint intermedio 401-575px */
-@media (min-width: 401px) and (max-width: 575.98px) {
+@media (max-width: 420px) {
   .phone-chassis {
-    height: 680px;
-    border-width: 10px;
-    border-radius: 40px;
+    transform: scale(0.85);
+    transform-origin: top center;
+    margin-bottom: -70px;
   }
-  .ig-carousel-container {
-    height: 300px;
+
+  .phone-chassis:hover {
+    transform: scale(0.85) translateY(-4px);
   }
 }
-

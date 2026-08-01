@@ -313,7 +313,7 @@ function Services() {
 
               return (
                 <div className="col-lg-4 col-md-6 d-flex" key={pkg.id}>
-                  <div className={`service-card-box w-100 d-flex flex-column ${isFull ? "border-success border-2 shadow" : ""}`}>
+                  <div className="service-card-box w-100 d-flex flex-column">
                     
                     {/* Admin Action Buttons directly on Card Header */}
                     {isAuthenticated && (
@@ -351,7 +351,7 @@ function Services() {
 
                     <div className="p-4 d-flex flex-column flex-grow-1 justify-content-between">
                       <div>
-                        <h3 className={`h4 font-heading fw-bold mb-2 ${isFull ? "text-success" : ""}`}>{title}</h3>
+                        <h3 className="h4 font-heading fw-bold mb-2">{title}</h3>
                         <p className="text-muted small mb-3">{subtitle}</p>
 
                         <ul className="feature-list-custom">
@@ -416,7 +416,7 @@ function Services() {
                       <div className="mt-3">
                         <a
                           href="tel:+393492949669"
-                          className={`btn ${isFull ? "btn-forest-submit" : "btn-outline-success"} w-100 fw-bold d-flex align-items-center justify-content-center gap-2`}
+                          className="btn btn-outline-success w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
                         >
                           <i className="bi bi-telephone-fill"></i>
                           <span>{t.contactUs}</span>

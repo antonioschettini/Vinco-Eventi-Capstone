@@ -1,6 +1,7 @@
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { translations } from "../../utils/translations";
+import footerBgImage from "../../assets/home/bannerFooter.png";
 import "./Footer.css";
 
 function Footer() {
@@ -13,8 +14,12 @@ function Footer() {
   };
 
   return (
-    <footer className="footer-section py-5 mt-auto">
-      <Container>
+    <footer
+      className="footer-section py-5 mt-auto position-relative"
+      style={{ backgroundImage: `url("${footerBgImage}")` }}
+    >
+      <div className="footer-overlay"></div>
+      <Container className="footer-content text-center position-relative">
         <Row className="justify-content-center text-center">
           <Col xs={12} md={8} lg={6}>
             {/* Nome Azienda */}
