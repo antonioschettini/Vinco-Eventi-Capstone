@@ -52,9 +52,9 @@ export const translations = {
       },
     },
     services: {
-      heroTitle: "Le proposte e i box formulati",
+      heroTitle: "Le proposte e i pacchetti formulati",
       heroSubtitle:
-        "Tutti gli eventi musicali e i party privati possono essere personalizzati. Qui sono elencate alcune tipologie di box e i vari servizi offerti per rendere unico il tuo evento.",
+        "Tutti gli eventi musicali e i party privati possono essere personalizzati. Qui sono elencate alcune tipologie di pacchetti e i vari servizi offerti per rendere unico il tuo evento.",
       packagesTitle: "I Nostri Pacchetti Esclusivi",
       brochureBtn: "BROCHURE",
       contactUs: "Richiedi Informazioni",
@@ -108,6 +108,7 @@ export const translations = {
         text: "VINCO EVENTI dispone di numerose band di musicisti e cantanti di alto livello adatte ad ogni tipologia di evento e gusto musicale. L’obiettivo è quello di customizzare l’evento per ogni singolo cliente diventando così un vero e proprio consulente musicale. VINCO EVENTI collabora, inoltre con tanti Wedding Planner e Destination Wedding Planner per proporre e costruire insieme al cliente le soluzioni migliori in termini di gusto musicale e budget. Dall’accompagnamento musicale per riti civili, aperitivi, pranzi o cene nuziali, taglio torta e dj set post party.",
       },
       adminActions: {
+        adminMode: "Modalità Admin Attiva - Gestione CRUD Servizi",
         addService: "Aggiungi Nuovo Pacchetto",
         editService: "Modifica",
         deleteService: "Elimina",
@@ -125,6 +126,7 @@ export const translations = {
       filterAll: "Tutti i Media",
       filterPhotos: "Foto",
       filterVideos: "Video",
+      filterFeatured: "In Evidenza",
       videoBadge: "Video",
       photoBadge: "Foto",
       playPreview: "Riproduci Video",
@@ -405,6 +407,7 @@ export const translations = {
         text: "VINCO EVENTI features numerous top-tier music bands and singers suitable for every type of event and musical taste. Our goal is to customize the event for each client, acting as a dedicated musical consultant. VINCO EVENTI also collaborates with many Wedding Planners and Destination Wedding Planners to build optimal solutions for musical taste and budget, covering civil ceremonies, cocktail hours, wedding dinners, cake cutting, and post-party DJ sets.",
       },
       adminActions: {
+        adminMode: "Admin Mode Active - Services CRUD Management",
         addService: "Add New Package",
         editService: "Edit",
         deleteService: "Delete",
@@ -422,6 +425,7 @@ export const translations = {
       filterAll: "All Media",
       filterPhotos: "Photos",
       filterVideos: "Videos",
+      filterFeatured: "Featured",
       videoBadge: "Video",
       photoBadge: "Photo",
       playPreview: "Play Video",

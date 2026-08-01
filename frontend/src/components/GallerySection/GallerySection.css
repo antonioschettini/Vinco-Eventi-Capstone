@@ -216,3 +216,33 @@
   }
 }
 
+/* Badge "In Evidenza" per Admin sulle Card Multimediali */
+.badge-featured-admin {
+  background-color: #ffc107 !important; /* Giallo brillante vivace analogo al pulsante modifica */
+  color: #000000 !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.25) !important;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.45), 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s ease;
+}
+
+.badge-featured-admin i {
+  color: #000000 !important;
+}
+
+/* Accent per il pulsante di filtro "In Evidenza" dell'admin */
+[data-bs-theme="dark"] .filter-btn-featured:not(.active) {
+  border-color: rgba(255, 193, 7, 0.4) !important;
+  background-color: rgba(255, 193, 7, 0.08) !important;
+}
+
+[data-bs-theme="light"] .filter-btn-featured:not(.active) {
+  border-color: rgba(255, 193, 7, 0.6) !important;
+  background-color: rgba(255, 193, 7, 0.12) !important;
+}
+
+

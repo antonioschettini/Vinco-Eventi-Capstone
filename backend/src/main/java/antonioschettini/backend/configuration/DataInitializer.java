@@ -8,6 +8,7 @@ import antonioschettini.backend.repositories.GalleryRepository;
 import antonioschettini.backend.repositories.ServiceRepository;
 import antonioschettini.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,9 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${admin.password:RipBigVincoEventi!}")
+    private String adminPassword;
+
     @Override
     public void run(String... args) throws Exception {
         seedAdminUser();
@@ -41,7 +45,7 @@ public class DataInitializer implements CommandLineRunner {
         if (userRepository.findByEmail(adminEmail).isEmpty()) {
             User admin = User.builder()
                     .email(adminEmail)
-                    .password(passwordEncoder.encode("RipBigVincoEventi!"))
+                    .password(passwordEncoder.encode(adminPassword))
                     .role(Role.ROLE_ADMIN)
                     .build();
             userRepository.save(admin);

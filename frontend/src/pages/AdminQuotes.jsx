@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import API_BASE_URL from "../config/api";
+import { authFetch } from "../utils/authFetch";
 import "./AdminQuotes.css";
 
 function AdminQuotes() {
+  const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
-  const [quotes, setQuotes] = useState([]);
+  const [allQuotes, setAllQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeFilter, setActiveFilter] = useState("ALL");
@@ -17,89 +19,41 @@ function AdminQuotes() {
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
     try {
-      let url = `${API_BASE_URL}/api/admin/quotes`;
-      if (activeFilter !== "ALL") {
-        url += `?status=${activeFilter}`;
-      }
-
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Impossibile caricare la lista dei preventivi.");
-      }
-
+      const response = await authFetch(`${API_BASE_URL}/api/admin/quotes`, {}, token, dispatch);
+      if (!response.ok) throw new Error("Impossibile caricare la lista dei preventivi.");
       const data = await response.json();
-      setQuotes(data);
+      setAllQuotes(data);
       setError("");
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [activeFilter, token]);
+  }, [token, dispatch]);
 
   useEffect(() => {
-    let isSubscribed = true;
-    const loadQuotes = async () => {
-      try {
-        let url = `${API_BASE_URL}/api/admin/quotes`;
-        if (activeFilter !== "ALL") {
-          url += `?status=${activeFilter}`;
-        }
-
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Impossibile caricare la lista dei preventivi.");
-        }
-
-        const data = await response.json();
-        if (isSubscribed) {
-          setQuotes(data);
-          setError("");
-        }
-      } catch (err) {
-        if (isSubscribed) {
-          setError(err.message);
-        }
-      } finally {
-        if (isSubscribed) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadQuotes();
-    return () => {
-      isSubscribed = false;
-    };
-  }, [activeFilter, token]);
+    fetchQuotes();
+  }, [fetchQuotes]);
 
   const handleUpdateStatus = async (id, newStatus) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/quotes/${id}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await authFetch(
+        `${API_BASE_URL}/api/admin/quotes/${id}/status`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stato: newStatus }),
         },
-        body: JSON.stringify({ stato: newStatus }),
-      });
+        token,
+        dispatch
+      );
 
       if (!response.ok) {
         throw new Error("Errore nell'aggiornamento dello stato.");
       }
 
       const updated = await response.json();
-      setQuotes((prev) => prev.map((q) => (q.id === id ? updated : q)));
+      setAllQuotes((prev) => prev.map((q) => (q.id === id ? updated : q)));
       if (selectedQuote && selectedQuote.id === id) {
         setSelectedQuote(updated);
       }
@@ -110,18 +64,18 @@ function AdminQuotes() {
 
   const handleDeleteQuote = async (id) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/quotes/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await authFetch(
+        `${API_BASE_URL}/api/admin/quotes/${id}`,
+        { method: "DELETE" },
+        token,
+        dispatch
+      );
 
       if (!response.ok) {
         throw new Error("Errore durante l'eliminazione del preventivo.");
       }
 
-      setQuotes((prev) => prev.filter((q) => q.id !== id));
+      setAllQuotes((prev) => prev.filter((q) => q.id !== id));
       if (selectedQuote && selectedQuote.id === id) {
         setShowDetailModal(false);
         setSelectedQuote(null);
@@ -140,8 +94,19 @@ function AdminQuotes() {
     }
   };
 
-  // Filtro di ricerca in tempo reale
-  const filteredQuotes = quotes.filter((q) => {
+  // Conteggi KPI — calcolati in tempo reale sull'intero dataset
+  const countAll = allQuotes.length;
+  const countPending = allQuotes.filter((q) => q.stato === "PENDING").length;
+  const countRead = allQuotes.filter((q) => q.stato === "READ").length;
+  const countProcessed = allQuotes.filter((q) => q.stato === "PROCESSED").length;
+
+  // Filtraggio per categoria attiva
+  const categoryQuotes = activeFilter === "ALL"
+    ? allQuotes
+    : allQuotes.filter((q) => q.stato === activeFilter);
+
+  // Filtro di ricerca testo in tempo reale
+  const filteredQuotes = categoryQuotes.filter((q) => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
     const fullName = `${q.nome} ${q.cognome}`.toLowerCase();
@@ -157,12 +122,6 @@ function AdminQuotes() {
       eventType.includes(query)
     );
   });
-
-  // Conteggi KPI
-  const countAll = quotes.length;
-  const countPending = quotes.filter((q) => q.stato === "PENDING").length;
-  const countRead = quotes.filter((q) => q.stato === "READ").length;
-  const countProcessed = quotes.filter((q) => q.stato === "PROCESSED").length;
 
   return (
     <div className="container admin-quotes-page">
@@ -318,7 +277,7 @@ function AdminQuotes() {
                     <th style={{ width: "240px" }}>Contatti</th>
                     <th style={{ width: "160px" }}>Evento</th>
                     <th style={{ width: "120px" }}>Stato</th>
-                    <th className="text-end" style={{ width: "130px" }}>Azioni</th>
+                    <th className="text-end" style={{ width: "160px" }}>Azioni</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -395,21 +354,33 @@ function AdminQuotes() {
                             <i className="bi bi-eye-fill"></i>
                           </button>
 
-                          {q.stato !== "PROCESSED" ? (
+                          {q.stato !== "PENDING" && (
+                            <button
+                              onClick={() => handleUpdateStatus(q.id, "PENDING")}
+                              className="btn btn-outline-warning"
+                              title="Segna In Attesa"
+                            >
+                              <i className="bi bi-clock-history"></i>
+                            </button>
+                          )}
+
+                          {q.stato !== "READ" && (
+                            <button
+                              onClick={() => handleUpdateStatus(q.id, "READ")}
+                              className="btn btn-outline-info"
+                              title="Segna come Letto"
+                            >
+                              <i className="bi bi-envelope-open"></i>
+                            </button>
+                          )}
+
+                          {q.stato !== "PROCESSED" && (
                             <button
                               onClick={() => handleUpdateStatus(q.id, "PROCESSED")}
                               className="btn btn-outline-success"
                               title="Segna come Gestito"
                             >
                               <i className="bi bi-check-lg"></i>
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleUpdateStatus(q.id, "PENDING")}
-                              className="btn btn-outline-warning"
-                              title="Riporta in Attesa"
-                            >
-                              <i className="bi bi-arrow-counterclockwise"></i>
                             </button>
                           )}
 
@@ -507,31 +478,45 @@ function AdminQuotes() {
                         <i className="bi bi-eye me-1"></i> Dettagli
                       </button>
 
-                      {q.stato !== "PROCESSED" ? (
-                        <button
-                          onClick={() => handleUpdateStatus(q.id, "PROCESSED")}
-                          className="btn btn-success btn-sm fw-semibold"
-                          title="Segna Gestito"
-                        >
-                          <i className="bi bi-check-lg"></i>
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleUpdateStatus(q.id, "PENDING")}
-                          className="btn btn-warning btn-sm text-dark fw-semibold"
-                          title="Riporta in Attesa"
-                        >
-                          <i className="bi bi-arrow-counterclockwise"></i>
-                        </button>
-                      )}
+                      <div className="btn-group btn-group-sm">
+                        {q.stato !== "PENDING" && (
+                          <button
+                            onClick={() => handleUpdateStatus(q.id, "PENDING")}
+                            className="btn btn-outline-warning"
+                            title="Segna In Attesa"
+                          >
+                            <i className="bi bi-clock-history"></i>
+                          </button>
+                        )}
 
-                      <button
-                        onClick={() => setDeleteConfirmId(q.id)}
-                        className="btn btn-outline-danger btn-sm"
-                        title="Elimina"
-                      >
-                        <i className="bi bi-trash"></i>
-                      </button>
+                        {q.stato !== "READ" && (
+                          <button
+                            onClick={() => handleUpdateStatus(q.id, "READ")}
+                            className="btn btn-outline-info"
+                            title="Segna come Letto"
+                          >
+                            <i className="bi bi-envelope-open"></i>
+                          </button>
+                        )}
+
+                        {q.stato !== "PROCESSED" && (
+                          <button
+                            onClick={() => handleUpdateStatus(q.id, "PROCESSED")}
+                            className="btn btn-outline-success"
+                            title="Segna come Gestito"
+                          >
+                            <i className="bi bi-check-lg"></i>
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => setDeleteConfirmId(q.id)}
+                          className="btn btn-outline-danger"
+                          title="Elimina"
+                        >
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -634,23 +619,27 @@ function AdminQuotes() {
                   </div>
                 </div>
               </div>
-              <div className="modal-footer bg-body-tertiary d-flex justify-content-between">
-                <div>
-                  {selectedQuote.stato !== "PROCESSED" ? (
-                    <button
-                      onClick={() => handleUpdateStatus(selectedQuote.id, "PROCESSED")}
-                      className="btn btn-success btn-sm me-2"
-                    >
-                      <i className="bi bi-check-circle me-1"></i> Segna Gestito
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleUpdateStatus(selectedQuote.id, "PENDING")}
-                      className="btn btn-warning btn-sm me-2"
-                    >
-                      <i className="bi bi-clock-history me-1"></i> Segna In Attesa
-                    </button>
-                  )}
+              <div className="modal-footer bg-body-tertiary d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div className="d-flex flex-wrap align-items-center gap-2">
+                  <span className="small text-muted fw-semibold me-1">Cambia Stato:</span>
+                  <button
+                    onClick={() => handleUpdateStatus(selectedQuote.id, "PENDING")}
+                    className={`btn btn-sm ${selectedQuote.stato === "PENDING" ? "btn-warning text-dark fw-bold disabled" : "btn-outline-warning"}`}
+                  >
+                    <i className="bi bi-clock-history me-1"></i> In Attesa
+                  </button>
+                  <button
+                    onClick={() => handleUpdateStatus(selectedQuote.id, "READ")}
+                    className={`btn btn-sm ${selectedQuote.stato === "READ" ? "btn-info text-white fw-bold disabled" : "btn-outline-info"}`}
+                  >
+                    <i className="bi bi-envelope-open me-1"></i> Letto
+                  </button>
+                  <button
+                    onClick={() => handleUpdateStatus(selectedQuote.id, "PROCESSED")}
+                    className={`btn btn-sm ${selectedQuote.stato === "PROCESSED" ? "btn-success fw-bold disabled" : "btn-outline-success"}`}
+                  >
+                    <i className="bi bi-check-circle me-1"></i> Gestito
+                  </button>
                 </div>
                 <button
                   type="button"

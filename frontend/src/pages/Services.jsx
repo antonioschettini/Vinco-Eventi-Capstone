@@ -157,12 +157,12 @@ function Services() {
           ...prev,
           [langField]: data.url,
         }));
-        alert("Immagine caricata su Cloudinary con successo!");
+        alert("Immagine caricata con successo!");
       } else {
-        alert("Errore durante l'upload dell'immagine su Cloudinary.");
+        alert("Impossibile completare l'upload dell'immagine. Puoi comunque inserire l'URL direttamente nel campo del servizio.");
       }
     } catch {
-      alert("Errore di connessione durante l'upload dell'immagine.");
+      alert("Errore di connessione durante l'upload dell'immagine. Puoi comunque inserire l'URL direttamente.");
     } finally {
       setUploadingImage(false);
     }
@@ -287,28 +287,26 @@ function Services() {
         </Container>
       </section>
 
-      {/* Bar Controlli Admin per Gestione / Aggiunta Pacchetti */}
-      {isAuthenticated && (
-        <div className="bg-success-subtle border-bottom border-success border-opacity-25 py-3">
-          <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-            <span className="fw-bold text-success d-flex align-items-center gap-2">
-              <i className="bi bi-shield-lock-fill"></i>
-              Modalità Admin Attiva - Gestione CRUD completa sui pacchetti
-            </span>
-            <button
-              onClick={handleOpenCreateModal}
-              className="btn btn-success btn-sm fw-bold d-flex align-items-center gap-2"
-            >
-              <i className="bi bi-plus-lg"></i>
-              <span>{t.adminActions.addService}</span>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* 2. I PACCHETTI PRINCIPALI (CARD / BOX) */}
       <section className="py-5">
         <div className="container">
+          {/* Bar Controlli Admin per Gestione / Aggiunta Pacchetti */}
+          {isAuthenticated && (
+            <div className="bg-success-subtle border border-success border-opacity-25 p-3 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+              <span className="fw-bold text-success d-flex align-items-center gap-2">
+                <i className="bi bi-shield-lock-fill fs-5"></i>
+                {t.adminActions.adminMode}
+              </span>
+              <button
+                onClick={handleOpenCreateModal}
+                className="btn btn-success btn-sm fw-bold d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm"
+              >
+                <i className="bi bi-plus-circle-fill"></i>
+                <span>{t.adminActions.addService}</span>
+              </button>
+            </div>
+          )}
+
           <div className="text-center mb-5">
             <h2 className="display-6 font-heading fw-bold">{t.packagesTitle}</h2>
             <div className="mx-auto border-bottom border-success border-3" style={{ width: "80px" }}></div>
@@ -324,7 +322,7 @@ function Services() {
               const featuresList = rawFeatures ? rawFeatures.split(";").map((f) => f.trim()).filter(Boolean) : [];
 
               return (
-                <div className="col-lg-4 col-md-6 d-flex" key={pkg.id}>
+                <div className="col-lg-4 col-md-6 d-flex justify-content-center" key={pkg.id}>
                   <div className="service-card-box w-100 d-flex flex-column">
                     
                     {/* Admin Action Buttons directly on Card Header */}
@@ -368,17 +366,20 @@ function Services() {
 
                         <ul className="feature-list-custom">
                           {featuresList.map((feat, idx) => {
+                            const cleanFeat = feat.replace(/\[BROCHURE\]/gi, "").trim();
+                            const featLower = feat.toLowerCase();
+
                             // Se siamo nel pacchetto FULL e la caratteristica richiede Brochure, rendi il pulsante cliccabile
-                            if (isFull && feat.includes("Live Band")) {
+                            if (isFull && (featLower.includes("live band") || featLower.includes("band"))) {
                               return (
                                 <li key={idx}>
-                                  Live Band{" "}
+                                  {cleanFeat}{" "}
                                   <a
                                     href={t.full.brochureLinks.liveBand}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="btn btn-danger btn-sm brochure-link-btn"
-                                    title="Apri Brochure Live Band su Google Drive"
+                                    title={lang === "en" ? "Open Live Band Brochure on Google Drive" : "Apri Brochure Live Band su Google Drive"}
                                   >
                                     <i className="bi bi-file-earmark-pdf-fill"></i>
                                     <span>{t.brochureBtn}</span>
@@ -386,16 +387,16 @@ function Services() {
                                 </li>
                               );
                             }
-                            if (isFull && feat.includes("Photobooth")) {
+                            if (isFull && (featLower.includes("photobooth") || featLower.includes("videobooth") || featLower.includes("telefono") || featLower.includes("guestbook"))) {
                               return (
                                 <li key={idx}>
-                                  Photobooth, Videobooth 360°, Telefono degli Ospiti{" "}
+                                  {cleanFeat}{" "}
                                   <a
                                     href={t.full.brochureLinks.photobooth}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="btn btn-danger btn-sm brochure-link-btn"
-                                    title="Apri Brochure Photobooth su Google Drive"
+                                    title={lang === "en" ? "Open Photobooth Brochure on Google Drive" : "Apri Brochure Photobooth su Google Drive"}
                                   >
                                     <i className="bi bi-file-earmark-pdf-fill"></i>
                                     <span>{t.brochureBtn}</span>
@@ -403,16 +404,16 @@ function Services() {
                                 </li>
                               );
                             }
-                            if (isFull && feat.includes("Illuminazioni")) {
+                            if (isFull && !featLower.includes("audio") && (featLower.includes("illuminazioni") || featLower.includes("lighting") || featLower.includes("sparkular") || featLower.includes("fuochi"))) {
                               return (
                                 <li key={idx}>
-                                  Illuminazioni, Fontane luminose sparkular, Fuochi d’artificio e Fumogeni Colorati{" "}
+                                  {cleanFeat}{" "}
                                   <a
                                     href={t.full.brochureLinks.lighting}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="btn btn-danger btn-sm brochure-link-btn"
-                                    title="Apri Brochure Scenografie Luminose su Google Drive"
+                                    title={lang === "en" ? "Open Lighting & Fireworks Brochure on Google Drive" : "Apri Brochure Scenografie Luminose su Google Drive"}
                                   >
                                     <i className="bi bi-file-earmark-pdf-fill"></i>
                                     <span>{t.brochureBtn}</span>
@@ -420,7 +421,7 @@ function Services() {
                                 </li>
                               );
                             }
-                            return <li key={idx}>{feat}</li>;
+                            return <li key={idx}>{cleanFeat}</li>;
                           })}
                         </ul>
                       </div>

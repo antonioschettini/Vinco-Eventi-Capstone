@@ -39,7 +39,7 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
   }, [show, currentMedia, dispatch]);
 
   useEffect(() => {
-    if (!show) return;
+    if (!show || !items || items.length === 0) return;
 
     const handleKeyDown = (e) => {
       if (e.key === "ArrowLeft") {
@@ -57,6 +57,26 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [show, currentIndex, items, onNavigate, onHide]);
 
+  // Pre-caricamento (prefetch) in background delle copertine/immagini adiacenti in JS per azzerare la latenza visiva ed evitare warning HTML <link rel="preload">
+  const nextItem = items && items.length > 1 ? items[(currentIndex + 1) % items.length] : null;
+  const prevItem = items && items.length > 1 ? items[(currentIndex - 1 + items.length) % items.length] : null;
+
+  const nextPosterUrl = nextItem ? (nextItem.posterUrl || getOptimizedCloudinaryUrl(nextItem.src, { type: "poster" })) : null;
+  const prevPosterUrl = prevItem ? (prevItem.posterUrl || getOptimizedCloudinaryUrl(prevItem.src, { type: "poster" })) : null;
+
+  useEffect(() => {
+    if (!show) return;
+
+    if (nextPosterUrl) {
+      const imgNext = new Image();
+      imgNext.src = nextPosterUrl;
+    }
+    if (prevPosterUrl) {
+      const imgPrev = new Image();
+      imgPrev.src = prevPosterUrl;
+    }
+  }, [show, nextPosterUrl, prevPosterUrl]);
+
   if (!currentMedia) return null;
 
   const handlePrev = (e) => {
@@ -72,22 +92,8 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
   const modalMediaUrl = getOptimizedCloudinaryUrl(currentMedia.src, { type: "modal" });
   const posterUrl = currentMedia.posterUrl || getOptimizedCloudinaryUrl(currentMedia.src, { type: "poster" });
 
-  // Calcolo prefetch per prossimo e precedente elemento
-  const nextItem = items && items.length > 1 ? items[(currentIndex + 1) % items.length] : null;
-  const prevItem = items && items.length > 1 ? items[(currentIndex - 1 + items.length) % items.length] : null;
-
-  const nextVideoUrl = nextItem && nextItem.type === "video" ? getOptimizedCloudinaryUrl(nextItem.src, { type: "modal" }) : null;
-  const nextPosterUrl = nextItem ? (nextItem.posterUrl || getOptimizedCloudinaryUrl(nextItem.src, { type: "poster" })) : null;
-  const prevVideoUrl = prevItem && prevItem.type === "video" ? getOptimizedCloudinaryUrl(prevItem.src, { type: "modal" }) : null;
-
   return (
-    <>
-      {/* Prefetching in background delle prossime risorse per riproduzione a zero latenza */}
-      {show && nextVideoUrl && <link rel="preload" href={nextVideoUrl} as="video" />}
-      {show && nextPosterUrl && <link rel="preload" href={nextPosterUrl} as="image" />}
-      {show && prevVideoUrl && <link rel="preload" href={prevVideoUrl} as="video" />}
-
-      <Modal
+    <Modal
         show={show}
         onHide={onHide}
         centered
@@ -176,7 +182,6 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
           </div>
         )}
       </Modal>
-    </>
   );
 }
 

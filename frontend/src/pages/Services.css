@@ -26,6 +26,9 @@
   overflow: hidden;
   background: var(--bs-body-bg);
   height: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .service-card-box:hover {
@@ -37,13 +40,14 @@
 .service-card-img-wrapper {
   position: relative;
   width: 100%;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   background-color: #000;
 }
 
 .service-card-img {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
@@ -62,6 +66,9 @@
   padding: 0.4em 0.9em;
   border-radius: 50rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #198754, #146c43);
+  color: #ffffff;
+  z-index: 2;
 }
 
 .badge-basic {
@@ -79,10 +86,17 @@
   color: #000;
 }
 
+.badge-custom,
+.badge-special {
+  background: linear-gradient(135deg, #0d6efd, #0a58ca);
+  color: #fff;
+}
+
 .feature-list-custom {
   list-style: none;
   padding-left: 0;
   margin-bottom: 1.5rem;
+  min-height: 110px;
 }
 
 .feature-list-custom li {

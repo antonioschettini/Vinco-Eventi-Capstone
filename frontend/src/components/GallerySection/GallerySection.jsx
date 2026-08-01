@@ -96,6 +96,7 @@ function GallerySection() {
   const filteredItems = allItems.filter((item) => {
     if (activeFilter === "photos") return item.type === "image";
     if (activeFilter === "videos") return item.type === "video";
+    if (activeFilter === "featured") return item.featured;
     return true;
   });
 
@@ -184,12 +185,12 @@ function GallerySection() {
           publicId: data.publicId || prev.publicId,
           posterUrl: data.posterUrl || prev.posterUrl,
         }));
-        alert("File multimediale caricato su Cloudinary con successo!");
+        alert("File multimediale caricato con successo!");
       } else {
-        alert("Errore durante l'upload del file su Cloudinary.");
+        alert("Impossibile completare l'upload del file. Puoi comunque inserire o incollare l'URL della risorsa multimediale direttamente nel campo sottostante.");
       }
     } catch {
-      alert("Errore di connessione durante l'upload multimediale.");
+      alert("Errore di connessione durante l'upload multimediale. Puoi comunque inserire l'URL direttamente nel campo sottostante.");
     } finally {
       setUploadingMedia(false);
     }
@@ -371,6 +372,14 @@ function GallerySection() {
                 {t.filterVideos} ({allItems.filter((i) => i.type === "video").length})
               </Nav.Link>
             </Nav.Item>
+            {isAuthenticated && (
+              <Nav.Item>
+                <Nav.Link eventKey="featured" className="filter-btn filter-btn-featured rounded-pill px-4 py-2">
+                  <i className="bi bi-star-fill me-2 text-warning"></i>
+                  {t.filterFeatured} ({allItems.filter((i) => i.featured).length})
+                </Nav.Link>
+              </Nav.Item>
+            )}
           </Nav>
         </div>
 
@@ -457,11 +466,8 @@ function GallerySection() {
 
                   {/* Badge "In Evidenza" - VISIBILE SOLO ALL'ADMIN in BASSO A DESTRA della card */}
                   {isAuthenticated && item.featured && (
-                    <span
-                      className="badge bg-warning text-dark rounded-pill position-absolute bottom-0 end-0 m-2 z-3 shadow-sm px-2 py-1"
-                      style={{ fontSize: "0.72rem", border: "1px solid rgba(0,0,0,0.15)" }}
-                    >
-                      <i className="bi bi-star-fill me-1"></i> Evidenza
+                    <span className="badge badge-featured-admin rounded-pill position-absolute bottom-0 end-0 m-2 z-3 px-2 py-1">
+                      <i className="bi bi-star-fill me-1"></i> {t.filterFeatured || "In Evidenza"}
                     </span>
                   )}
 
@@ -598,15 +604,18 @@ function GallerySection() {
                   </Col>
 
                   <Col md={12}>
-                    <label className="form-label fw-semibold">URL Risorsa Multimediale (Cloudinary o Link)</label>
+                    <label className="form-label fw-semibold">URL Risorsa Multimediale (Cloudinary o Link Diretto)*</label>
                     <input
                       type="text"
                       className="form-control"
                       value={formData.src}
                       onChange={(e) => setFormData({ ...formData, src: e.target.value })}
                       required
-                      placeholder="https://res.cloudinary.com/..."
+                      placeholder="https://res.cloudinary.com/... o link diretto"
                     />
+                    <small className="text-muted d-block mt-1">
+                      Si autocompila al caricamento del file oppure puoi incollare manualmente un qualsiasi URL multimediale diretto.
+                    </small>
                   </Col>
 
                   {/* Video Start Time (Offset) & Display Order */}
