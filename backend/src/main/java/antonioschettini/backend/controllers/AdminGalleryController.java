@@ -49,7 +49,7 @@ public class AdminGalleryController {
 
     @PostMapping("/upload-media")
     public ResponseEntity<Map<String, String>> uploadMedia(@RequestParam("file") MultipartFile file) throws IOException {
-        String mediaUrl = cloudinaryService.uploadMedia(file);
-        return ResponseEntity.ok(Map.of("url", mediaUrl));
+        Map<String, String> uploadMetadata = cloudinaryService.uploadMediaWithMetadata(file);
+        return ResponseEntity.ok(uploadMetadata);
     }
 }

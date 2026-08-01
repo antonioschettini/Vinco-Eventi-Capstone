@@ -123,6 +123,20 @@
   transform: translateX(4px);
 }
 
+.map-contact-link {
+  cursor: pointer;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.map-contact-link:hover {
+  color: var(--primary-forest, #204a35) !important;
+  text-decoration: underline !important;
+}
+
+[data-bs-theme="dark"] .map-contact-link:hover {
+  color: #58bc82 !important;
+}
+
 @media (max-width: 991.98px) {
   .map-iframe-container {
     min-height: 320px;
@@ -133,3 +147,4 @@
     padding: 1.75rem 1.5rem;
   }
 }
+

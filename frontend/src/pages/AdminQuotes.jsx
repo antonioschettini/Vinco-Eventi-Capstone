@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
+import API_BASE_URL from "../config/api";
 import "./AdminQuotes.css";
 
 function AdminQuotes() {
@@ -13,11 +14,10 @@ function AdminQuotes() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
-  const fetchQuotes = async () => {
+  const fetchQuotes = useCallback(async () => {
     setLoading(true);
-    setError("");
     try {
-      let url = "http://localhost:8080/api/admin/quotes";
+      let url = `${API_BASE_URL}/api/admin/quotes`;
       if (activeFilter !== "ALL") {
         url += `?status=${activeFilter}`;
       }
@@ -34,20 +34,58 @@ function AdminQuotes() {
 
       const data = await response.json();
       setQuotes(data);
+      setError("");
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeFilter, token]);
 
   useEffect(() => {
-    fetchQuotes();
+    let isSubscribed = true;
+    const loadQuotes = async () => {
+      try {
+        let url = `${API_BASE_URL}/api/admin/quotes`;
+        if (activeFilter !== "ALL") {
+          url += `?status=${activeFilter}`;
+        }
+
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Impossibile caricare la lista dei preventivi.");
+        }
+
+        const data = await response.json();
+        if (isSubscribed) {
+          setQuotes(data);
+          setError("");
+        }
+      } catch (err) {
+        if (isSubscribed) {
+          setError(err.message);
+        }
+      } finally {
+        if (isSubscribed) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadQuotes();
+    return () => {
+      isSubscribed = false;
+    };
   }, [activeFilter, token]);
 
   const handleUpdateStatus = async (id, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/admin/quotes/${id}/status`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/quotes/${id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +110,7 @@ function AdminQuotes() {
 
   const handleDeleteQuote = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/admin/quotes/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/quotes/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -315,7 +353,7 @@ function AdminQuotes() {
                           </a>
                         </div>
                         <div>
-                          <a href={`tel:${q.telefono}`} className="text-decoration-none contact-chip-phone font-monospace">
+                          <a href={`tel:${(q.telefono || "").replace(/[^\d+]/g, "")}`} className="text-decoration-none contact-chip-phone font-monospace">
                             <i className="bi bi-telephone me-1"></i>
                             {q.telefono}
                           </a>
@@ -446,7 +484,7 @@ function AdminQuotes() {
                             <i className="bi bi-envelope-fill"></i>
                             <span className="text-truncate" style={{ maxWidth: "160px" }}>{q.email}</span>
                           </a>
-                          <a href={`tel:${q.telefono}`} className="contact-chip contact-chip-phone">
+                          <a href={`tel:${(q.telefono || "").replace(/[^\d+]/g, "")}`} className="contact-chip contact-chip-phone">
                             <i className="bi bi-telephone-fill"></i>
                             <span>{q.telefono}</span>
                           </a>
@@ -545,7 +583,7 @@ function AdminQuotes() {
                   <div className="col-md-6">
                     <label className="text-muted small fw-semibold">Telefono</label>
                     <p className="mb-0 fw-semibold">
-                      <a href={`tel:${selectedQuote.telefono}`} className="text-decoration-none text-body">
+                      <a href={`tel:${(selectedQuote.telefono || "").replace(/[^\d+]/g, "")}`} className="text-decoration-none text-body">
                         {selectedQuote.telefono}
                       </a>
                     </p>

@@ -1,3 +1,15 @@
-# Agent directories
+# Agent & AI tool files / directories
 .agent/
-.agents/AGENTS.md
+.agents/
+.gemini/
+.brain/
+AGENTS.md
+
+# Agent generated plans, notes, and task reminders
+implementation_plan.md
+walkthrough.md
+promemoria*
+*.promemoria*
+.tasks/
+tasks.md
+task_list.json

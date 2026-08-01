@@ -9,6 +9,8 @@ import plusItaImg from "../assets/serviziOfferti/plusIta.png";
 import plusEngImg from "../assets/serviziOfferti/plusEng.png";
 import fullItaImg from "../assets/serviziOfferti/fullIta.png";
 import fullEngImg from "../assets/serviziOfferti/fullEng.png";
+import API_BASE_URL from "../config/api";
+import { handlePhoneClick } from "../utils/contactHelpers";
 import "./Services.css";
 
 function Services() {
@@ -17,7 +19,6 @@ function Services() {
   const t = translations[lang].services;
 
   const [dbServices, setDbServices] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -40,24 +41,34 @@ function Services() {
   });
 
   const fetchDbServices = async () => {
-    setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/api/services");
+      const response = await fetch(`${API_BASE_URL}/api/services`);
       if (response.ok) {
         const data = await response.json();
-        // Filtra solo i servizi di categoria PACKAGE
         const packagesOnly = data.filter((s) => s.category === "PACKAGE");
         setDbServices(packagesOnly);
       }
-    } catch (err) {
+    } catch {
       console.log("Database non raggiungibile. Uso fallback locali per visualizzazione.");
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDbServices();
+    let isSubscribed = true;
+    const loadServices = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/services`);
+        if (response.ok && isSubscribed) {
+          const data = await response.json();
+          const packagesOnly = data.filter((s) => s.category === "PACKAGE");
+          setDbServices(packagesOnly);
+        }
+      } catch {
+        console.log("Database non raggiungibile. Uso fallback locali per visualizzazione.");
+      }
+    };
+    loadServices();
+    return () => { isSubscribed = false; };
   }, []);
 
   // Determina l'immagine da visualizzare (Priorità: 1. URL Cloudinary/DB, 2. Immagine Locale Fallback)
@@ -132,7 +143,7 @@ function Services() {
     formDataUpload.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8080/api/admin/services/upload-image", {
+      const res = await fetch(`${API_BASE_URL}/api/admin/services/upload-image`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -150,7 +161,7 @@ function Services() {
       } else {
         alert("Errore durante l'upload dell'immagine su Cloudinary.");
       }
-    } catch (err) {
+    } catch {
       alert("Errore di connessione durante l'upload dell'immagine.");
     } finally {
       setUploadingImage(false);
@@ -161,8 +172,8 @@ function Services() {
     e.preventDefault();
     try {
       const url = editingService
-        ? `http://localhost:8080/api/admin/services/${editingService.id}`
-        : "http://localhost:8080/api/admin/services";
+        ? `${API_BASE_URL}/api/admin/services/${editingService.id}`
+        : `${API_BASE_URL}/api/admin/services`;
       const method = editingService ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -181,7 +192,7 @@ function Services() {
       } else {
         alert("Errore nel salvataggio del servizio.");
       }
-    } catch (err) {
+    } catch {
       alert("Errore di connessione con il server backend.");
     }
   };
@@ -189,7 +200,7 @@ function Services() {
   const handleDeleteService = async (id) => {
     if (!window.confirm(t.adminActions.confirmDelete)) return;
     try {
-      const response = await fetch(`http://localhost:8080/api/admin/services/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/services/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -198,7 +209,7 @@ function Services() {
       if (response.ok) {
         fetchDbServices();
       }
-    } catch (err) {
+    } catch {
       alert("Impossibile eliminare il servizio.");
     }
   };
@@ -264,6 +275,7 @@ function Services() {
               <div className="d-flex justify-content-center">
                 <a
                   href="tel:+393492949669"
+                  onClick={(e) => handlePhoneClick(e, "+393492949669")}
                   className="btn btn-forest-submit btn-lg px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2"
                 >
                   <i className="bi bi-telephone-fill"></i>
@@ -416,6 +428,7 @@ function Services() {
                       <div className="mt-3">
                         <a
                           href="tel:+393492949669"
+                          onClick={(e) => handlePhoneClick(e, "+393492949669")}
                           className="btn btn-outline-success w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
                         >
                           <i className="bi bi-telephone-fill"></i>

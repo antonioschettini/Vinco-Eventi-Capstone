@@ -1,13 +1,29 @@
 import { useState, useRef } from "react";
 import { useSelector } from "react-redux";
-import { Modal, Button, Spinner, Alert } from "react-bootstrap";
+import { Modal, Button, Spinner, Alert, Dropdown } from "react-bootstrap";
+import API_BASE_URL from "../../config/api";
 import { translations } from "../../utils/translations";
 import "./ContactForm.css";
+
+const COUNTRY_PREFIXES = [
+  { code: "it", name: "Italia", prefix: "+39", flagUrl: "https://flagcdn.com/w40/it.png" },
+  { code: "fr", name: "Francia", prefix: "+33", flagUrl: "https://flagcdn.com/w40/fr.png" },
+  { code: "de", name: "Germania", prefix: "+49", flagUrl: "https://flagcdn.com/w40/de.png" },
+  { code: "gb", name: "Regno Unito", prefix: "+44", flagUrl: "https://flagcdn.com/w40/gb.png" },
+  { code: "es", name: "Spagna", prefix: "+34", flagUrl: "https://flagcdn.com/w40/es.png" },
+  { code: "ch", name: "Svizzera", prefix: "+41", flagUrl: "https://flagcdn.com/w40/ch.png" },
+  { code: "at", name: "Austria", prefix: "+43", flagUrl: "https://flagcdn.com/w40/at.png" },
+  { code: "us", name: "Stati Uniti / Canada", prefix: "+1", flagUrl: "https://flagcdn.com/w40/us.png" },
+  { code: "cn", name: "Cina", prefix: "+86", flagUrl: "https://flagcdn.com/w40/cn.png" },
+  { code: "jp", name: "Giappone", prefix: "+81", flagUrl: "https://flagcdn.com/w40/jp.png" },
+  { code: "br", name: "Brasile", prefix: "+55", flagUrl: "https://flagcdn.com/w40/br.png" },
+];
 
 const initialFormState = {
   nome: "",
   cognome: "",
   email: "",
+  prefissoTelefono: "+39",
   telefono: "",
   tipoEvento: "",
   dataEvento: "",
@@ -24,8 +40,12 @@ const initialFormState = {
 // Valida Email
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
-// Valida Telefono (accetta numeri, spazi, +, - e parentesi, almeno 6 cifre)
-const isValidPhone = (phone) => /^[\d\s+\-()]{6,20}$/.test(phone.trim());
+// Valida Telefono (almeno 6 cifre numeriche)
+const isValidPhone = (phone) => {
+  if (!phone) return false;
+  const digitsOnly = phone.replace(/[^\d]/g, "");
+  return digitsOnly.length >= 6 && digitsOnly.length <= 15;
+};
 
 // Valida Data (deve essere da oggi in poi)
 const isValidFutureDate = (dateString) => {
@@ -56,11 +76,22 @@ function ContactForm() {
   const [submitStatus, setSubmitStatus] = useState(null); // { type: 'success' | 'danger', message: string }
   const [showResetModal, setShowResetModal] = useState(false);
 
+  const selectedCountry = COUNTRY_PREFIXES.find(
+    (c) => c.prefix === formData.prefissoTelefono
+  ) || COUNTRY_PREFIXES[0];
+
+  const getCountryName = (country) => {
+    return t.countries?.[country.code] || country.name;
+  };
+
+  const selectedCountryName = getCountryName(selectedCountry);
+
   const scrollToTop = () => {
     if (formRef.current) {
       formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -119,11 +150,14 @@ function ContactForm() {
     setIsSubmitting(true);
     setSubmitStatus(null);
 
+    const cleanPhoneDigits = formData.telefono.trim().replace(/^\+\d{1,4}\s*/, "");
+    const fullPhone = `${formData.prefissoTelefono} ${cleanPhoneDigits}`;
+
     const payload = {
       nome: formData.nome,
       cognome: formData.cognome,
       email: formData.email,
-      telefono: formData.telefono,
+      telefono: fullPhone,
       dataEvento: formData.dataEvento || null,
       tipoEvento: formData.tipoEvento,
       location: formData.luogoEvento,
@@ -137,7 +171,7 @@ function ContactForm() {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/quotes", {
+      const response = await fetch(`${API_BASE_URL}/api/quotes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -302,20 +336,64 @@ function ContactForm() {
             <label htmlFor="telefono" className="form-label font-body fw-semibold text-body fs-7">
               {t.phone} <span className="text-danger">*</span>
             </label>
-            <input
-              type="tel"
-              id="telefono"
-              name="telefono"
-              tabIndex={4}
-              value={formData.telefono}
-              onChange={handleChange}
-              placeholder="+39 333 123 4567"
-              className={`form-control font-body ${
-                validated && !isValidPhone(formData.telefono) ? "is-invalid" : ""
-              }`}
-              required
-            />
-            <div className="invalid-feedback">Il {t.phone} è obbligatorio.</div>
+            <div className="input-group">
+              <Dropdown className="phone-prefix-dropdown">
+                <Dropdown.Toggle
+                  variant="outline-secondary"
+                  id="dropdown-phone-prefix"
+                  className="d-flex align-items-center gap-1 phone-prefix-btn"
+                  title={`${selectedCountryName} (${selectedCountry.prefix})`}
+                >
+                  <img
+                    src={selectedCountry.flagUrl}
+                    alt={selectedCountryName}
+                    className="country-flag-icon"
+                    width="18"
+                    height="13"
+                  />
+                  <span className="prefix-num-sm">{selectedCountry.prefix}</span>
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu className="phone-prefix-menu shadow-lg">
+                  {COUNTRY_PREFIXES.map((country) => {
+                    const countryName = getCountryName(country);
+                    return (
+                      <Dropdown.Item
+                        key={country.code}
+                        active={country.prefix === formData.prefissoTelefono}
+                        onClick={() => setFormData((prev) => ({ ...prev, prefissoTelefono: country.prefix }))}
+                        className="d-flex align-items-center gap-2 py-2 px-3 fs-7"
+                      >
+                        <img
+                          src={country.flagUrl}
+                          alt={countryName}
+                          className="country-flag-icon"
+                          width="18"
+                          height="13"
+                        />
+                        <span className="fw-semibold me-auto">{countryName}</span>
+                        <span className="text-body-secondary font-monospace small">{country.prefix}</span>
+                      </Dropdown.Item>
+                    );
+                  })}
+                </Dropdown.Menu>
+              </Dropdown>
+
+              <input
+                type="tel"
+                id="telefono"
+                name="telefono"
+                tabIndex={5}
+                value={formData.telefono}
+                onChange={handleChange}
+                placeholder="333 123 4567"
+                className={`form-control phone-input-field font-body ${
+                  validated && !isValidPhone(formData.telefono) ? "is-invalid" : ""
+                }`}
+                required
+              />
+              <div className="invalid-feedback">Il {t.phone} è obbligatorio (inserisci un numero di almeno 6 cifre).</div>
+            </div>
           </div>
         </div>
 

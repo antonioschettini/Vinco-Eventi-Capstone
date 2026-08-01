@@ -12,7 +12,7 @@ function AudioController() {
   const dispatch = useDispatch();
   const audioRef = useRef(null);
 
-  const { isPlaying, volume, currentTrackIndex, autoplayBlocked } = useSelector(
+  const { isPlaying, volume, currentTrackIndex } = useSelector(
     (state) => state.audio
   );
 
@@ -20,14 +20,8 @@ function AudioController() {
 
   // Inizializzazione al montaggio: per rispettare la policy del browser, l'audio non parte finché l'utente non interagisce
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.volume = volume;
     dispatch(setAutoplayBlocked(true));
-  }, []);
-
-
+  }, [dispatch]);
 
   // Sincronizza stato isPlaying di Redux con l'elemento Audio HTML5
   useEffect(() => {
@@ -65,7 +59,7 @@ function AudioController() {
     if (isPlaying) {
       audio.play().catch((err) => console.warn("Errore cambio traccia:", err));
     }
-  }, [currentTrackIndex]);
+  }, [currentTrackIndex, currentTrack.src, isPlaying]);
 
   // Evento di fine traccia -> Passa automaticamente alla traccia successiva
   const handleEnded = () => {

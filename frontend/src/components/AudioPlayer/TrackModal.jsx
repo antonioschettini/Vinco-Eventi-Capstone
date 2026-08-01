@@ -37,11 +37,11 @@ function TrackModal() {
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
 
-  useEffect(() => {
-    if (modalPosition) {
-      setPosition(modalPosition);
-    }
-  }, [modalPosition]);
+  const [prevModalPos, setPrevModalPos] = useState(modalPosition);
+  if (modalPosition && modalPosition !== prevModalPos) {
+    setPrevModalPos(modalPosition);
+    setPosition(modalPosition);
+  }
 
   useEffect(() => {
     const handleResize = () => {
@@ -67,7 +67,9 @@ function TrackModal() {
     if (pointerId !== null && target.setPointerCapture) {
       try {
         target.setPointerCapture(pointerId);
-      } catch (e) {}
+      } catch {
+        /* ignore pointer capture failure */
+      }
     }
   };
 
@@ -91,7 +93,9 @@ function TrackModal() {
       if (pointerId !== null && target.releasePointerCapture) {
         try {
           target.releasePointerCapture(pointerId);
-        } catch (e) {}
+        } catch {
+          /* ignore pointer release failure */
+        }
       }
     }
   };

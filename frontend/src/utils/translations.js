@@ -214,12 +214,6 @@ export const translations = {
         "Raccontaci la tua idea e richiedi un preventivo gratuito e personalizzato.",
       ctaBtn: "Richiedi un Preventivo",
     },
-    instagramMockup: {
-      location: "Puglia, Italia",
-      caption:
-        "Crea ricordi indimenticabili con la colonna sonora perfetta per il tuo giorno speciale! ✨🎶",
-      hashtags: "#VincoEventi #WeddingPuglia #WeddingMusic #PugliaEvents",
-    },
     contactForm: {
       title: "Richiedi un Preventivo",
       subtitle:
@@ -279,6 +273,19 @@ export const translations = {
         "Richiesta inviata con successo! Ti risponderemo al più presto.",
       errorMessage: "Si è verificato un errore. Riprova più tardi.",
       optional: "(opzionale)",
+      countries: {
+        it: "Italia",
+        fr: "Francia",
+        de: "Germania",
+        gb: "Regno Unito",
+        es: "Spagna",
+        ch: "Svizzera",
+        at: "Austria",
+        us: "Stati Uniti / Canada",
+        cn: "Cina",
+        jp: "Giappone",
+        br: "Brasile",
+      },
     },
     instagramMockup: {
       location: "Puglia, Italia",
@@ -501,12 +508,6 @@ export const translations = {
       ctaSub: "Tell us your vision and request a free, personalized quote.",
       ctaBtn: "Request a Quote",
     },
-    instagramMockup: {
-      location: "Apulia, Italy",
-      caption:
-        "Create unforgettable memories with the perfect soundtrack for your special day! ✨🎶",
-      hashtags: "#VincoEventi #WeddingPuglia #WeddingMusic #ApuliaEvents",
-    },
     contactForm: {
       title: "Request a Quote",
       subtitle:
@@ -566,6 +567,19 @@ export const translations = {
         "Request submitted successfully! We will get back to you soon.",
       errorMessage: "An error occurred. Please try again later.",
       optional: "(optional)",
+      countries: {
+        it: "Italy",
+        fr: "France",
+        de: "Germany",
+        gb: "United Kingdom",
+        es: "Spain",
+        ch: "Switzerland",
+        at: "Austria",
+        us: "United States / Canada",
+        cn: "China",
+        jp: "Japan",
+        br: "Brazil",
+      },
     },
     instagramMockup: {
       location: "Apulia, Italy",

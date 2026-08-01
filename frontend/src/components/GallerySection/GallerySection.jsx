@@ -3,6 +3,8 @@ import { Container, Row, Col, Carousel, Nav, Modal } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { translations } from "../../utils/translations";
 import { galleryItems as staticGalleryItems } from "./galleryData";
+import { getOptimizedCloudinaryUrl } from "../../utils/cloudinary";
+import API_BASE_URL from "../../config/api";
 import MediaModal from "../MediaModal/MediaModal";
 import "./GallerySection.css";
 
@@ -12,7 +14,6 @@ function GallerySection() {
   const t = translations[lang].gallery;
 
   const [dbItems, setDbItems] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("all");
 
   // Lightbox Modal State
@@ -35,25 +36,37 @@ function GallerySection() {
     featured: false,
     startTime: "",
     displayOrder: 1,
+    publicId: "",
+    posterUrl: "",
   });
 
   const fetchGalleryItems = async () => {
-    setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/api/gallery");
+      const response = await fetch(`${API_BASE_URL}/api/gallery`);
       if (response.ok) {
         const data = await response.json();
         setDbItems(data);
       }
-    } catch (err) {
+    } catch {
       console.log("Database gallery non raggiungibile. Uso fallback locali per visualizzazione.");
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchGalleryItems();
+    let isSubscribed = true;
+    const loadItems = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/gallery`);
+        if (response.ok && isSubscribed) {
+          const data = await response.json();
+          setDbItems(data);
+        }
+      } catch {
+        console.log("Database gallery non raggiungibile. Uso fallback locali per visualizzazione.");
+      }
+    };
+    loadItems();
+    return () => { isSubscribed = false; };
   }, []);
 
   // Formatta l'elenco dei media da renderizzare
@@ -120,6 +133,8 @@ function GallerySection() {
       featured: false,
       startTime: "",
       displayOrder: allItems.length + 1,
+      publicId: "",
+      posterUrl: "",
     });
     setShowAdminModal(true);
   };
@@ -138,6 +153,8 @@ function GallerySection() {
       featured: item.featured || false,
       startTime: item.startTime !== null && item.startTime !== undefined ? item.startTime : "",
       displayOrder: item.displayOrder || 1,
+      publicId: item.publicId || "",
+      posterUrl: item.posterUrl || "",
     });
     setShowAdminModal(true);
   };
@@ -151,7 +168,7 @@ function GallerySection() {
     uploadData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8080/api/admin/gallery/upload-media", {
+      const res = await fetch(`${API_BASE_URL}/api/admin/gallery/upload-media`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -164,12 +181,14 @@ function GallerySection() {
         setFormData((prev) => ({
           ...prev,
           src: data.url,
+          publicId: data.publicId || prev.publicId,
+          posterUrl: data.posterUrl || prev.posterUrl,
         }));
         alert("File multimediale caricato su Cloudinary con successo!");
       } else {
         alert("Errore durante l'upload del file su Cloudinary.");
       }
-    } catch (err) {
+    } catch {
       alert("Errore di connessione durante l'upload multimediale.");
     } finally {
       setUploadingMedia(false);
@@ -193,8 +212,8 @@ function GallerySection() {
     try {
       const isEdit = editingItem && editingItem.id && !String(editingItem.id).startsWith("v_") && !String(editingItem.id).startsWith("p_") && !String(editingItem.id).startsWith("v1");
       const url = isEdit
-        ? `http://localhost:8080/api/admin/gallery/${editingItem.id}`
-        : "http://localhost:8080/api/admin/gallery";
+        ? `${API_BASE_URL}/api/admin/gallery/${editingItem.id}`
+        : `${API_BASE_URL}/api/admin/gallery`;
       const method = isEdit ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -213,7 +232,7 @@ function GallerySection() {
       } else {
         alert("Errore nel salvataggio dell'elemento della galleria.");
       }
-    } catch (err) {
+    } catch {
       alert("Errore di connessione con il server backend.");
     }
   };
@@ -223,7 +242,7 @@ function GallerySection() {
     if (!window.confirm(t.confirmDeleteMedia)) return;
 
     try {
-      const response = await fetch(`http://localhost:8080/api/admin/gallery/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/gallery/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -234,7 +253,7 @@ function GallerySection() {
       } else {
         alert("Impossibile eliminare l'elemento selezionato.");
       }
-    } catch (err) {
+    } catch {
       alert("Errore di connessione durante l'eliminazione.");
     }
   };
@@ -282,11 +301,13 @@ function GallerySection() {
                   <div className="carousel-media-wrapper">
                     {item.type === "video" ? (
                       <video
-                        src={item.startTime ? `${item.src}#t=${item.startTime}` : item.src}
+                        src={item.startTime ? `${getOptimizedCloudinaryUrl(item.src, { type: "grid" })}#t=${item.startTime}` : getOptimizedCloudinaryUrl(item.src, { type: "grid" })}
+                        poster={item.posterUrl || getOptimizedCloudinaryUrl(item.src, { type: "poster" })}
                         muted
                         loop
                         playsInline
                         autoPlay
+                        preload="auto"
                         onLoadedMetadata={(e) => {
                           if (item.startTime && e.target) {
                             e.target.currentTime = item.startTime;
@@ -296,7 +317,7 @@ function GallerySection() {
                       />
                     ) : (
                       <img
-                        src={item.src}
+                        src={getOptimizedCloudinaryUrl(item.src, { type: "grid" })}
                         alt={item.title}
                         className="carousel-media-content"
                       />
@@ -389,11 +410,13 @@ function GallerySection() {
                   {item.type === "video" ? (
                     <>
                       <video
-                        src={item.startTime ? `${item.src}#t=${item.startTime}` : item.src}
+                        src={item.startTime ? `${getOptimizedCloudinaryUrl(item.src, { type: "grid" })}#t=${item.startTime}` : getOptimizedCloudinaryUrl(item.src, { type: "grid" })}
+                        poster={item.posterUrl || getOptimizedCloudinaryUrl(item.src, { type: "poster" })}
                         muted
                         loop
                         playsInline
                         autoPlay
+                        preload="auto"
                         onLoadedMetadata={(e) => {
                           if (item.startTime && e.target) {
                             e.target.currentTime = item.startTime;
@@ -408,7 +431,7 @@ function GallerySection() {
                   ) : (
                     <>
                       <img
-                        src={item.src}
+                        src={getOptimizedCloudinaryUrl(item.src, { type: "grid" })}
                         alt={item.title}
                         className="gallery-media-thumb"
                         loading="lazy"

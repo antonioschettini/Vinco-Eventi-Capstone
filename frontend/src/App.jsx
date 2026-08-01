@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Services from "./pages/Services";
 import Gallery from "./pages/Gallery";
 import About from "./pages/About";
+import AdminLogin from "./pages/AdminLogin";
 import AdminQuotes from "./pages/AdminQuotes";
 import ProtectedRoute from "./components/Admin/ProtectedRoute";
 import "./App.css";
@@ -44,6 +45,7 @@ function App() {
           <Route path="servizi" element={<Services />} />
           <Route path="galleria" element={<Gallery />} />
           <Route path="chi-siamo" element={<About />} />
+          <Route path="admin" element={<AdminLogin />} />
           <Route
             path="admin/preventivi"
             element={

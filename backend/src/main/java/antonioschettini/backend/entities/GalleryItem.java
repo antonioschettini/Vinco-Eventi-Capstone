@@ -48,6 +48,12 @@ public class GalleryItem {
     @Column(name = "display_order")
     private Integer displayOrder;
 
+    @Column(name = "public_id")
+    private String publicId;
+
+    @Column(name = "poster_url", columnDefinition = "TEXT")
+    private String posterUrl;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

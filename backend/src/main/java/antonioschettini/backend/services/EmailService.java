@@ -50,6 +50,9 @@ public class EmailService {
                     ? quote.getDataRichiesta().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                     : "Ora";
 
+            String phoneFormatted = quote.getTelefono() != null && !quote.getTelefono().isBlank() ? quote.getTelefono() : "Non specificato";
+            String telHref = quote.getTelefono() != null ? quote.getTelefono().replaceAll("[^\\d+]", "") : "";
+
             // Testo Semplice (Plain Text Alternative per filtri antispam)
             String plainText = String.format("""
                 NUOVA RICHIESTA DI PREVENTIVO - VINCO EVENTI
@@ -162,7 +165,7 @@ public class EmailService {
                 """,
                     quote.getNome(), quote.getCognome(),
                     quote.getEmail(), quote.getEmail(),
-                    quote.getTelefono(), quote.getTelefono(),
+                    telHref, phoneFormatted,
                     dataEventoFormatted,
                     quote.getTipoEvento() != null ? quote.getTipoEvento() : "Non specificato",
                     quote.getLocation() != null ? quote.getLocation() : "Non specificata",

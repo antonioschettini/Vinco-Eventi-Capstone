@@ -31,6 +31,12 @@ public class GlobalExceptionHandler {
         return new ErrorPayload(ex.getMessage(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(TooManyRequestsException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ErrorPayload handleTooManyRequests(TooManyRequestsException ex) {
+        return new ErrorPayload(ex.getMessage(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorPayload handleValidation(MethodArgumentNotValidException ex) {

@@ -1,6 +1,7 @@
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { translations } from "../../utils/translations";
+import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
 import "./LocationMap.css";
 
 function LocationMap() {
@@ -83,7 +84,8 @@ function LocationMap() {
                         </span>
                         <a
                           href={`tel:${t.phoneValue.replace(/[^\d+]/g, "")}`}
-                          className="fw-medium text-body text-decoration-none font-body fs-6"
+                          onClick={(e) => handlePhoneClick(e, t.phoneValue)}
+                          className="fw-medium text-body text-decoration-none font-body fs-6 map-contact-link"
                         >
                           {t.phoneValue}
                         </a>
@@ -101,7 +103,8 @@ function LocationMap() {
                         </span>
                         <a
                           href={`mailto:${t.emailValue}`}
-                          className="fw-medium text-body text-decoration-none font-body fs-6"
+                          onClick={(e) => handleEmailClick(e, t.emailValue)}
+                          className="fw-medium text-body text-decoration-none font-body fs-6 map-contact-link"
                         >
                           {t.emailValue}
                         </a>

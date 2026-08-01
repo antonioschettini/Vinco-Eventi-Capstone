@@ -43,7 +43,7 @@ function MatrimonioWidgets() {
             window.wpShowRatedWAv3("283893", "2024");
             window.wpShowRatedWAv3("283893", "2025");
           }
-        } catch (e) {
+        } catch {
           // Fallback gestito via markup statico sottostante
         }
       }, 150);

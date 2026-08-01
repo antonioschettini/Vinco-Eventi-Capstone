@@ -4,6 +4,8 @@ import { translations } from "../../utils/translations";
 import footerBgImage from "../../assets/home/bannerFooter.png";
 import "./Footer.css";
 
+import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
+
 function Footer() {
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].footer;
@@ -37,13 +39,21 @@ function Footer() {
               </p>
               <p className="mb-0">
                 <i className="bi bi-telephone-fill me-2 text-forest"></i>
-                <a href={`tel:${t.phone.replace(/[^\d+]/g, "")}`} className="info-link">
+                <a
+                  href={`tel:${t.phone.replace(/[^\d+]/g, "")}`}
+                  onClick={(e) => handlePhoneClick(e, t.phone)}
+                  className="info-link"
+                >
                   {t.phone}
                 </a>
               </p>
               <p className="mb-0">
                 <i className="bi bi-envelope-fill me-2 text-forest"></i>
-                <a href={`mailto:${t.email}`} className="info-link">
+                <a
+                  href={`mailto:${t.email}`}
+                  onClick={(e) => handleEmailClick(e, t.email)}
+                  className="info-link"
+                >
                   {t.email}
                 </a>
               </p>

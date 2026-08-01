@@ -25,5 +25,7 @@ public record GalleryDTO(
         Boolean featured,
 
         Double startTime,
-        Integer displayOrder
+        Integer displayOrder,
+        String publicId,
+        String posterUrl
 ) {}

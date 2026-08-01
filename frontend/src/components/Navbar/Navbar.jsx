@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme, setLanguage } from "../../redux/slices/uiSlice";
 import {
@@ -17,6 +17,7 @@ import {
   logout,
 } from "../../redux/slices/authSlice";
 import tracks from "../../data/tracksData";
+import API_BASE_URL from "../../config/api";
 import AudioController from "../AudioPlayer/AudioController";
 import { translations } from "../../utils/translations";
 import "./Navbar.css";
@@ -61,12 +62,16 @@ const UKFlag = () => (
 function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const theme = useSelector((state) => state.ui.theme);
   const lang = useSelector((state) => state.ui.language);
-  const { isAuthenticated, user, loading, error: authError } = useSelector(
+  const { isAuthenticated, user, loading } = useSelector(
     (state) => state.auth
   );
   const t = translations[lang].nav;
+
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const showAdminButton = isAuthenticated || isAdminRoute;
 
   // Redux audio state
   const { isPlaying, volume, currentTrackIndex, isMuted } = useSelector(
@@ -107,7 +112,7 @@ function Navbar() {
     dispatch(loginStart());
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -127,7 +132,7 @@ function Navbar() {
       setPassword("");
       setShowLogin(false);
       navigate("/admin/preventivi");
-    } catch (err) {
+    } catch {
       const msg = "Impossibile connettersi al server di autenticazione.";
       setLoginError(msg);
       dispatch(loginFailure(msg));
@@ -266,104 +271,108 @@ function Navbar() {
           </div>
         </div>
 
-        {/* Lato Destro: Area Privata con Modale/Popover Login */}
-        <div className="top-right position-relative" ref={popoverRef}>
-          <button
-            onClick={() => setShowLogin(!showLogin)}
-            className={`admin-login-btn-toggle d-flex align-items-center gap-2 ${
-              showLogin ? "active" : ""
-            } ${isAuthenticated ? "border-success text-success" : ""}`}
-            aria-expanded={showLogin}
-          >
-            <i className={`bi ${isAuthenticated ? "bi-shield-check" : "bi-lock-fill"}`}></i>
-            <span>{isAuthenticated ? "Admin Panel" : t.adminLogin}</span>
-          </button>
+        {/* Lato Destro: Area Privata con Modale/Popover Login (visibile solo su rotte /admin o se autenticato) */}
+        {showAdminButton ? (
+          <div className="top-right position-relative" ref={popoverRef}>
+            <button
+              onClick={() => setShowLogin(!showLogin)}
+              className={`admin-login-btn-toggle d-flex align-items-center gap-2 ${
+                showLogin ? "active" : ""
+              } ${isAuthenticated ? "border-success text-success" : ""}`}
+              aria-expanded={showLogin}
+            >
+              <i className={`bi ${isAuthenticated ? "bi-shield-check" : "bi-lock-fill"}`}></i>
+              <span>{isAuthenticated ? "Admin Panel" : t.adminLogin}</span>
+            </button>
 
-          {/* Modale Login / Admin Menu Dropdown Popover */}
-          {showLogin && (
-            <div className="login-dropdown-popover p-3 shadow-lg rounded">
-              {isAuthenticated ? (
-                <div className="text-start">
-                  <div className="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
-                    <i className="bi bi-person-circle fs-5 text-success"></i>
-                    <div>
-                      <div className="fw-bold small text-truncate" style={{ maxWidth: "160px" }}>
-                        {user?.email}
+            {/* Modale Login / Admin Menu Dropdown Popover */}
+            {showLogin && (
+              <div className="login-dropdown-popover p-3 shadow-lg rounded">
+                {isAuthenticated ? (
+                  <div className="text-start">
+                    <div className="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
+                      <i className="bi bi-person-circle fs-5 text-success"></i>
+                      <div>
+                        <div className="fw-bold small text-truncate" style={{ maxWidth: "160px" }}>
+                          {user?.email}
+                        </div>
+                        <span className="badge bg-success text-uppercase style-badge small" style={{ fontSize: "0.65rem" }}>
+                          {user?.role}
+                        </span>
                       </div>
-                      <span className="badge bg-success text-uppercase style-badge small" style={{ fontSize: "0.65rem" }}>
-                        {user?.role}
-                      </span>
                     </div>
+                    <Link
+                      to="/admin/preventivi"
+                      className="btn btn-outline-success btn-sm w-100 mb-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
+                      onClick={() => setShowLogin(false)}
+                    >
+                      <i className="bi bi-file-earmark-text"></i>
+                      <span>Dashboard Preventivi</span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="btn btn-danger btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
+                    >
+                      <i className="bi bi-box-arrow-right"></i>
+                      <span>Logout</span>
+                    </button>
                   </div>
-                  <Link
-                    to="/admin/preventivi"
-                    className="btn btn-outline-success btn-sm w-100 mb-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
-                    onClick={() => setShowLogin(false)}
-                  >
-                    <i className="bi bi-file-earmark-text"></i>
-                    <span>Dashboard Preventivi</span>
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="btn btn-danger btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
-                  >
-                    <i className="bi bi-box-arrow-right"></i>
-                    <span>Logout</span>
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleLoginSubmit}>
-                  {loginError && (
-                    <div className="alert alert-danger p-2 small mb-2 text-start" role="alert">
-                      <i className="bi bi-exclamation-triangle-fill me-1"></i>
-                      {loginError}
-                    </div>
-                  )}
-                  <div className="mb-2 text-start">
-                    <label className="form-label small mb-1 fw-semibold">
-                      {t.email}
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="form-control form-control-sm input-custom"
-                      required
-                      placeholder="vincoeventi@gmail.com"
-                    />
-                  </div>
-                  <div className="mb-3 text-start">
-                    <label className="form-label small mb-1 fw-semibold">
-                      {t.password}
-                    </label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="form-control form-control-sm input-custom"
-                      required
-                      placeholder="••••••••"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="btn btn-forest-submit btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <span className="spinner-border spinner-border-sm" role="status"></span>
-                    ) : (
-                      <>
-                        <i className="bi bi-box-arrow-in-right"></i>
-                        <span>{t.loginBtn}</span>
-                      </>
+                ) : (
+                  <form onSubmit={handleLoginSubmit}>
+                    {loginError && (
+                      <div className="alert alert-danger p-2 small mb-2 text-start" role="alert">
+                        <i className="bi bi-exclamation-triangle-fill me-1"></i>
+                        {loginError}
+                      </div>
                     )}
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-        </div>
+                    <div className="mb-2 text-start">
+                      <label className="form-label small mb-1 fw-semibold">
+                        {t.email}
+                      </label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="form-control form-control-sm input-custom"
+                        required
+                        placeholder="vincoeventi@gmail.com"
+                      />
+                    </div>
+                    <div className="mb-3 text-start">
+                      <label className="form-label small mb-1 fw-semibold">
+                        {t.password}
+                      </label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="form-control form-control-sm input-custom"
+                        required
+                        placeholder="••••••••"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="btn btn-forest-submit btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <span className="spinner-border spinner-border-sm" role="status"></span>
+                      ) : (
+                        <>
+                          <i className="bi bi-box-arrow-in-right"></i>
+                          <span>{t.loginBtn}</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="top-right" style={{ minWidth: "120px" }}></div>
+        )}
       </div>
 
       {/* 2. Fascia Centrale - Logo con Animazione Ritmo Musicale */}

@@ -81,6 +81,116 @@
   box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
 }
 
+/* Phone Input Group with Custom Dropdown */
+.contact-form-wrapper .phone-prefix-dropdown {
+  flex: 0 0 auto;
+}
+
+.contact-form-wrapper .phone-prefix-btn {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-top-left-radius: 10px !important;
+  border-bottom-left-radius: 10px !important;
+  height: 100%;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.45rem 0.6rem !important;
+  min-width: 76px;
+}
+
+/* Freccetta dropdown integrata */
+.contact-form-wrapper .phone-prefix-btn::after {
+  margin-left: 0.25rem;
+  vertical-align: 0.15em;
+  border-top-width: 0.3em;
+  border-right-width: 0.3em;
+  border-left-width: 0.3em;
+}
+
+[data-bs-theme="dark"] .contact-form-wrapper .phone-prefix-btn {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f0f0f0;
+}
+
+[data-bs-theme="light"] .contact-form-wrapper .phone-prefix-btn {
+  background-color: #ffffff;
+  border-color: #dee2e6;
+  color: #212529;
+}
+
+.contact-form-wrapper .phone-prefix-btn:hover,
+.contact-form-wrapper .phone-prefix-btn:focus,
+.contact-form-wrapper .phone-prefix-btn:active,
+.contact-form-wrapper .show > .phone-prefix-btn.dropdown-toggle {
+  background-color: rgba(32, 74, 53, 0.12) !important;
+  border-color: var(--primary-forest, #204a35) !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
+/* Flag Icon Styling */
+.country-flag-icon {
+  width: 18px;
+  height: 13px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+/* Prefix Number Small Size */
+.prefix-num-sm {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+/* Dropdown Menu Custom Styling */
+.phone-prefix-menu {
+  max-height: 250px;
+  overflow-y: auto;
+  min-width: 220px;
+  border-radius: 12px;
+  padding: 6px;
+  z-index: 1060;
+}
+
+[data-bs-theme="dark"] .phone-prefix-menu {
+  background-color: #18221c;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-bs-theme="dark"] .phone-prefix-menu .dropdown-item {
+  color: #e0e0e0;
+  border-radius: 6px;
+}
+
+[data-bs-theme="dark"] .phone-prefix-menu .dropdown-item:hover,
+[data-bs-theme="dark"] .phone-prefix-menu .dropdown-item.active {
+  background-color: var(--primary-forest, #204a35);
+  color: #ffffff;
+}
+
+[data-bs-theme="light"] .phone-prefix-menu .dropdown-item {
+  border-radius: 6px;
+}
+
+[data-bs-theme="light"] .phone-prefix-menu .dropdown-item:hover,
+[data-bs-theme="light"] .phone-prefix-menu .dropdown-item.active {
+  background-color: rgba(32, 74, 53, 0.1);
+  color: var(--primary-forest, #204a35);
+}
+
+.contact-form-wrapper .input-group > .phone-input-field {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-top-right-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
 /* Classe globale di utilità tipografica — unica definizione nel progetto */
 .fs-7 {
   font-size: 0.8rem;
