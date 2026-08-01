@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
 import heroBgImage from "../assets/home/fotoEnzoSera.webp";
@@ -10,15 +10,22 @@ import plusEngImg from "../assets/serviziOfferti/plusEng.png";
 import fullItaImg from "../assets/serviziOfferti/fullIta.png";
 import fullEngImg from "../assets/serviziOfferti/fullEng.png";
 import API_BASE_URL from "../config/api";
+import { apiFetch, authApiFetch } from "../utils/apiClient";
+import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
+import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import { handlePhoneClick } from "../utils/contactHelpers";
 import "./Services.css";
 
 function Services() {
+  const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const { isAuthenticated, token } = useSelector((state) => state.auth);
   const t = translations[lang].services;
 
   const [dbServices, setDbServices] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -41,30 +48,34 @@ function Services() {
   });
 
   const fetchDbServices = async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/services`);
-      if (response.ok) {
-        const data = await response.json();
+      const data = await apiFetch(`${API_BASE_URL}/api/services`);
+      if (Array.isArray(data)) {
         const packagesOnly = data.filter((s) => s.category === "PACKAGE");
         setDbServices(packagesOnly);
       }
     } catch {
       console.log("Database non raggiungibile. Uso fallback locali per visualizzazione.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     let isSubscribed = true;
     const loadServices = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/services`);
-        if (response.ok && isSubscribed) {
-          const data = await response.json();
+        const data = await apiFetch(`${API_BASE_URL}/api/services`);
+        if (isSubscribed && Array.isArray(data)) {
           const packagesOnly = data.filter((s) => s.category === "PACKAGE");
           setDbServices(packagesOnly);
         }
       } catch {
         console.log("Database non raggiungibile. Uso fallback locali per visualizzazione.");
+      } finally {
+        if (isSubscribed) setLoading(false);
       }
     };
     loadServices();
@@ -139,30 +150,31 @@ function Services() {
     if (!file) return;
 
     setUploadingImage(true);
+    setErrorMsg("");
+    setSuccessMsg("");
     const formDataUpload = new FormData();
     formDataUpload.append("file", file);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/services/upload-image`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const data = await authApiFetch(
+        `${API_BASE_URL}/api/admin/services/upload-image`,
+        {
+          method: "POST",
+          body: formDataUpload,
         },
-        body: formDataUpload,
-      });
+        token,
+        dispatch
+      );
 
-      if (res.ok) {
-        const data = await res.json();
+      if (data?.url) {
         setFormData((prev) => ({
           ...prev,
           [langField]: data.url,
         }));
-        alert("Immagine caricata con successo!");
-      } else {
-        alert("Impossibile completare l'upload dell'immagine. Puoi comunque inserire l'URL direttamente nel campo del servizio.");
+        setSuccessMsg("Immagine caricata con successo su Cloudinary!");
       }
-    } catch {
-      alert("Errore di connessione durante l'upload dell'immagine. Puoi comunque inserire l'URL direttamente.");
+    } catch (err) {
+      setErrorMsg(`Upload fallito: ${err.message}`);
     } finally {
       setUploadingImage(false);
     }
@@ -170,47 +182,49 @@ function Services() {
 
   const handleCreateOrUpdateService = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
     try {
       const url = editingService
         ? `${API_BASE_URL}/api/admin/services/${editingService.id}`
         : `${API_BASE_URL}/api/admin/services`;
       const method = editingService ? "PUT" : "POST";
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      await authApiFetch(
+        url,
+        {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+        token,
+        dispatch
+      );
 
-      if (response.ok) {
-        setShowAddModal(false);
-        setEditingService(null);
-        fetchDbServices();
-      } else {
-        alert("Errore nel salvataggio del servizio.");
-      }
-    } catch {
-      alert("Errore di connessione con il server backend.");
+      setShowAddModal(false);
+      setEditingService(null);
+      setSuccessMsg(editingService ? "Pacchetto aggiornato con successo!" : "Nuovo pacchetto creato!");
+      fetchDbServices();
+    } catch (err) {
+      setErrorMsg(err.message);
     }
   };
 
   const handleDeleteService = async (id) => {
     if (!window.confirm(t.adminActions.confirmDelete)) return;
+    setErrorMsg("");
+    setSuccessMsg("");
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/services/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        fetchDbServices();
-      }
-    } catch {
-      alert("Impossibile eliminare il servizio.");
+      await authApiFetch(
+        `${API_BASE_URL}/api/admin/services/${id}`,
+        { method: "DELETE" },
+        token,
+        dispatch
+      );
+      setSuccessMsg("Pacchetto eliminato con successo.");
+      fetchDbServices();
+    } catch (err) {
+      setErrorMsg(err.message);
     }
   };
 
@@ -290,6 +304,25 @@ function Services() {
       {/* 2. I PACCHETTI PRINCIPALI (CARD / BOX) */}
       <section className="py-5">
         <div className="container">
+          {/* Banner Notifiche (Errore / Successo) */}
+          {errorMsg && (
+            <ErrorBanner
+              message={errorMsg}
+              type="danger"
+              className="mb-4"
+              onDismiss={() => setErrorMsg("")}
+            />
+          )}
+          {successMsg && (
+            <ErrorBanner
+              message={successMsg}
+              type="success"
+              className="mb-4"
+              autoDismissMs={5000}
+              onDismiss={() => setSuccessMsg("")}
+            />
+          )}
+
           {/* Bar Controlli Admin per Gestione / Aggiunta Pacchetti */}
           {isAuthenticated && (
             <div className="bg-success-subtle border border-success border-opacity-25 p-3 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
@@ -305,6 +338,10 @@ function Services() {
                 <span>{t.adminActions.addService}</span>
               </button>
             </div>
+          )}
+
+          {loading && (
+            <LoadingSpinner variant="inline" message="Caricamento pacchetti servizi in corso..." size="md" />
           )}
 
           <div className="text-center mb-5">

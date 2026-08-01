@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
 import { useSelector } from "react-redux";
-import { Modal, Button, Spinner, Alert, Dropdown } from "react-bootstrap";
+import { Modal, Button, Spinner, Dropdown } from "react-bootstrap";
 import API_BASE_URL from "../../config/api";
+import { apiFetch } from "../../utils/apiClient";
+import ErrorBanner from "../ErrorBanner/ErrorBanner";
 import { translations } from "../../utils/translations";
 import "./ContactForm.css";
 
@@ -171,43 +173,22 @@ function ContactForm() {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/quotes`, {
+      await apiFetch(`${API_BASE_URL}/api/quotes`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
-        setSubmitStatus({
-          type: "success",
-          message: t.successMessage,
-        });
-        resetFormInputs();
-      } else {
-        throw new Error("Server error status: " + response.status);
-      }
+      setSubmitStatus({
+        type: "success",
+        message: t.successMessage,
+      });
+      resetFormInputs();
     } catch (error) {
-      // Se l'errore è stato lanciato da noi (status 4xx/5xx), mostralo come errore reale
-      if (error.message && error.message.startsWith("Server error status:")) {
-        setSubmitStatus({
-          type: "danger",
-          message: t.errorMessage || "Errore nel salvataggio. Riprova più tardi.",
-        });
-      } else {
-        // Errore di rete (backend non raggiungibile) — fallback per demo
-        console.warn(
-          "Spring Boot backend non raggiungibile. Mostro esito di demo...",
-          error
-        );
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setSubmitStatus({
-          type: "success",
-          message: t.successMessage,
-        });
-        resetFormInputs();
-      }
+      setSubmitStatus({
+        type: "danger",
+        message: error.message || t.errorMessage || "Errore durante l'invio del preventivo. Riprova più tardi.",
+      });
     } finally {
       setIsSubmitting(false);
       scrollToTop();
@@ -237,33 +218,22 @@ function ContactForm() {
       </div>
 
       {submitStatus && (
-        <Alert
-          variant={submitStatus.type}
-          dismissible
-          onClose={() => setSubmitStatus(null)}
-          className="mb-4 rounded-3"
-        >
-          <i
-            className={`bi ${
-              submitStatus.type === "success"
-                ? "bi-check-circle-fill"
-                : "bi-exclamation-triangle-fill"
-            } me-2`}
-          ></i>
-          {submitStatus.message}
-        </Alert>
+        <ErrorBanner
+          message={submitStatus.message}
+          type={submitStatus.type}
+          className="mb-4"
+          onDismiss={() => setSubmitStatus(null)}
+          autoDismissMs={submitStatus.type === "success" ? 8000 : 0}
+        />
       )}
 
       {showValidationBanner && (
-        <Alert
-          variant="warning"
-          dismissible
-          onClose={() => setShowValidationBanner(false)}
-          className="mb-4 rounded-3 fw-medium fs-6"
-        >
-          <i className="bi bi-info-circle-fill me-2 fs-5"></i>
-          {t.validationBanner}
-        </Alert>
+        <ErrorBanner
+          message={t.validationBannerText}
+          type="warning"
+          className="mb-4"
+          onDismiss={() => setShowValidationBanner(false)}
+        />
       )}
 
       <form onSubmit={handleSubmit} noValidate>

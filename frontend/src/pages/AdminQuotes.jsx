@@ -1,8 +1,26 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import API_BASE_URL from "../config/api";
-import { authFetch } from "../utils/authFetch";
+import { authApiFetch } from "../utils/apiClient";
+import { handleEmailClick, handlePhoneClick } from "../utils/contactHelpers";
+import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
+import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import "./AdminQuotes.css";
+
+const getEventTypeBadgeClass = (tipo) => {
+  if (!tipo) return "event-badge-matrimonio";
+  const normalized = tipo.toLowerCase().trim();
+  if (normalized.includes("matrimonio") || normalized.includes("wedding")) {
+    return "event-badge-matrimonio";
+  }
+  if (normalized.includes("aziendale") || normalized.includes("corporate")) {
+    return "event-badge-aziendale";
+  }
+  if (normalized.includes("privato") || normalized.includes("private")) {
+    return "event-badge-privato";
+  }
+  return "event-badge-altro";
+};
 
 function AdminQuotes() {
   const dispatch = useDispatch();
@@ -10,6 +28,7 @@ function AdminQuotes() {
   const [allQuotes, setAllQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedQuote, setSelectedQuote] = useState(null);
@@ -18,12 +37,11 @@ function AdminQuotes() {
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
+    setError("");
+    setActionError("");
     try {
-      const response = await authFetch(`${API_BASE_URL}/api/admin/quotes`, {}, token, dispatch);
-      if (!response.ok) throw new Error("Impossibile caricare la lista dei preventivi.");
-      const data = await response.json();
-      setAllQuotes(data);
-      setError("");
+      const data = await authApiFetch(`${API_BASE_URL}/api/admin/quotes`, {}, token, dispatch);
+      setAllQuotes(data || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -32,12 +50,32 @@ function AdminQuotes() {
   }, [token, dispatch]);
 
   useEffect(() => {
-    fetchQuotes();
-  }, [fetchQuotes]);
+    let active = true;
+    const loadData = async () => {
+      try {
+        const data = await authApiFetch(`${API_BASE_URL}/api/admin/quotes`, {}, token, dispatch);
+        if (active) {
+          setAllQuotes(data || []);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (active) {
+          setError(err.message);
+          setLoading(false);
+        }
+      }
+    };
+
+    loadData();
+    return () => {
+      active = false;
+    };
+  }, [token, dispatch]);
 
   const handleUpdateStatus = async (id, newStatus) => {
+    setActionError("");
     try {
-      const response = await authFetch(
+      const updated = await authApiFetch(
         `${API_BASE_URL}/api/admin/quotes/${id}/status`,
         {
           method: "PUT",
@@ -48,32 +86,24 @@ function AdminQuotes() {
         dispatch
       );
 
-      if (!response.ok) {
-        throw new Error("Errore nell'aggiornamento dello stato.");
-      }
-
-      const updated = await response.json();
       setAllQuotes((prev) => prev.map((q) => (q.id === id ? updated : q)));
       if (selectedQuote && selectedQuote.id === id) {
         setSelectedQuote(updated);
       }
     } catch (err) {
-      alert(err.message);
+      setActionError(err.message);
     }
   };
 
   const handleDeleteQuote = async (id) => {
+    setActionError("");
     try {
-      const response = await authFetch(
+      await authApiFetch(
         `${API_BASE_URL}/api/admin/quotes/${id}`,
         { method: "DELETE" },
         token,
         dispatch
       );
-
-      if (!response.ok) {
-        throw new Error("Errore durante l'eliminazione del preventivo.");
-      }
 
       setAllQuotes((prev) => prev.filter((q) => q.id !== id));
       if (selectedQuote && selectedQuote.id === id) {
@@ -82,7 +112,7 @@ function AdminQuotes() {
       }
       setDeleteConfirmId(null);
     } catch (err) {
-      alert(err.message);
+      setActionError(err.message);
     }
   };
 
@@ -236,19 +266,29 @@ function AdminQuotes() {
         </div>
       </div>
 
-      {/* Caricamento / Errori */}
-      {loading && (
-        <div className="text-center py-5">
-          <div className="spinner-border text-success" role="status"></div>
-          <p className="mt-2 text-muted">Caricamento preventivi in corso...</p>
-        </div>
+      {/* Banner di errore per azioni (es. modifica stato/eliminazione fallita) */}
+      {actionError && (
+        <ErrorBanner
+          message={actionError}
+          type="danger"
+          className="mb-4"
+          onDismiss={() => setActionError("")}
+          autoDismissMs={6000}
+        />
       )}
 
-      {error && (
-        <div className="alert alert-danger shadow-sm mb-4" role="alert">
-          <i className="bi bi-exclamation-triangle-fill me-2"></i>
-          {error}
-        </div>
+      {/* Caricamento / Errori principali */}
+      {loading && (
+        <LoadingSpinner variant="inline" message="Caricamento preventivi in corso..." size="lg" />
+      )}
+
+      {error && !loading && (
+        <ErrorBanner
+          message={error}
+          type="danger"
+          className="mb-4"
+          onDismiss={() => setError("")}
+        />
       )}
 
       {/* Stato Vuoto */}
@@ -306,20 +346,33 @@ function AdminQuotes() {
                       </td>
                       <td className="small">
                         <div>
-                          <a href={`mailto:${q.email}`} className="text-decoration-none contact-chip-email font-monospace" title={q.email}>
+                          <a
+                            href={`mailto:${q.email}`}
+                            onClick={(e) => handleEmailClick(e, q.email)}
+                            className="text-decoration-none contact-chip-email font-monospace"
+                            title={q.email}
+                          >
                             <i className="bi bi-envelope me-1"></i>
                             {q.email}
                           </a>
                         </div>
-                        <div>
-                          <a href={`tel:${(q.telefono || "").replace(/[^\d+]/g, "")}`} className="text-decoration-none contact-chip-phone font-monospace">
-                            <i className="bi bi-telephone me-1"></i>
-                            {q.telefono}
-                          </a>
-                        </div>
+                        {q.telefono && (
+                          <div>
+                            <a
+                              href={`tel:${q.telefono.replace(/[^\d+]/g, "")}`}
+                              onClick={(e) => handlePhoneClick(e, q.telefono)}
+                              className="text-decoration-none contact-chip-phone font-monospace"
+                            >
+                              <i className="bi bi-telephone me-1"></i>
+                              {q.telefono}
+                            </a>
+                          </div>
+                        )}
                       </td>
                       <td className="small">
-                        <span className="badge bg-secondary mb-1">{q.tipoEvento || "Matrimonio"}</span>
+                        <span className={`badge ${getEventTypeBadgeClass(q.tipoEvento)} mb-1`}>
+                          {q.tipoEvento || "Matrimonio"}
+                        </span>
                         {q.dataEvento && (
                           <div className="text-muted text-nowrap">
                             <i className="bi bi-calendar-event me-1"></i>
@@ -431,7 +484,7 @@ function AdminQuotes() {
                       {/* Card Body */}
                       <div className="quote-card-body">
                         <div className="d-flex flex-wrap gap-2 mb-3">
-                          <span className="badge bg-secondary">
+                          <span className={`badge ${getEventTypeBadgeClass(q.tipoEvento)}`}>
                             <i className="bi bi-tag-fill me-1"></i>
                             {q.tipoEvento || "Matrimonio"}
                           </span>
@@ -451,14 +504,26 @@ function AdminQuotes() {
 
                         {/* Direct Contact Links */}
                         <div className="d-flex flex-wrap gap-2 mb-3">
-                          <a href={`mailto:${q.email}`} className="contact-chip contact-chip-email">
-                            <i className="bi bi-envelope-fill"></i>
-                            <span className="text-truncate" style={{ maxWidth: "160px" }}>{q.email}</span>
-                          </a>
-                          <a href={`tel:${(q.telefono || "").replace(/[^\d+]/g, "")}`} className="contact-chip contact-chip-phone">
-                            <i className="bi bi-telephone-fill"></i>
-                            <span>{q.telefono}</span>
-                          </a>
+                          {q.email && (
+                            <a
+                              href={`mailto:${q.email}`}
+                              onClick={(e) => handleEmailClick(e, q.email)}
+                              className="contact-chip contact-chip-email"
+                            >
+                              <i className="bi bi-envelope-fill"></i>
+                              <span className="text-truncate" style={{ maxWidth: "160px" }}>{q.email}</span>
+                            </a>
+                          )}
+                          {q.telefono && (
+                            <a
+                              href={`tel:${q.telefono.replace(/[^\d+]/g, "")}`}
+                              onClick={(e) => handlePhoneClick(e, q.telefono)}
+                              className="contact-chip contact-chip-phone"
+                            >
+                              <i className="bi bi-telephone-fill"></i>
+                              <span>{q.telefono}</span>
+                            </a>
+                          )}
                         </div>
 
                         {q.messaggio && (
@@ -558,54 +623,72 @@ function AdminQuotes() {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="text-muted small fw-semibold">Email</label>
-                    <p className="mb-0 fw-semibold text-primary">
-                      <a href={`mailto:${selectedQuote.email}`} className="text-decoration-none">
+                    <label className="text-muted small fw-semibold d-block mb-1">Email</label>
+                    <p className="mb-0 fw-semibold">
+                      <a
+                        href={`mailto:${selectedQuote.email}`}
+                        onClick={(e) => handleEmailClick(e, selectedQuote.email)}
+                        className="text-decoration-none contact-chip-email"
+                      >
+                        <i className="bi bi-envelope me-1"></i>
                         {selectedQuote.email}
                       </a>
                     </p>
                   </div>
                   <div className="col-md-6">
-                    <label className="text-muted small fw-semibold">Telefono</label>
+                    <label className="text-muted small fw-semibold d-block mb-1">Telefono</label>
                     <p className="mb-0 fw-semibold">
-                      <a href={`tel:${(selectedQuote.telefono || "").replace(/[^\d+]/g, "")}`} className="text-decoration-none text-body">
-                        {selectedQuote.telefono}
-                      </a>
+                      {selectedQuote.telefono ? (
+                        <a
+                          href={`tel:${selectedQuote.telefono.replace(/[^\d+]/g, "")}`}
+                          onClick={(e) => handlePhoneClick(e, selectedQuote.telefono)}
+                          className="text-decoration-none contact-chip-phone"
+                        >
+                          <i className="bi bi-telephone me-1"></i>
+                          {selectedQuote.telefono}
+                        </a>
+                      ) : (
+                        <span className="text-muted">Non specificato</span>
+                      )}
                     </p>
                   </div>
 
                   <hr className="my-2" />
 
                   <div className="col-md-4">
-                    <label className="text-muted small fw-semibold">Data Evento</label>
+                    <label className="text-muted small fw-semibold d-block">Data Evento</label>
                     <p className="mb-0 fw-bold">{selectedQuote.dataEvento || "Non specificata"}</p>
                   </div>
                   <div className="col-md-4">
-                    <label className="text-muted small fw-semibold">Tipo Evento</label>
-                    <p className="mb-0 fw-bold">{selectedQuote.tipoEvento || "Matrimonio"}</p>
+                    <label className="text-muted small fw-semibold d-block mb-1">Tipo Evento</label>
+                    <div>
+                      <span className={`badge ${getEventTypeBadgeClass(selectedQuote.tipoEvento)} fs-6`}>
+                        {selectedQuote.tipoEvento || "Matrimonio"}
+                      </span>
+                    </div>
                   </div>
                   <div className="col-md-4">
-                    <label className="text-muted small fw-semibold">Location Evento</label>
+                    <label className="text-muted small fw-semibold d-block">Location Evento</label>
                     <p className="mb-0">{selectedQuote.location || "Non specificata"}</p>
                   </div>
 
                   <div className="col-md-4">
-                    <label className="text-muted small fw-semibold">Numero Ospiti</label>
+                    <label className="text-muted small fw-semibold d-block">Numero Ospiti</label>
                     <p className="mb-0">{selectedQuote.numeroOspiti || "Non specificato"}</p>
                   </div>
                   <div className="col-md-4">
-                    <label className="text-muted small fw-semibold">Orario Giornata</label>
+                    <label className="text-muted small fw-semibold d-block">Orario Giornata</label>
                     <p className="mb-0">{selectedQuote.orarioGiornata || "Non specificato"}</p>
                   </div>
                   <div className="col-md-4">
-                    <label className="text-muted small fw-semibold">Tipo Cerimonia</label>
+                    <label className="text-muted small fw-semibold d-block">Tipo Cerimonia</label>
                     <p className="mb-0">{selectedQuote.tipoCerimonia || "Non specificato"}</p>
                   </div>
 
                   {selectedQuote.budget && (
                     <div className="col-md-12">
-                      <label className="text-muted small fw-semibold">Idea di Budget</label>
-                      <p className="mb-0 badge bg-secondary fs-6">{selectedQuote.budget}</p>
+                      <label className="text-muted small fw-semibold d-block mb-1">Idea di Budget</label>
+                      <span className="badge bg-secondary fs-6 mt-1">{selectedQuote.budget}</span>
                     </div>
                   )}
 

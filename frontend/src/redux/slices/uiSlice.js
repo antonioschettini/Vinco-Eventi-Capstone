@@ -15,6 +15,7 @@ const getInitialLanguage = () => {
 const initialState = {
   theme: getInitialTheme(),
   language: getInitialLanguage(),
+  globalError: null, // { message: string, type: 'danger'|'warning'|'info'|'success' }
 };
 
 const uiSlice = createSlice({
@@ -31,8 +32,18 @@ const uiSlice = createSlice({
         localStorage.setItem("lang", action.payload);
       }
     },
+    setGlobalError: (state, action) => {
+      if (typeof action.payload === "string") {
+        state.globalError = { message: action.payload, type: "danger" };
+      } else {
+        state.globalError = action.payload; // object { message, type, autoDismissMs }
+      }
+    },
+    clearGlobalError: (state) => {
+      state.globalError = null;
+    },
   },
 });
 
-export const { toggleTheme, setLanguage } = uiSlice.actions;
+export const { toggleTheme, setLanguage, setGlobalError, clearGlobalError } = uiSlice.actions;
 export default uiSlice.reducer;

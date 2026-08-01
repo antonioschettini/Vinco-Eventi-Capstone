@@ -148,6 +148,35 @@
   border: 1px solid rgba(25, 135, 84, 0.4);
 }
 
+/* Event Type Custom Color Badges */
+.event-badge-matrimonio {
+  background-color: rgba(219, 39, 119, 0.12);
+  color: #be185d;
+  border: 1px solid rgba(219, 39, 119, 0.35);
+  font-weight: 600;
+}
+
+.event-badge-aziendale {
+  background-color: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  border: 1px solid rgba(37, 99, 235, 0.35);
+  font-weight: 600;
+}
+
+.event-badge-privato {
+  background-color: rgba(124, 58, 237, 0.12);
+  color: #6d28d9;
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  font-weight: 600;
+}
+
+.event-badge-altro {
+  background-color: rgba(13, 148, 136, 0.12);
+  color: #0f766e;
+  border: 1px solid rgba(13, 148, 136, 0.35);
+  font-weight: 600;
+}
+
 /* Card View for Mobile/Tablet (< 992px) */
 .quote-card-mobile {
   border-radius: 14px;
@@ -274,6 +303,30 @@
   background-color: rgba(34, 197, 94, 0.2);
   color: #4ade80;
   border-color: rgba(34, 197, 94, 0.45);
+}
+
+[data-bs-theme="dark"] .event-badge-matrimonio {
+  background-color: rgba(244, 114, 182, 0.2);
+  color: #f472b6;
+  border-color: rgba(244, 114, 182, 0.45);
+}
+
+[data-bs-theme="dark"] .event-badge-aziendale {
+  background-color: rgba(96, 165, 250, 0.2);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.45);
+}
+
+[data-bs-theme="dark"] .event-badge-privato {
+  background-color: rgba(167, 139, 250, 0.2);
+  color: #c084fc;
+  border-color: rgba(167, 139, 250, 0.45);
+}
+
+[data-bs-theme="dark"] .event-badge-altro {
+  background-color: rgba(45, 212, 191, 0.2);
+  color: #2dd4bf;
+  border-color: rgba(45, 212, 191, 0.45);
 }
 
 [data-bs-theme="dark"] .quote-card-header {

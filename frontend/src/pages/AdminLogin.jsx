@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import API_BASE_URL from "../config/api";
+import { apiFetch } from "../utils/apiClient";
+import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import {
   loginStart,
   loginSuccess,
@@ -45,39 +47,28 @@ function AdminLogin() {
     dispatch(loginStart());
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const data = await apiFetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        const msg =
-          errData.message || "Credenziali non valide! Verifica e riprova.";
-        setLoginError(msg);
-        dispatch(loginFailure(msg));
-
-        // Incrementa tentativi falliti e applica cooldown di 30s dopo 3 errori
-        const newAttempts = failedAttempts + 1;
-        setFailedAttempts(newAttempts);
-        if (newAttempts >= 3) {
-          setCooldown(30);
-          setFailedAttempts(0);
-        }
-        return;
-      }
-
-      const data = await response.json();
       dispatch(loginSuccess(data));
       setEmail("");
       setPassword("");
       setFailedAttempts(0);
       navigate("/admin/preventivi");
-    } catch {
-      const msg = "Impossibile connettersi al server di autenticazione.";
+    } catch (err) {
+      const msg = err.message || "Credenziali non valide! Verifica e riprova.";
       setLoginError(msg);
       dispatch(loginFailure(msg));
+
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+      if (newAttempts >= 3) {
+        setCooldown(30);
+        setFailedAttempts(0);
+      }
     }
   };
 
@@ -106,26 +97,21 @@ function AdminLogin() {
         </div>
 
         {loginError && (
-          <div
-            className="alert alert-danger d-flex align-items-center gap-2 p-3 rounded-3 small mb-4"
-            role="alert"
-          >
-            <i className="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
-            <div>{loginError}</div>
-          </div>
+          <ErrorBanner
+            message={loginError}
+            type="danger"
+            className="mb-4"
+            onDismiss={() => setLoginError("")}
+          />
         )}
 
         {cooldown > 0 && (
-          <div
-            className="alert alert-warning d-flex align-items-center gap-2 p-3 rounded-3 small mb-4"
-            role="alert"
-          >
-            <i className="bi bi-hourglass-split fs-5 flex-shrink-0"></i>
-            <div>
-              Troppi tentativi errati. Attendi <strong>{cooldown}s</strong> prima
-              di riprovare.
-            </div>
-          </div>
+          <ErrorBanner
+            message={`Troppi tentativi errati. Attendi ${cooldown}s prima di riprovare.`}
+            type="warning"
+            icon="bi-hourglass-split"
+            className="mb-4"
+          />
         )}
 
         <form onSubmit={handleSubmit}>

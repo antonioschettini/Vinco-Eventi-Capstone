@@ -1,0 +1,52 @@
+/* ============================================================
+   ErrorBanner – Animazioni e stile del banner di errore
+   ============================================================ */
+
+.error-banner {
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  animation-fill-mode: both;
+}
+
+/* Entrata: slide down + fade in */
+.error-banner--enter {
+  animation: errorBannerSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Uscita: slide up + fade out */
+.error-banner--exit {
+  animation: errorBannerSlideOut 0.3s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+@keyframes errorBannerSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes errorBannerSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    max-height: 120px;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+    max-height: 0;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+/* Icona colorata per ogni variante */
+.error-banner.alert-danger .bi { color: #dc3545; }
+.error-banner.alert-warning .bi { color: #ffc107; }
+.error-banner.alert-info .bi { color: #0dcaf0; }
+.error-banner.alert-success .bi { color: #198754; }
