@@ -28,7 +28,7 @@ public class JWTTools {
                 .claim("id", user.getId().toString())
                 .claim("role", user.getRole().name())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7 giorni
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60)) // 1 ora
                 .signWith(getSigningKey())
                 .compact();
     }
