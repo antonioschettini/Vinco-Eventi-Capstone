@@ -14,6 +14,7 @@ import { apiFetch, authApiFetch } from "../utils/apiClient";
 import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import { handlePhoneClick } from "../utils/contactHelpers";
+import imageCompression from "browser-image-compression";
 import "./Services.css";
 
 function Services() {
@@ -152,8 +153,24 @@ function Services() {
     setUploadingImage(true);
     setErrorMsg("");
     setSuccessMsg("");
+    let fileToUpload = file;
+
+    if (file.type && file.type.startsWith("image/")) {
+      try {
+        const options = {
+          maxSizeMB: 0.8,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          fileType: "image/webp",
+        };
+        fileToUpload = await imageCompression(file, options);
+      } catch (compressionErr) {
+        console.warn("Impossibile comprimere l'immagine nel client, uso del file originale:", compressionErr);
+      }
+    }
+
     const formDataUpload = new FormData();
-    formDataUpload.append("file", file);
+    formDataUpload.append("file", fileToUpload);
 
     try {
       const data = await authApiFetch(

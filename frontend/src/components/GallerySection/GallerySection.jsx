@@ -6,6 +6,7 @@ import { galleryItems as staticGalleryItems } from "./galleryData";
 import { getOptimizedCloudinaryUrl } from "../../utils/cloudinary";
 import API_BASE_URL from "../../config/api";
 import MediaModal from "../MediaModal/MediaModal";
+import imageCompression from "browser-image-compression";
 import "./GallerySection.css";
 
 function GallerySection() {
@@ -165,8 +166,24 @@ function GallerySection() {
     if (!file) return;
 
     setUploadingMedia(true);
+    let fileToUpload = file;
+
+    if (file.type && file.type.startsWith("image/")) {
+      try {
+        const options = {
+          maxSizeMB: 0.8,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          fileType: "image/webp",
+        };
+        fileToUpload = await imageCompression(file, options);
+      } catch (compressionErr) {
+        console.warn("Impossibile comprimere l'immagine nel client, uso del file originale:", compressionErr);
+      }
+    }
+
     const uploadData = new FormData();
-    uploadData.append("file", file);
+    uploadData.append("file", fileToUpload);
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/admin/gallery/upload-media`, {

@@ -1,7 +1,6 @@
 package antonioschettini.backend.exceptions;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -50,6 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorPayload handleGenericException(Exception ex) {
-        return new ErrorPayload("Si è verificato un errore interno del server: " + ex.getMessage(), LocalDateTime.now());
+        return new ErrorPayload("Si è verificato un errore interno del server: " + ex.getMessage(),
+                LocalDateTime.now());
     }
 }

@@ -30,7 +30,9 @@ public class CloudinaryService {
         }
         try {
             Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
-                    "folder", "vinco_eventi_servizi"
+                    "folder", "vinco_eventi_servizi",
+                    "quality", "auto",
+                    "fetch_format", "auto"
             ));
             return uploadResult.get("secure_url") != null ? uploadResult.get("secure_url").toString() : uploadResult.get("url").toString();
         } catch (Exception e) {
@@ -65,18 +67,14 @@ public class CloudinaryService {
             Map<String, Object> params = new HashMap<>();
             params.put("folder", "vinco_eventi_galleria");
             params.put("resource_type", isVideo ? "video" : "auto");
-            params.put("eager_async", false);
+            params.put("quality", "auto");
+            params.put("fetch_format", "auto");
 
             if (isVideo) {
+                params.put("eager_async", false);
                 params.put("eager", Arrays.asList(
-                        "q_auto,f_auto,w_1080,c_limit",
-                        "q_auto,f_auto,w_720,c_limit",
+                        "q_auto:eco,f_auto,w_720,c_limit",
                         "f_jpg,q_auto,w_720,so_0"
-                ));
-            } else {
-                params.put("eager", Arrays.asList(
-                        "q_auto,f_auto,w_1080,c_limit",
-                        "q_auto,f_auto,w_720,c_limit"
                 ));
             }
 
