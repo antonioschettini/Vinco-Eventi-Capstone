@@ -1,12 +1,32 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap");
 
-/* Reset e Variabili Globali */
+/* Reset e Variabili Globali del Brand Vinco Eventi */
 :root {
   --primary-forest: #204a35;
   --primary-forest-hover: #163324;
+  --emerald-accent: #48936c;
+  --emerald-glow: rgba(72, 147, 108, 0.35);
+  --gold-accent: #d4af37;
+  --gold-hover: #c59b27;
+  
+  /* Theme Tokens Dark Mode */
+  --dark-bg: #0c120e;
+  --dark-card-bg: rgba(18, 26, 21, 0.65);
+  --dark-card-hover: rgba(24, 36, 29, 0.85);
+  --dark-border: rgba(255, 255, 255, 0.12);
+  --dark-text: #e4ece7;
+  --dark-heading: #ffffff;
+  
+  /* Theme Tokens Light Mode */
+  --light-bg: #f8faf9;
+  --light-card-bg: rgba(255, 255, 255, 0.85);
+  --light-card-hover: rgba(255, 255, 255, 0.98);
+  --light-border: rgba(32, 74, 53, 0.15);
+  --light-text: #1c2b22;
+  --light-heading: #204a35;
 }
 
-/* Regole Base del Body */
+/* Regole Base del Body e Sfondi Unificati */
 body {
   margin: 0;
   padding: 0;
@@ -17,6 +37,54 @@ body {
   display: flex;
   flex-direction: column;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-bs-theme="dark"] body {
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+[data-bs-theme="light"] body {
+  background-color: var(--light-bg);
+  color: var(--light-text);
+}
+
+/* Uniformità stato Focus per Form, Input, Select e Textarea (Zero blu Bootstrap) */
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+  border-color: var(--emerald-accent) !important;
+  box-shadow: 0 0 0 0.25rem var(--emerald-glow) !important;
+  background-color: rgba(18, 26, 21, 0.8) !important;
+  color: #ffffff !important;
+}
+
+[data-bs-theme="light"] .form-control:focus,
+[data-bs-theme="light"] .form-select:focus {
+  border-color: var(--primary-forest) !important;
+  box-shadow: 0 0 0 0.25rem rgba(32, 74, 53, 0.2) !important;
+  background-color: #ffffff !important;
+  color: var(--primary-forest) !important;
+}
+
+/* Linea d'Accento Decorativa Unificata per i Titoli */
+.section-title-line {
+  position: relative;
+  display: inline-block;
+}
+
+.section-title-line::after {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 3px;
+  background-color: var(--primary-forest);
+  margin: 12px auto 0 auto;
+  border-radius: 2px;
+}
+
+[data-bs-theme="dark"] .section-title-line::after {
+  background-color: var(--emerald-accent);
+  box-shadow: 0 0 10px var(--emerald-glow);
 }
 
 /* Classi Tipografiche Premium */
@@ -56,7 +124,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 .hero-bio-section {
   position: relative;
   background-size: cover;
-  background-position: center 22%;
+  background-position: center 15%;
   background-repeat: no-repeat;
   min-height: 85vh;
   display: flex;
@@ -132,7 +200,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 .hero-gallery-section {
   position: relative;
   background-size: cover;
-  background-position: center 30%;
+  background-position: center 28%;
   background-repeat: no-repeat;
   min-height: 65vh;
   display: flex;
@@ -141,6 +209,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   overflow: hidden;
   margin-top: 0;
   transition: background-position 0.5s ease;
+}
+
+/* Override specifico per la posizione dello sfondo Hero solo nella Home Page */
+.hero-home-section {
+  background-position: center 5% !important;
 }
 
 .hero-gallery-overlay {
@@ -246,10 +319,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 .entertainment-img-wrapper {
   position: relative;
   width: 100%;
-  height: 250px;
+  aspect-ratio: 16 / 10;
+  min-height: 200px;
+  max-height: 280px;
   overflow: hidden;
   flex-shrink: 0;
-  /* Garantisce che l'immagine figlio si ancori sempre al centro */
   display: flex;
   align-items: center;
   justify-content: center;

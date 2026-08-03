@@ -28,7 +28,7 @@ function Home() {
     <div className="homepage">
       {/* Hero Section Biografia (Testo Sovrapposto Direttamente allo Sfondo) */}
       <section
-        className="hero-gallery-section py-5 position-relative"
+        className="hero-gallery-section hero-home-section py-5 position-relative"
         style={{ backgroundImage: `url("${bioBgImage}")` }}
       >
         <div className="hero-gallery-overlay"></div>
@@ -50,7 +50,7 @@ function Home() {
       </section>
 
       {/* Intrattenimento su Misura e Artisti Section */}
-      <section className="entertainment-section py-5 my-3 my-md-4">
+      <section className="entertainment-section py-5">
         <div className="container py-3">
           <div className="row justify-content-center mb-5">
             <div className="col-12 col-lg-10 text-center">
@@ -69,7 +69,7 @@ function Home() {
               const card = t.cards[key];
               const image = cardImages[key];
               return (
-                <div key={key} className="col-12 col-md-6 col-lg-6 col-xl-3 d-flex">
+                <div key={key} className="col-12 col-sm-6 col-xxl-3 d-flex">
                   <div className="entertainment-card card border-0 rounded-4 w-100 d-flex flex-column">
                     <div className={`entertainment-img-wrapper entertainment-img-wrapper--${key}`}>
                       <img
@@ -96,7 +96,7 @@ function Home() {
       </section>
 
       {/* Sezione Instagram Mockup + Form di Contatto */}
-      <section className="contact-instagram-section py-5 bg-body-tertiary border-top border-bottom">
+      <section className="contact-instagram-section py-5">
         <Container className="py-3 py-md-4">
           <Row className="g-4 g-lg-5 align-items-center">
             {/* Colonna Sinistra: Instagram Smartphone Mockup */}

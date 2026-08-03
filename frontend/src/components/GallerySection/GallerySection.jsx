@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Carousel, Nav, Modal } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { translations } from "../../utils/translations";
@@ -9,6 +9,66 @@ import MediaModal from "../MediaModal/MediaModal";
 import imageCompression from "browser-image-compression";
 import "./GallerySection.css";
 
+// Componente helper per la riproduzione lazy dei video in griglia tramite Intersection Observer
+function LazyGridVideo({ src, posterUrl, item, className }) {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const target = videoRef.current;
+    if (!target) return;
+
+    // Tenta l'avvio della riproduzione al mount del video
+    target.play().catch(() => {});
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (target.paused) {
+              target.play().catch(() => {});
+            }
+          } else {
+            if (!target.paused) {
+              target.pause();
+            }
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "100px" }
+    );
+
+    observer.observe(target);
+    return () => {
+      if (target) observer.unobserve(target);
+    };
+  }, []);
+
+  const videoSrc = item.startTime
+    ? `${getOptimizedCloudinaryUrl(src, { type: "grid" })}#t=${item.startTime}`
+    : getOptimizedCloudinaryUrl(src, { type: "grid" });
+
+  const poster = posterUrl || getOptimizedCloudinaryUrl(src, { type: "poster" });
+
+  return (
+    <video
+      ref={videoRef}
+      src={videoSrc}
+      poster={poster}
+      muted
+      loop
+      playsInline
+      autoPlay
+      preload="metadata"
+      onLoadedMetadata={(e) => {
+        if (item.startTime && e.target) {
+          e.target.currentTime = item.startTime;
+        }
+      }}
+      className={className}
+    />
+  );
+}
+
 function GallerySection() {
   const lang = useSelector((state) => state.ui.language);
   const { isAuthenticated, token } = useSelector((state) => state.auth);
@@ -16,6 +76,12 @@ function GallerySection() {
 
   const [dbItems, setDbItems] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [visibleCount, setVisibleCount] = useState(8);
+
+  const handleFilterSelect = (selectedKey) => {
+    setActiveFilter(selectedKey);
+    setVisibleCount(8);
+  };
 
   // Lightbox Modal State
   const [modalShow, setModalShow] = useState(false);
@@ -101,8 +167,36 @@ function GallerySection() {
     return true;
   });
 
+  // Batch paginated items for smooth 8-at-a-time grid rendering
+  const visibleItems = filteredItems.slice(0, visibleCount);
+  const hasMoreItems = filteredItems.length > visibleCount;
+  const remainingCount = filteredItems.length - visibleCount;
+
   // Featured items for top carousel
   const featuredItems = allItems.filter((item) => item.featured);
+
+  // State per l'indice attivo del Carosello "Momenti in Evidenza"
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
+  // Pre-caricamento in sottofondo delle copertine/poster HD delle slide adiacenti nel carosello
+  useEffect(() => {
+    if (!featuredItems || featuredItems.length <= 1) return;
+
+    const nextItem = featuredItems[(carouselIndex + 1) % featuredItems.length];
+    const prevItem = featuredItems[(carouselIndex - 1 + featuredItems.length) % featuredItems.length];
+
+    const nextPoster = nextItem.posterUrl || getOptimizedCloudinaryUrl(nextItem.src, { type: "poster" });
+    const prevPoster = prevItem.posterUrl || getOptimizedCloudinaryUrl(prevItem.src, { type: "poster" });
+
+    if (nextPoster) {
+      const imgNext = new Image();
+      imgNext.src = nextPoster;
+    }
+    if (prevPoster) {
+      const imgPrev = new Image();
+      imgPrev.src = prevPoster;
+    }
+  }, [carouselIndex, featuredItems]);
 
   const handleCardClick = (index) => {
     setSelectedIndex(index);
@@ -221,8 +315,14 @@ function GallerySection() {
       return;
     }
 
+    let finalPosterUrl = formData.posterUrl;
+    if (!finalPosterUrl && formData.type === "video" && formData.src) {
+      finalPosterUrl = getOptimizedCloudinaryUrl(formData.src, { type: "poster" });
+    }
+
     const payload = {
       ...formData,
+      posterUrl: finalPosterUrl,
       startTime: formData.startTime !== "" ? parseFloat(formData.startTime) : null,
       displayOrder: parseInt(formData.displayOrder) || 1,
     };
@@ -308,50 +408,68 @@ function GallerySection() {
               </p>
             </div>
 
-            <Carousel fade interval={4000} className="gallery-top-carousel rounded-4 overflow-hidden shadow">
-              {featuredItems.map((item) => (
-                <Carousel.Item
-                  key={item.id}
-                  onClick={() => handleCarouselClick(item)}
-                  className="gallery-carousel-item cursor-pointer position-relative"
-                >
+            <Carousel
+              activeIndex={carouselIndex}
+              onSelect={(idx) => setCarouselIndex(idx)}
+              fade
+              interval={4000}
+              className="gallery-top-carousel rounded-4 overflow-hidden shadow"
+            >
+              {featuredItems.map((item, idx) => {
+                const isActive = idx === carouselIndex;
+                const itemPoster = item.posterUrl || getOptimizedCloudinaryUrl(item.src, { type: "poster" });
 
-                  <div className="carousel-media-wrapper">
-                    {item.type === "video" ? (
-                      <video
-                        src={item.startTime ? `${getOptimizedCloudinaryUrl(item.src, { type: "grid" })}#t=${item.startTime}` : getOptimizedCloudinaryUrl(item.src, { type: "grid" })}
-                        poster={item.posterUrl || getOptimizedCloudinaryUrl(item.src, { type: "poster" })}
-                        muted
-                        loop
-                        playsInline
-                        autoPlay
-                        preload="auto"
-                        onLoadedMetadata={(e) => {
-                          if (item.startTime && e.target) {
-                            e.target.currentTime = item.startTime;
-                          }
-                        }}
-                        className="carousel-media-content"
-                      />
-                    ) : (
-                      <img
-                        src={getOptimizedCloudinaryUrl(item.src, { type: "grid" })}
-                        alt={item.title}
-                        className="carousel-media-content"
-                      />
-                    )}
-                    <div className="carousel-overlay-caption p-4">
-                      <span className="badge bg-success px-3 py-2 rounded-pill mb-2">
-                        {item.type === "video" ? t.videoBadge : t.photoBadge}
-                      </span>
-                      <h3 className="h3 font-heading text-white mb-1 fw-bold">
-                        {item.title}
-                      </h3>
-                      <p className="text-white-50 fs-6 mb-0">{item.subtitle}</p>
+                return (
+                  <Carousel.Item
+                    key={item.id}
+                    onClick={() => handleCarouselClick(item)}
+                    className="gallery-carousel-item cursor-pointer position-relative"
+                  >
+                    <div className="carousel-media-wrapper">
+                      {item.type === "video" ? (
+                        isActive ? (
+                          <video
+                            src={item.startTime ? `${getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}#t=${item.startTime}` : getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}
+                            poster={itemPoster}
+                            muted
+                            loop
+                            playsInline
+                            autoPlay
+                            preload="auto"
+                            onLoadedMetadata={(e) => {
+                              if (item.startTime && e.target) {
+                                e.target.currentTime = item.startTime;
+                              }
+                            }}
+                            className="carousel-media-content"
+                          />
+                        ) : (
+                          <img
+                            src={itemPoster}
+                            alt={item.title}
+                            className="carousel-media-content"
+                          />
+                        )
+                      ) : (
+                        <img
+                          src={getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}
+                          alt={item.title}
+                          className="carousel-media-content"
+                        />
+                      )}
+                      <div className="carousel-overlay-caption p-4">
+                        <span className="badge bg-success px-3 py-2 rounded-pill mb-2">
+                          {item.type === "video" ? t.videoBadge : t.photoBadge}
+                        </span>
+                        <h3 className="h3 font-heading text-white mb-1 fw-bold">
+                          {item.title}
+                        </h3>
+                        <p className="text-white-50 fs-6 mb-0">{item.subtitle}</p>
+                      </div>
                     </div>
-                  </div>
-                </Carousel.Item>
-              ))}
+                  </Carousel.Item>
+                );
+              })}
             </Carousel>
           </div>
         )}
@@ -368,7 +486,7 @@ function GallerySection() {
           {/* Filter Nav Tabs */}
           <Nav
             activeKey={activeFilter}
-            onSelect={(selectedKey) => setActiveFilter(selectedKey)}
+            onSelect={handleFilterSelect}
             className="gallery-filter-tabs justify-content-center mt-4 gap-2"
           >
             <Nav.Item>
@@ -402,7 +520,7 @@ function GallerySection() {
 
         {/* Multimedia Grid */}
         <Row className="g-3 g-md-4">
-          {filteredItems.map((item, index) => (
+          {visibleItems.map((item, index) => (
             <Col key={item.id} xs={12} sm={6} md={4} lg={3}>
               <div
                 className="gallery-card rounded-4 overflow-hidden position-relative"
@@ -435,19 +553,10 @@ function GallerySection() {
                 <div className="gallery-media-wrapper">
                   {item.type === "video" ? (
                     <>
-                      <video
-                        src={item.startTime ? `${getOptimizedCloudinaryUrl(item.src, { type: "grid" })}#t=${item.startTime}` : getOptimizedCloudinaryUrl(item.src, { type: "grid" })}
-                        poster={item.posterUrl || getOptimizedCloudinaryUrl(item.src, { type: "poster" })}
-                        muted
-                        loop
-                        playsInline
-                        autoPlay
-                        preload="auto"
-                        onLoadedMetadata={(e) => {
-                          if (item.startTime && e.target) {
-                            e.target.currentTime = item.startTime;
-                          }
-                        }}
+                      <LazyGridVideo
+                        src={item.src}
+                        posterUrl={item.posterUrl}
+                        item={item}
                         className="gallery-media-thumb"
                       />
                       <div className="play-icon-overlay">
@@ -500,6 +609,25 @@ function GallerySection() {
             </Col>
           ))}
         </Row>
+
+        {/* Pulsante "Mostra Altri Media" (Paginazione batch da 8) */}
+        {hasMoreItems && (
+          <div className="text-center mt-5">
+            <button
+              onClick={() => setVisibleCount((prev) => prev + 8)}
+              className="btn btn-load-more rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2"
+            >
+              <i className="bi bi-arrow-down-circle-fill fs-5"></i>
+              <span>{t.loadMore || "Mostra Altri Media"}</span>
+              <span className="badge bg-success text-white rounded-pill ms-2 px-2 py-1 fs-7">
+                +{remainingCount} {t.remainingMedia || "rimanenti"}
+              </span>
+            </button>
+            <div className="text-body-secondary small mt-2 font-body">
+              {t.showingCounter || "Visualizzati"} {visibleItems.length} {t.of || "di"} {filteredItems.length}
+            </div>
+          </div>
+        )}
 
         {/* Lightbox Modal Window */}
         <MediaModal

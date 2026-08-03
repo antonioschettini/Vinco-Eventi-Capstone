@@ -245,4 +245,42 @@
   background-color: rgba(255, 193, 7, 0.12) !important;
 }
 
+/* Styling del pulsante Mostra Altri Media (Paginazione 8-Batch) */
+.btn-load-more {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.3px;
+  font-size: 1rem;
+}
+
+[data-bs-theme="dark"] .btn-load-more {
+  color: #48936c !important;
+  border-color: rgba(72, 147, 108, 0.4) !important;
+  background-color: rgba(32, 74, 53, 0.25) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+[data-bs-theme="dark"] .btn-load-more:hover {
+  background-color: #204a35 !important;
+  color: #ffffff !important;
+  border-color: #48936c !important;
+  box-shadow: 0 8px 24px rgba(32, 74, 53, 0.45);
+  transform: translateY(-2px);
+}
+
+[data-bs-theme="light"] .btn-load-more {
+  color: var(--primary-forest, #204a35) !important;
+  border-color: rgba(32, 74, 53, 0.35) !important;
+  background-color: rgba(32, 74, 53, 0.06) !important;
+}
+
+[data-bs-theme="light"] .btn-load-more:hover {
+  background-color: var(--primary-forest, #204a35) !important;
+  color: #ffffff !important;
+  border-color: var(--primary-forest, #204a35) !important;
+  box-shadow: 0 8px 24px rgba(32, 74, 53, 0.25);
+  transform: translateY(-2px);
+}
+
+
 

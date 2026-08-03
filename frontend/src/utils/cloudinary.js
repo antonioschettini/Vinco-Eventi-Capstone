@@ -63,6 +63,13 @@ export function getOptimizedCloudinaryUrl(url, options = {}) {
 
   if (width) {
     transformList.push(`q_${transformQuality}`, `w_${width}`, `c_${crop}`);
+  } else if (type === "carousel") {
+    // 720p HD per il carosello "Momenti in Evidenza" in alto (nitidezza e colori superiori)
+    if (isVideo) {
+      transformList.push("q_auto", "w_720", `c_${crop}`);
+    } else {
+      transformList.push("q_auto", "w_1200", `c_${crop}`);
+    }
   } else if (type === "grid") {
     // 480p per anteprime animate veloci in griglia (download istantaneo in < 100ms)
     if (isVideo) {
