@@ -2,8 +2,8 @@
  * upload-gallery-to-cloudinary.mjs
  *
  * Script automatizzato batch per Vinco Eventi:
- * 1. Upload e aggiornamento dei 31 media della Galleria da riUploadCloudinary/
- * 2. Upload e aggiornamento delle immagini dei 3 Servizi Offerti (BASIC, PLUS, FULL) da serviziOfferti/
+ * 1. Upload e aggiornamento delle immagini dei 3 Servizi Offerti (BASIC, PLUS, FULL) da serviziOfferti/
+ * 2. Upload e aggiornamento dei 31 media della Galleria da riUploadCloudinary/
  *
  * Uso: node scripts/upload-gallery-to-cloudinary.mjs
  */
@@ -22,6 +22,41 @@ const SERVIZI_DIR = path.join(FRONTEND_SRC, "assets/serviziOfferti");
 const BACKEND_URL = "http://localhost:8080";
 const ADMIN_EMAIL = "vincoeventi@gmail.com";
 const ADMIN_PASSWORD = "RipBigVincoEventi!";
+
+// Mappa esatta dei 31 media in ordine di displayOrder / galleria
+const GALLERY_FILE_MAP = [
+  "vaz9o4beyovfhcr5triw.mov", // 1. Set ELETTRICO
+  "vbybme8q65ywkaisvhfo.mov", // 2. Crossroads Live
+  "kz0w0hx5a8lhts8czb6l.mp4", // 3. DJ Set Exclusive Live
+  "bkimedchkfe02pqhm5xi.jpg", // 4. Console DJ Set
+  "gdj0cjbkmoakcpipxhmq.mov", // 5. Exclusive Night Party
+  "un507woyugpftspgjajb.mp4", // 6. Live Band Night Performance
+  "cywyjakbmcqh73tamzhg.webp",// 7. Esibizione Vocalist
+  "mulpxihugmquppcreyp5.mp4", // 8. Luci LED & Console Show
+  "tyz1zx989veguuhhfvdq.mov", // 9. Live Energy & Dj Set
+  "e3chehntj5aesbx8gvpz.jpg", // 10. Illuminazione Cielo Stellato
+  "wnqshvydnagmut5a4bw1.mov", // 11. Wedding Party Highlights
+  "qfqfjc1lalwtrgnuwj0r.mp4", // 12. Party & Clubbing Vibe
+  "vxjn1vwb9lvq4cljidu3.jpg", // 13. Il Primo Bacio degli Sposi
+  "h6lvl6whetifsprevnn0.mov", // 14. Live Vibes & Social Reel
+  "e5cd0uz0698qnnwnmgqs.mp4", // 15. Live Acoustics Aperitivo
+  "hlxlk2jz64hd7pbq4u5k.mov", // 16. Atmosphere & Lights
+  "uye6veyu60euff4oyynj.jpg", // 17. Brindisi & Taglio Torta
+  "vunxsnh0lc2jkqdxuop9.mp4", // 18. Fumogeni & Effetti Scenografici
+  "m86cnpmuhvavvo6u4ccd.mov", // 19. Festeggiamenti in Musica
+  "nzf2avveppyfgavf5dlb.jpg", // 20. Fumogeni Colorati Sposi
+  "yuhpya4xt3ipx3znwyl0.mp4", // 21. DJ Set & Live Mix
+  "y2e73pox3aetvywkyfre.mov", // 22. Live Show Console
+  "lemqus6xy5uc4z1uqstr.jpg", // 23. Band Live Aperitivo
+  "deljvnzddlc8arskk15z.mov", // 24. DJ Set Moment
+  "tacxrqeuinco1mfvsemr.mp4", // 25. Live Show Finale
+  "lf8rkdrcvgu2fjl2glo3.mov", // 26. Show dal Vivo
+  "mufw0vb5wyjfm72yzpop.jpg", // 27. Cocktail & Sax Vibe
+  "o0n56p2rf3rfe0kexuvi.mov", // 28. Live Session Highlight
+  "r8jfbr4d6lydp2d9eug2.png", // 29. I Nostri Musicisti
+  "si66dzezw5mvdellz50x.mov", // 30. Live Sound Experience
+  "jpztopltw1bmxyoovmyt.webp",// 31. Accoglienza Ospiti in Musica
+];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -164,7 +199,7 @@ async function main() {
       await sleep(300);
     }
   } else {
-    console.error(" Impossibile recuperare i servizi dal backend.");
+    console.error("❌ Impossibile recuperare i servizi dal backend.");
   }
 
   // --- SEZIONE 2: GALLERIA ---
@@ -175,25 +210,23 @@ async function main() {
   }
 
   const items = await galleryRes.json();
+  // Ordina gli elementi del DB per displayOrder
+  items.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
   console.log(`Trovati ${items.length} elementi della galleria a DB.\n`);
 
   let successCount = 0;
 
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
-    console.log(`[${i + 1}/${items.length}] "${item.titleIta}" (${item.type})`);
+    console.log(`[${i + 1}/${items.length}] "${item.titleIta}" (${item.type}) - Order: ${item.displayOrder}`);
 
-    // Cerca il file locale in riUploadCloudinary prima per nome file o ID
-    let targetFileName = "";
-    if (item.src && item.src.includes("/")) {
-      targetFileName = item.src.substring(item.src.lastIndexOf("/") + 1);
-    }
+    // Cerca il file locale tramite la mappa GALLERY_FILE_MAP o per nome
+    const mappedFileName = GALLERY_FILE_MAP[i] || "";
+    let localFilePath = path.join(RI_UPLOAD_DIR, mappedFileName);
 
-    let localFilePath = path.join(RI_UPLOAD_DIR, targetFileName);
-
-    // Fallback: cerca file con estensione generica se l'estensione differisce
-    if (!fs.existsSync(localFilePath) && targetFileName.includes(".")) {
-      const baseNoExt = targetFileName.substring(0, targetFileName.lastIndexOf("."));
+    if (!fs.existsSync(localFilePath)) {
+      // Fallback: cerca nel dir se l'estensione differisce
+      const baseNoExt = mappedFileName.substring(0, mappedFileName.lastIndexOf("."));
       const foundInDir = fs.readdirSync(RI_UPLOAD_DIR).find((f) => f.startsWith(baseNoExt));
       if (foundInDir) {
         localFilePath = path.join(RI_UPLOAD_DIR, foundInDir);
@@ -201,7 +234,7 @@ async function main() {
     }
 
     if (!fs.existsSync(localFilePath)) {
-      console.warn(`  ⚠️ File locale non trovato per "${item.titleIta}" (Cercato: ${targetFileName}). Salto...`);
+      console.warn(`  ⚠️ File locale non trovato per "${item.titleIta}" (Mappato: ${mappedFileName}). Salto...`);
       continue;
     }
 
@@ -234,7 +267,7 @@ async function main() {
       });
 
       if (putRes.ok) {
-        console.log(`  ✅ OK! Nuova URL: ${uploadResult.url.substring(0, 75)}...`);
+        console.log(`  ✅ OK! Nuova URL: ${uploadResult.url}`);
         successCount++;
       } else {
         console.error(`  ❌ Errore aggiornamento DB per "${item.titleIta}": ${await putRes.text()}`);
@@ -249,7 +282,7 @@ async function main() {
   console.log("\n" + "=".repeat(65));
   console.log(`  🎉 RIPRISTINO E MIGRAZIONE COMPLETATA!`);
   console.log(`  - Servizi aggiornati con immagini Cloudinary ottimizzate.`);
-  console.log(`  - Galleria: ${successCount}/${items.length} media re-importati.`);
+  console.log(`  - Galleria: ${successCount}/${items.length} media re-importati su Cloudinary.`);
   console.log("=" .repeat(65));
 }
 

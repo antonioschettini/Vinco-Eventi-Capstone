@@ -73,8 +73,8 @@ public class CloudinaryService {
             if (isVideo) {
                 params.put("eager_async", false);
                 params.put("eager", Arrays.asList(
-                        "q_auto:eco,f_auto,w_720,c_limit",
-                        "f_jpg,q_auto,w_720,so_0"
+                        new com.cloudinary.Transformation().rawTransformation("q_auto:eco,f_auto,w_720,c_limit"),
+                        new com.cloudinary.Transformation().rawTransformation("f_jpg,q_auto,w_720,so_0")
                 ));
             }
 
@@ -116,6 +116,7 @@ public class CloudinaryService {
                     "resourceType", resourceType
             );
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Upload Cloudinary multimediale fallito: " + e.getMessage() + ". Utilizzo del fallback di salvataggio locale.");
             return saveLocally(file, "vinco_eventi_galleria");
         }
