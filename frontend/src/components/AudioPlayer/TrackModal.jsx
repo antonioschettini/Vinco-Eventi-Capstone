@@ -26,11 +26,12 @@ function TrackModal() {
 
   const currentTrack = tracks[currentTrackIndex] || tracks[0];
 
-  // Inizializza o recupera la posizione del modale
+  // Inizializza o recupera la posizione del modale (default: in alto a sinistra a specchio rispetto al modale di consenso)
   const [position, setPosition] = useState(() => {
     if (modalPosition) return modalPosition;
-    const defaultX = Math.max(8, Math.min(window.innerWidth - 270, window.innerWidth - 260));
-    const defaultY = Math.max(8, Math.min(90, window.innerHeight - 340));
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 576;
+    const defaultX = isMobile ? 12 : 20;
+    const defaultY = isMobile ? 48 : 52;
     return { x: defaultX, y: defaultY };
   });
 
@@ -129,7 +130,7 @@ function TrackModal() {
           onTouchEnd={(e) => endDrag(e.currentTarget)}
         >
           <i className="bi bi-grip-horizontal text-secondary fs-6"></i>
-          <span className="fw-semibold track-header-title">Vinco Eventi Player</span>
+          <span className="fw-semibold track-header-title">VINCO EVENTI Player</span>
         </div>
 
         {/* Pulsante Chiudi X con StopPropagation per risposta immediata */}

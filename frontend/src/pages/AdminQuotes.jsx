@@ -348,7 +348,7 @@ function AdminQuotes() {
                         <div>
                           <a
                             href={`mailto:${q.email}`}
-                            onClick={(e) => handleEmailClick(e, q.email)}
+                            onClick={(e) => handleEmailClick(e, q.email, dispatch)}
                             className="text-decoration-none contact-chip-email font-monospace"
                             title={q.email}
                           >
@@ -507,7 +507,7 @@ function AdminQuotes() {
                           {q.email && (
                             <a
                               href={`mailto:${q.email}`}
-                              onClick={(e) => handleEmailClick(e, q.email)}
+                              onClick={(e) => handleEmailClick(e, q.email, dispatch)}
                               className="contact-chip contact-chip-email"
                             >
                               <i className="bi bi-envelope-fill"></i>
@@ -627,7 +627,7 @@ function AdminQuotes() {
                     <p className="mb-0 fw-semibold">
                       <a
                         href={`mailto:${selectedQuote.email}`}
-                        onClick={(e) => handleEmailClick(e, selectedQuote.email)}
+                        onClick={(e) => handleEmailClick(e, selectedQuote.email, dispatch)}
                         className="text-decoration-none contact-chip-email"
                       >
                         <i className="bi bi-envelope me-1"></i>

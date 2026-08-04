@@ -1,10 +1,11 @@
 import { Container, Row, Col } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
 import "./LocationMap.css";
 
 function LocationMap() {
+  const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].about;
 
@@ -40,7 +41,7 @@ function LocationMap() {
             <Col xs={12} lg={7} xl={8}>
               <div className="map-iframe-container">
                 <iframe
-                  title="Vinco Eventi Location Map"
+                  title="VINCO EVENTI Location Map"
                   src={embedUrl}
                   loading="lazy"
                   allowFullScreen
@@ -54,7 +55,7 @@ function LocationMap() {
               <div className="map-info-card">
                 <div>
                   <h3 className="h4 font-heading text-body fw-bold mb-4 pb-2 border-bottom border-secondary border-opacity-25">
-                    Vinco Eventi HQ
+                    VINCO EVENTI HQ
                   </h3>
 
                   <div className="d-flex flex-column gap-4">
@@ -103,7 +104,7 @@ function LocationMap() {
                         </span>
                         <a
                           href={`mailto:${t.emailValue}`}
-                          onClick={(e) => handleEmailClick(e, t.emailValue)}
+                          onClick={(e) => handleEmailClick(e, t.emailValue, dispatch)}
                           className="fw-medium text-body text-decoration-none font-body fs-6 map-contact-link"
                         >
                           {t.emailValue}

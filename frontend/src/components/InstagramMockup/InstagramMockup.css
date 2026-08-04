@@ -6,9 +6,10 @@
   justify-content: center;
   align-items: center;
   padding: 0.5rem 0;
+  perspective: 1200px;
 }
 
-/* Smartphone Chassis (Dimensioni Fisse e Proporzioni Rigorose) */
+/* Smartphone Chassis (Dimensioni Fisse e Proporzioni Rigorose + Effetto 3D Elegante) */
 .phone-chassis {
   position: relative;
   width: 340px;
@@ -17,15 +18,25 @@
   border: 10px solid #222824;
   border-radius: 44px;
   box-shadow: 
-    0 20px 48px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.12),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.8);
+    -8px 16px 36px rgba(0, 0, 0, 0.45),
+    0 24px 48px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.85),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   user-select: none;
   margin: 0 auto;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform: perspective(1200px) rotateX(2.5deg) rotateY(-3.5deg) translateY(0) translateZ(0);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, box-shadow;
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: linear-gradient(#fff, #fff);
+  transform-style: preserve-3d;
 }
 
 /* Dynamic Glass Gloss Reflection */
@@ -38,8 +49,8 @@
   height: 35%;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.07) 0%,
-    rgba(255, 255, 255, 0.01) 50%,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
     transparent 100%
   );
   pointer-events: none;
@@ -47,10 +58,13 @@
 }
 
 .phone-chassis:hover {
-  transform: translateY(-4px);
+  transform: perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(-6px) translateZ(12px);
   box-shadow: 
-    0 28px 56px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(32, 120, 75, 0.4);
+    -12px 28px 56px rgba(0, 0, 0, 0.55),
+    0 32px 64px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(32, 120, 75, 0.5),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.85),
+    inset 0 1px 2px rgba(255, 255, 255, 0.25);
 }
 
 /* Status Bar & Notch */
@@ -137,7 +151,9 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 1.5px solid var(--bs-body-bg);
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .ig-username {
@@ -178,24 +194,22 @@
   object-fit: cover;
 }
 
-/* Navigation Chevrons */
+/* Navigation Chevrons - Glassmorphism Styling matching Hero Cards */
 .ig-carousel-nav-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
-  color: #ffffff;
-  border: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
   opacity: 0;
-  transition: opacity 0.25s ease, background 0.2s ease;
+  transition: opacity 0.25s ease, background-color 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
   z-index: 15;
   cursor: pointer;
 }
@@ -204,9 +218,41 @@
   opacity: 0.85;
 }
 
-.ig-carousel-nav-btn:hover {
+/* Glassmorphism Styling - Dark Theme Default */
+.ig-carousel-nav-btn,
+[data-bs-theme="dark"] .ig-carousel-nav-btn {
+  background-color: rgba(18, 26, 21, 0.40);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Glassmorphism Styling - Light Theme */
+[data-bs-theme="light"] .ig-carousel-nav-btn {
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(32, 74, 53, 0.16);
+  color: var(--primary-forest, #204a35);
+  box-shadow: 0 3px 10px rgba(32, 74, 53, 0.10);
+}
+
+/* Hover States for Smartphone Widget Chevrons */
+.ig-carousel-nav-btn:hover,
+[data-bs-theme="dark"] .ig-carousel-nav-btn:hover {
   opacity: 1 !important;
-  background: rgba(0, 0, 0, 0.8);
+  background-color: rgba(32, 74, 53, 0.85);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 10px rgba(32, 74, 53, 0.4);
+}
+
+[data-bs-theme="light"] .ig-carousel-nav-btn:hover {
+  opacity: 1 !important;
+  background-color: var(--primary-forest, #204a35);
+  border-color: var(--primary-forest, #204a35);
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 4px 14px rgba(32, 74, 53, 0.25);
 }
 
 .ig-carousel-nav-btn.prev {
@@ -317,24 +363,24 @@
 /* Scaling per schermi di ampiezza ridotta per mantenere l'intero telefono integro e visibile */
 @media (max-width: 991.98px) {
   .phone-chassis {
-    transform: scale(0.92);
+    transform: scale(0.92) perspective(1200px) rotateX(2.5deg) rotateY(-3.5deg) translateZ(0);
     transform-origin: top center;
     margin-bottom: -40px;
   }
 
   .phone-chassis:hover {
-    transform: scale(0.92) translateY(-4px);
+    transform: scale(0.92) perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(-6px) translateZ(12px);
   }
 }
 
 @media (max-width: 420px) {
   .phone-chassis {
-    transform: scale(0.85);
+    transform: scale(0.85) perspective(1200px) rotateX(2.5deg) rotateY(-3.5deg) translateZ(0);
     transform-origin: top center;
     margin-bottom: -70px;
   }
 
   .phone-chassis:hover {
-    transform: scale(0.85) translateY(-4px);
+    transform: scale(0.85) perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(-6px) translateZ(12px);
   }
 }

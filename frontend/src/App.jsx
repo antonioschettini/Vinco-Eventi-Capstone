@@ -5,6 +5,8 @@ import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import TrackModal from "./components/AudioPlayer/TrackModal";
 import MobileBottomPlayer from "./components/AudioPlayer/MobileBottomPlayer";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+import EmailChoiceModal from "./components/EmailModal/EmailChoiceModal";
 import ProtectedRoute from "./components/Admin/ProtectedRoute";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 import ErrorBanner from "./components/ErrorBanner/ErrorBanner";
@@ -31,6 +33,8 @@ function Layout() {
       <Navbar />
       <TrackModal />
       <MobileBottomPlayer />
+      <ScrollToTop />
+      <EmailChoiceModal />
       
       {/* Banner per errori/notifiche globali in alto */}
       {globalError && (

@@ -12,7 +12,7 @@ import imgCielo from "../../assets/home/cielo stellato.jpg";
 import logoEnzo from "../../assets/home/foto sfondo banner enzo.jpeg";
 
 const slideImages = [
-  { id: 1, src: imgSposi, alt: "Sposi Vinco Eventi" },
+  { id: 1, src: imgSposi, alt: "Sposi VINCO EVENTI" },
   { id: 2, src: imgAperitivo, alt: "Aperitivo con Band dal Vivo" },
   { id: 3, src: imgDancefloor, alt: "Dancefloor & DJ Set" },
   { id: 4, src: imgFumogeni, alt: "Effetti Spettacolari & Fumogeni" },
@@ -95,8 +95,8 @@ function InstagramMockup() {
             <div className="d-flex align-items-center gap-2 overflow-hidden">
               <div className="ig-avatar-ring">
                 <img
-                  src={logoEnzo}
-                  alt="vincoeventi"
+                  src="/logo tondo vinco eventi trasparente.png"
+                  alt="VINCO EVENTI"
                   className="ig-avatar-img"
                 />
               </div>
@@ -235,8 +235,8 @@ function InstagramMockup() {
             </button>
             <button className="btn btn-link p-0 text-body" aria-label="Profile">
               <img
-                src={logoEnzo}
-                alt="Profile"
+                src="/logo tondo vinco eventi trasparente.png"
+                alt="Profile VINCO EVENTI"
                 className="rounded-circle"
                 style={{ width: "22px", height: "22px", objectFit: "cover" }}
               />

@@ -405,7 +405,7 @@ function Services() {
                     <div className="service-card-img-wrapper">
                       <img
                         src={getServiceImage(pkg)}
-                        alt={`${title} Vinco Eventi`}
+                        alt={`${title} VINCO EVENTI`}
                         className="service-card-img"
                       />
                       <span className={`package-badge-pill badge-${badgeUpper.toLowerCase()}`}>

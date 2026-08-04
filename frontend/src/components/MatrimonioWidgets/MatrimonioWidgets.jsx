@@ -56,7 +56,7 @@ function MatrimonioWidgets() {
     };
   }, []);
 
-  // Recensioni ufficiali verificate su Matrimonio.com per Vinco Eventi
+  // Recensioni ufficiali verificate su Matrimonio.com per VINCO EVENTI
   const reviewsData = [
     {
       id: 1,
@@ -82,7 +82,7 @@ function MatrimonioWidgets() {
       date: "04/07/2026",
       rating: 5.0,
       title: "Couldn't have asked for a better music company!",
-      text: "Il mio wedding planner ha raccomandato Vinco Eventi, e fin dall'inizio l'intero processo è stato così facile! Sono stati incredibilmente professionali, organizzati e curati in ogni dettaglio.",
+      text: "Il mio wedding planner ha raccomandato VINCO EVENTI, e fin dall'inizio l'intero processo è stato così facile! Sono stati incredibilmente professionali, organizzati e curati in ogni dettaglio.",
       initials: "F",
     },
     {

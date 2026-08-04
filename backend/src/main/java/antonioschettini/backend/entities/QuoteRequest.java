@@ -55,6 +55,8 @@ public class QuoteRequest {
 
     private String budget;
 
+    private String lingua;
+
     @Column(name = "data_richiesta")
     private LocalDateTime dataRichiesta;
 
@@ -69,6 +71,9 @@ public class QuoteRequest {
         }
         if (this.stato == null) {
             this.stato = QuoteStatus.PENDING;
+        }
+        if (this.lingua == null || this.lingua.isBlank()) {
+            this.lingua = "it";
         }
     }
 }

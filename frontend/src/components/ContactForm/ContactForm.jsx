@@ -8,17 +8,23 @@ import { translations } from "../../utils/translations";
 import "./ContactForm.css";
 
 const COUNTRY_PREFIXES = [
-  { code: "it", name: "Italia", prefix: "+39", flagUrl: "https://flagcdn.com/w40/it.png" },
-  { code: "fr", name: "Francia", prefix: "+33", flagUrl: "https://flagcdn.com/w40/fr.png" },
-  { code: "de", name: "Germania", prefix: "+49", flagUrl: "https://flagcdn.com/w40/de.png" },
-  { code: "gb", name: "Regno Unito", prefix: "+44", flagUrl: "https://flagcdn.com/w40/gb.png" },
-  { code: "es", name: "Spagna", prefix: "+34", flagUrl: "https://flagcdn.com/w40/es.png" },
-  { code: "ch", name: "Svizzera", prefix: "+41", flagUrl: "https://flagcdn.com/w40/ch.png" },
-  { code: "at", name: "Austria", prefix: "+43", flagUrl: "https://flagcdn.com/w40/at.png" },
-  { code: "us", name: "Stati Uniti / Canada", prefix: "+1", flagUrl: "https://flagcdn.com/w40/us.png" },
-  { code: "cn", name: "Cina", prefix: "+86", flagUrl: "https://flagcdn.com/w40/cn.png" },
-  { code: "jp", name: "Giappone", prefix: "+81", flagUrl: "https://flagcdn.com/w40/jp.png" },
-  { code: "br", name: "Brasile", prefix: "+55", flagUrl: "https://flagcdn.com/w40/br.png" },
+  { code: "it", name: "Italia", nameEn: "Italy", prefix: "+39", flagUrl: "https://flagcdn.com/w40/it.png" },
+  { code: "fr", name: "Francia", nameEn: "France", prefix: "+33", flagUrl: "https://flagcdn.com/w40/fr.png" },
+  { code: "de", name: "Germania", nameEn: "Germany", prefix: "+49", flagUrl: "https://flagcdn.com/w40/de.png" },
+  { code: "gb", name: "Regno Unito", nameEn: "United Kingdom", prefix: "+44", flagUrl: "https://flagcdn.com/w40/gb.png" },
+  { code: "es", name: "Spagna", nameEn: "Spain", prefix: "+34", flagUrl: "https://flagcdn.com/w40/es.png" },
+  { code: "ch", name: "Svizzera", nameEn: "Switzerland", prefix: "+41", flagUrl: "https://flagcdn.com/w40/ch.png" },
+  { code: "at", name: "Austria", nameEn: "Austria", prefix: "+43", flagUrl: "https://flagcdn.com/w40/at.png" },
+  { code: "us", name: "Stati Uniti / Canada", nameEn: "United States / Canada", prefix: "+1", flagUrl: "https://flagcdn.com/w40/us.png" },
+  { code: "cn", name: "Cina", nameEn: "China", prefix: "+86", flagUrl: "https://flagcdn.com/w40/cn.png" },
+  { code: "jp", name: "Giappone", nameEn: "Japan", prefix: "+81", flagUrl: "https://flagcdn.com/w40/jp.png" },
+  { code: "br", name: "Brasile", nameEn: "Brazil", prefix: "+55", flagUrl: "https://flagcdn.com/w40/br.png" },
+  { code: "nl", name: "Paesi Bassi", nameEn: "Netherlands", prefix: "+31", flagUrl: "https://flagcdn.com/w40/nl.png" },
+  { code: "be", name: "Belgio", nameEn: "Belgium", prefix: "+32", flagUrl: "https://flagcdn.com/w40/be.png" },
+  { code: "pt", name: "Portogallo", nameEn: "Portugal", prefix: "+351", flagUrl: "https://flagcdn.com/w40/pt.png" },
+  { code: "gr", name: "Grecia", nameEn: "Greece", prefix: "+30", flagUrl: "https://flagcdn.com/w40/gr.png" },
+  { code: "ae", name: "Emirati Arabi Uniti", nameEn: "United Arab Emirates", prefix: "+971", flagUrl: "https://flagcdn.com/w40/ae.png" },
+  { code: "au", name: "Australia", nameEn: "Australia", prefix: "+61", flagUrl: "https://flagcdn.com/w40/au.png" },
 ];
 
 const initialFormState = {
@@ -28,11 +34,13 @@ const initialFormState = {
   prefissoTelefono: "+39",
   telefono: "",
   tipoEvento: "",
+  tipoEventoAltro: "",
   dataEvento: "",
   luogoEvento: "",
   numeroOspiti: "",
   momentoGiornata: "",
   tipoCerimonia: "",
+  tipoCerimoniaAltro: "",
   ideaFesta: "",
   ulterioriInfo: "",
   budget: "",
@@ -77,16 +85,35 @@ function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // { type: 'success' | 'danger', message: string }
   const [showResetModal, setShowResetModal] = useState(false);
+  const [prefixSearch, setPrefixSearch] = useState("");
 
   const selectedCountry = COUNTRY_PREFIXES.find(
     (c) => c.prefix === formData.prefissoTelefono
   ) || COUNTRY_PREFIXES[0];
 
   const getCountryName = (country) => {
-    return t.countries?.[country.code] || country.name;
+    if (!country) return "";
+    return t.countries?.[country.code] || (lang === "en" && country.nameEn ? country.nameEn : country.name);
   };
 
   const selectedCountryName = getCountryName(selectedCountry);
+
+  const filteredCountries = COUNTRY_PREFIXES.filter((c) => {
+    const q = prefixSearch.toLowerCase().trim();
+    if (!q) return true;
+    const nameIt = (c.name || "").toLowerCase();
+    const nameEn = (c.nameEn || "").toLowerCase();
+    const translationName = (t.countries?.[c.code] || "").toLowerCase();
+    const code = (c.code || "").toLowerCase();
+    const prefix = (c.prefix || "").toLowerCase();
+    return (
+      nameIt.includes(q) ||
+      nameEn.includes(q) ||
+      translationName.includes(q) ||
+      code.includes(q) ||
+      prefix.includes(q)
+    );
+  });
 
   const scrollToTop = () => {
     if (formRef.current) {
@@ -97,15 +124,28 @@ function ContactForm() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
 
-    // If changing tipoEvento to something other than Matrimonio, clear tipoCerimonia
-    if (name === "tipoEvento" && value !== "Matrimonio") {
-      setFormData((prev) => ({ ...prev, tipoCerimonia: "" }));
-    }
+      if (name === "tipoEvento") {
+        if (value !== "Altro") {
+          updated.tipoEventoAltro = "";
+        }
+        if (value !== "Matrimonio") {
+          updated.tipoCerimonia = "";
+          updated.tipoCerimoniaAltro = "";
+        }
+      }
+
+      if (name === "tipoCerimonia" && value !== "Altro") {
+        updated.tipoCerimoniaAltro = "";
+      }
+
+      return updated;
+    });
   };
 
   const isFormValid = () => {
@@ -121,6 +161,12 @@ function ContactForm() {
       (field) => formData[field].toString().trim() !== ""
     );
 
+    const eventTypeOtherOk =
+      formData.tipoEvento !== "Altro" || formData.tipoEventoAltro.trim() !== "";
+
+    const ceremonyTypeOtherOk =
+      formData.tipoCerimonia !== "Altro" || formData.tipoCerimoniaAltro.trim() !== "";
+
     const emailOk = isValidEmail(formData.email);
     const phoneOk = isValidPhone(formData.telefono);
     const locationOk = isValidLocation(formData.luogoEvento);
@@ -129,6 +175,8 @@ function ContactForm() {
 
     return (
       allBasicFilled &&
+      eventTypeOtherOk &&
+      ceremonyTypeOtherOk &&
       emailOk &&
       phoneOk &&
       locationOk &&
@@ -155,21 +203,32 @@ function ContactForm() {
     const cleanPhoneDigits = formData.telefono.trim().replace(/^\+\d{1,4}\s*/, "");
     const fullPhone = `${formData.prefissoTelefono} ${cleanPhoneDigits}`;
 
+    const finalTipoEvento =
+      formData.tipoEvento === "Altro"
+        ? (formData.tipoEventoAltro.trim() ? `Altro: ${formData.tipoEventoAltro.trim()}` : "Altro")
+        : formData.tipoEvento;
+
+    const finalTipoCerimonia =
+      formData.tipoCerimonia === "Altro"
+        ? (formData.tipoCerimoniaAltro.trim() ? `Altro: ${formData.tipoCerimoniaAltro.trim()}` : "Altro")
+        : formData.tipoCerimonia;
+
     const payload = {
       nome: formData.nome,
       cognome: formData.cognome,
       email: formData.email,
       telefono: fullPhone,
       dataEvento: formData.dataEvento || null,
-      tipoEvento: formData.tipoEvento,
+      tipoEvento: finalTipoEvento,
       location: formData.luogoEvento,
       numeroOspiti: String(formData.numeroOspiti),
       orarioGiornata: formData.momentoGiornata,
-      tipoCerimonia: formData.tipoCerimonia,
+      tipoCerimonia: finalTipoCerimonia,
       messaggio: formData.ideaFesta
         ? `${formData.ideaFesta}${formData.ulterioriInfo ? "\n\nInfo aggiuntive: " + formData.ulterioriInfo : ""}`
         : formData.ulterioriInfo || "",
       budget: formData.budget,
+      lingua: lang,
     };
 
     try {
@@ -324,28 +383,68 @@ function ContactForm() {
                   <span className="prefix-num-sm">{selectedCountry.prefix}</span>
                 </Dropdown.Toggle>
 
-                <Dropdown.Menu className="phone-prefix-menu shadow-lg">
-                  {COUNTRY_PREFIXES.map((country) => {
-                    const countryName = getCountryName(country);
-                    return (
-                      <Dropdown.Item
-                        key={country.code}
-                        active={country.prefix === formData.prefissoTelefono}
-                        onClick={() => setFormData((prev) => ({ ...prev, prefissoTelefono: country.prefix }))}
-                        className="d-flex align-items-center gap-2 py-2 px-3 fs-7"
-                      >
-                        <img
-                          src={country.flagUrl}
-                          alt={countryName}
-                          className="country-flag-icon"
-                          width="18"
-                          height="13"
-                        />
-                        <span className="fw-semibold me-auto">{countryName}</span>
-                        <span className="text-body-secondary font-monospace small">{country.prefix}</span>
-                      </Dropdown.Item>
-                    );
-                  })}
+                <Dropdown.Menu className="phone-prefix-menu shadow-lg p-2">
+                  <div className="px-2 pb-2 mb-1 border-bottom border-secondary border-opacity-10">
+                    <div className="input-group input-group-sm">
+                      <span className="input-group-text bg-transparent border-end-0 text-muted">
+                        <i className="bi bi-search"></i>
+                      </span>
+                      <input
+                        type="text"
+                        className="form-control form-control-sm border-start-0 prefix-search-input"
+                        placeholder={lang === "en" ? "Search country or prefix..." : "Cerca paese o prefisso..."}
+                        value={prefixSearch}
+                        onChange={(e) => setPrefixSearch(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                      {prefixSearch && (
+                        <button
+                          className="btn btn-sm btn-outline-secondary border-start-0"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPrefixSearch("");
+                          }}
+                        >
+                          <i className="bi bi-x"></i>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="prefix-menu-items-scroll">
+                    {filteredCountries.length > 0 ? (
+                      filteredCountries.map((country) => {
+                        const countryName = getCountryName(country);
+                        return (
+                          <Dropdown.Item
+                            key={country.code}
+                            active={country.prefix === formData.prefissoTelefono}
+                            onClick={() => {
+                              setFormData((prev) => ({ ...prev, prefissoTelefono: country.prefix }));
+                              setPrefixSearch("");
+                            }}
+                            className="d-flex align-items-center gap-2 py-2 px-3 fs-7"
+                          >
+                            <img
+                              src={country.flagUrl}
+                              alt={countryName}
+                              className="country-flag-icon"
+                              width="18"
+                              height="13"
+                            />
+                            <span className="fw-semibold me-auto">{countryName}</span>
+                            <span className="text-body-secondary font-monospace small">{country.prefix}</span>
+                          </Dropdown.Item>
+                        );
+                      })
+                    ) : (
+                      <div className="text-muted text-center py-2 fs-7">
+                        {lang === "en" ? "No results found" : "Nessun risultato trovato"}
+                      </div>
+                    )}
+                  </div>
                 </Dropdown.Menu>
               </Dropdown>
 
@@ -391,6 +490,30 @@ function ContactForm() {
               <option value="Altro">{t.eventTypes.other}</option>
             </select>
             <div className="invalid-feedback">Seleziona il {t.eventType}.</div>
+
+            {formData.tipoEvento === "Altro" && (
+              <div className="mt-2">
+                <label htmlFor="tipoEventoAltro" className="form-label font-body fw-semibold text-body fs-7">
+                  {t.eventTypeOtherLabel || "Specifica tipo di evento"} <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="tipoEventoAltro"
+                  name="tipoEventoAltro"
+                  tabIndex={5}
+                  value={formData.tipoEventoAltro}
+                  onChange={handleChange}
+                  placeholder={t.eventTypeOtherPlaceholder || "Es. Laurea, Anniversario, Festa di Gala..."}
+                  className={`form-control font-body ${
+                    validated && !formData.tipoEventoAltro.trim() ? "is-invalid" : ""
+                  }`}
+                  required
+                />
+                <div className="invalid-feedback">
+                  {t.eventTypeOtherError || "Specifica il tipo di evento."}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="col-12 col-md-6">
@@ -517,10 +640,34 @@ function ContactForm() {
                 className="form-select font-body"
               >
                 <option value="">{t.selectCeremonyType}</option>
-                <option value="Civile">{t.ceremonyOptions.civil}</option>
+                <option value="Civile / Simbolico">{t.ceremonyOptions.civil}</option>
                 <option value="Religioso">{t.ceremonyOptions.religious}</option>
                 <option value="Altro">{t.ceremonyOptions.other}</option>
               </select>
+
+              {formData.tipoCerimonia === "Altro" && (
+                <div className="mt-2">
+                  <label htmlFor="tipoCerimoniaAltro" className="form-label font-body fw-semibold text-body fs-7">
+                    {t.ceremonyTypeOtherLabel || "Specifica tipo di cerimonia"} <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="tipoCerimoniaAltro"
+                    name="tipoCerimoniaAltro"
+                    tabIndex={10}
+                    value={formData.tipoCerimoniaAltro}
+                    onChange={handleChange}
+                    placeholder={t.ceremonyTypeOtherPlaceholder || "Es. All'aperto, Umanista, Simbolica..."}
+                    className={`form-control font-body ${
+                      validated && !formData.tipoCerimoniaAltro.trim() ? "is-invalid" : ""
+                    }`}
+                    required
+                  />
+                  <div className="invalid-feedback">
+                    {t.ceremonyTypeOtherError || "Specifica il tipo di cerimonia."}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -601,7 +748,7 @@ function ContactForm() {
             {t.acceptTerms} <span className="text-danger">*</span>
           </label>
           <div className="invalid-feedback">
-            Devi accettare i termini e le condizioni per proseguire.
+            {t.acceptTermsError || "Devi prendere visione dell'Informativa sulla Privacy e accettare i Termini e Condizioni per proseguire."}
           </div>
         </div>
 

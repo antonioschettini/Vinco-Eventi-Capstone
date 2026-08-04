@@ -22,39 +22,44 @@ import AudioController from "../AudioPlayer/AudioController";
 import { translations } from "../../utils/translations";
 import "./Navbar.css";
 
-// SVG Bandiera Italiana
+// SVG Bandiera Italiana (Rapporto 3:2 perfetto)
 const ItalyFlag = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 3 2"
-    width="20"
-    height="14"
+    viewBox="0 0 30 20"
+    width="24"
+    height="16"
     className="flag-icon-svg"
   >
-    <rect width="1" height="2" fill="#009246" />
-    <rect x="1" width="1" height="2" fill="#F1F2F1" />
-    <rect x="2" width="1" height="2" fill="#CE2B37" />
+    <clipPath id="it-clip">
+      <rect width="30" height="20" rx="4" ry="4" />
+    </clipPath>
+    <g clipPath="url(#it-clip)">
+      <rect width="10" height="20" fill="#009246" />
+      <rect x="10" width="10" height="20" fill="#F1F2F1" />
+      <rect x="20" width="10" height="20" fill="#CE2B37" />
+    </g>
   </svg>
 );
 
-// SVG Bandiera Regno Unito (UK)
+// SVG Bandiera Regno Unito (Rapporto 3:2 perfetto)
 const UKFlag = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 60 30"
-    width="20"
-    height="14"
+    viewBox="0 0 60 40"
+    width="24"
+    height="16"
     className="flag-icon-svg"
   >
-    <clipPath id="uj-clip">
-      <rect width="60" height="30" />
+    <clipPath id="uk-clip">
+      <rect width="60" height="40" rx="8" ry="8" />
     </clipPath>
-    <g clipPath="url(#uj-clip)">
-      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#00247D" strokeWidth="60" />
-      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#FFFFFF" strokeWidth="6" />
-      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#CF142B" strokeWidth="4" />
-      <path d="M30,0 L30,30 M0,15 L60,15" stroke="#FFFFFF" strokeWidth="10" />
-      <path d="M30,0 L30,30 M0,15 L60,15" stroke="#CF142B" strokeWidth="6" />
+    <g clipPath="url(#uk-clip)">
+      <rect width="60" height="40" fill="#00247D" />
+      <path d="M0,0 L60,40 M60,0 L0,40" stroke="#FFFFFF" strokeWidth="8" />
+      <path d="M0,0 L60,40 M60,0 L0,40" stroke="#CF142B" strokeWidth="4" />
+      <path d="M30,0 L30,40 M0,20 L60,20" stroke="#FFFFFF" strokeWidth="12" />
+      <path d="M30,0 L30,40 M0,20 L60,20" stroke="#CF142B" strokeWidth="7" />
     </g>
   </svg>
 );
@@ -278,11 +283,20 @@ function Navbar() {
               onClick={() => setShowLogin(!showLogin)}
               className={`admin-login-btn-toggle d-flex align-items-center gap-2 ${
                 showLogin ? "active" : ""
-              } ${isAuthenticated ? "border-success text-success" : ""}`}
+              }`}
               aria-expanded={showLogin}
             >
-              <i className={`bi ${isAuthenticated ? "bi-shield-check" : "bi-lock-fill"}`}></i>
-              <span>{isAuthenticated ? "Admin Panel" : t.adminLogin}</span>
+              {isAuthenticated ? (
+                <img
+                  src="/logo tondo vinco eventi trasparente.png"
+                  alt="Admin VINCO EVENTI"
+                  className="admin-btn-icon rounded-circle"
+                  style={{ width: "20px", height: "20px", objectFit: "cover" }}
+                />
+              ) : (
+                <i className="bi bi-lock-fill admin-btn-icon"></i>
+              )}
+              <span>{isAuthenticated ? t.adminPanel : t.adminLogin}</span>
             </button>
 
             {/* Modale Login / Admin Menu Dropdown Popover */}
@@ -290,13 +304,24 @@ function Navbar() {
               <div className="login-dropdown-popover p-3 shadow-lg rounded">
                 {isAuthenticated ? (
                   <div className="text-start">
-                    <div className="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
-                      <i className="bi bi-person-circle fs-5 text-success"></i>
-                      <div>
-                        <div className="fw-bold small text-truncate" style={{ maxWidth: "160px" }}>
+                    <div className="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+                      <img
+                        src="/logo tondo vinco eventi trasparente.png"
+                        alt="VINCO EVENTI Admin"
+                        className="rounded-circle flex-shrink-0"
+                        style={{ width: "34px", height: "34px", objectFit: "cover" }}
+                      />
+                      <div className="flex-grow-1 min-w-0">
+                        <div
+                          className="fw-bold small text-body admin-email-text"
+                          title={user?.email}
+                        >
                           {user?.email}
                         </div>
-                        <span className="badge bg-success text-uppercase style-badge small" style={{ fontSize: "0.65rem" }}>
+                        <span
+                          className="badge bg-success text-uppercase style-badge small mt-0.5"
+                          style={{ fontSize: "0.65rem" }}
+                        >
                           {user?.role}
                         </span>
                       </div>
@@ -380,7 +405,7 @@ function Navbar() {
         <Link
           to="/"
           className={`logo-container ${isPlaying ? "is-playing" : ""}`}
-          aria-label="Vinco Eventi Home"
+          aria-label="VINCO EVENTI Home"
         >
           {/* Animazione del ritmo musicale attorno al logo */}
           <div className="musical-rhythm-wrapper" aria-hidden="true">
@@ -411,7 +436,7 @@ function Navbar() {
           <div className="logo-wrapper">
             <img
               src="/logoVincoEventi.jpeg"
-              alt="Vinco Eventi Logo"
+              alt="VINCO EVENTI Logo"
               className="logo-img"
             />
           </div>

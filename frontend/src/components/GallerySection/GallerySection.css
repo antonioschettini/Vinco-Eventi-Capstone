@@ -40,6 +40,119 @@
   text-align: left;
 }
 
+/* Custom Elegant Carousel Navigation Controls */
+.gallery-top-carousel .carousel-control-prev,
+.gallery-top-carousel .carousel-control-next {
+  width: auto;
+  opacity: 0.75;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+  padding: 0 1.25rem;
+}
+
+.gallery-top-carousel:hover .carousel-control-prev,
+.gallery-top-carousel:hover .carousel-control-next {
+  opacity: 1;
+}
+
+.gallery-top-carousel .gallery-carousel-nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+/* Glassmorphism Styling - Dark Theme Default */
+.gallery-top-carousel .gallery-carousel-nav-btn,
+[data-bs-theme="dark"] .gallery-top-carousel .gallery-carousel-nav-btn {
+  background-color: rgba(18, 26, 21, 0.40);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* Glassmorphism Styling - Light Theme */
+[data-bs-theme="light"] .gallery-top-carousel .gallery-carousel-nav-btn {
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(32, 74, 53, 0.16);
+  color: var(--primary-forest, #204a35);
+  box-shadow: 0 4px 16px rgba(32, 74, 53, 0.10);
+}
+
+/* Hover States for Dark & Light Mode */
+.gallery-top-carousel .carousel-control-prev:hover .gallery-carousel-nav-btn,
+.gallery-top-carousel .carousel-control-next:hover .gallery-carousel-nav-btn,
+.gallery-top-carousel .gallery-carousel-nav-btn:hover,
+[data-bs-theme="dark"] .gallery-top-carousel .carousel-control-prev:hover .gallery-carousel-nav-btn,
+[data-bs-theme="dark"] .gallery-top-carousel .carousel-control-next:hover .gallery-carousel-nav-btn,
+[data-bs-theme="dark"] .gallery-top-carousel .gallery-carousel-nav-btn:hover {
+  background-color: rgba(32, 74, 53, 0.85);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 12px rgba(32, 74, 53, 0.4);
+}
+
+[data-bs-theme="light"] .gallery-top-carousel .carousel-control-prev:hover .gallery-carousel-nav-btn,
+[data-bs-theme="light"] .gallery-top-carousel .carousel-control-next:hover .gallery-carousel-nav-btn,
+[data-bs-theme="light"] .gallery-top-carousel .gallery-carousel-nav-btn:hover {
+  background-color: var(--primary-forest, #204a35);
+  border-color: var(--primary-forest, #204a35);
+  color: #ffffff;
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(32, 74, 53, 0.25);
+}
+
+/* Custom Carousel Indicators (Pagination Dots) */
+.gallery-top-carousel .carousel-indicators {
+  margin-bottom: 1rem;
+  z-index: 12;
+  gap: 6px;
+}
+
+.gallery-top-carousel .carousel-indicators [data-bs-target] {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  margin: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.6;
+}
+
+.gallery-top-carousel .carousel-indicators [data-bs-target],
+[data-bs-theme="dark"] .gallery-top-carousel .carousel-indicators [data-bs-target] {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.gallery-top-carousel .carousel-indicators .active,
+[data-bs-theme="dark"] .gallery-top-carousel .carousel-indicators .active {
+  width: 24px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="light"] .gallery-top-carousel .carousel-indicators [data-bs-target] {
+  background-color: rgba(32, 74, 53, 0.35);
+}
+
+[data-bs-theme="light"] .gallery-top-carousel .carousel-indicators .active {
+  width: 24px;
+  border-radius: 4px;
+  background-color: var(--primary-forest, #204a35);
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(32, 74, 53, 0.25);
+}
+
 /* Gallery Section Heading */
 .gallery-title-line {
   position: relative;

@@ -414,6 +414,16 @@ function GallerySection() {
               fade
               interval={4000}
               className="gallery-top-carousel rounded-4 overflow-hidden shadow"
+              prevIcon={
+                <div className="gallery-carousel-nav-btn prev" aria-hidden="true">
+                  <i className="bi bi-chevron-left"></i>
+                </div>
+              }
+              nextIcon={
+                <div className="gallery-carousel-nav-btn next" aria-hidden="true">
+                  <i className="bi bi-chevron-right"></i>
+                </div>
+              }
             >
               {featuredItems.map((item, idx) => {
                 const isActive = idx === carouselIndex;

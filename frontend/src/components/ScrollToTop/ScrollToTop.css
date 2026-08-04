@@ -1,0 +1,108 @@
+/* Pulsante Fluttuante Elegante "Torna in alto" */
+.scroll-to-top-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 1030;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 50px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  /* Stato iniziale nascosto con animazione fluida */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px) scale(0.92);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.25s ease,
+              color 0.25s ease;
+}
+
+/* Stato visibile dopo lo scroll */
+.scroll-to-top-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* Icona direzionale con micro-transizione */
+.scroll-to-top-btn .scroll-top-icon {
+  font-size: 0.95rem;
+  transition: transform 0.25s ease;
+}
+
+.scroll-to-top-btn:hover .scroll-top-icon {
+  transform: translateY(-2px);
+}
+
+/* Stili specifici per Dark Mode */
+[data-bs-theme="dark"] .scroll-to-top-btn {
+  background-color: rgba(18, 26, 21, 0.85);
+  border: 1px solid rgba(72, 147, 108, 0.35);
+  color: #e4ece7;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+[data-bs-theme="dark"] .scroll-to-top-btn:hover {
+  background-color: rgba(24, 38, 29, 0.95);
+  border-color: var(--emerald-accent);
+  color: #ffffff;
+  box-shadow: 0 10px 28px rgba(72, 147, 108, 0.35);
+  transform: translateY(-3px);
+}
+
+/* Stili specifici per Light Mode */
+[data-bs-theme="light"] .scroll-to-top-btn {
+  background-color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(32, 74, 53, 0.2);
+  color: var(--primary-forest);
+  box-shadow: 0 6px 20px rgba(32, 74, 53, 0.15);
+}
+
+[data-bs-theme="light"] .scroll-to-top-btn:hover {
+  background-color: #ffffff;
+  border-color: var(--primary-forest);
+  color: var(--primary-forest-hover);
+  box-shadow: 0 10px 26px rgba(32, 74, 53, 0.25);
+  transform: translateY(-3px);
+}
+
+.scroll-to-top-btn:active {
+  transform: translateY(0) scale(0.96);
+}
+
+/* Responsiveness: Per schermi piccoli (< 820px) regoliamo la posizione per evitare sovrapposizioni con MobileBottomPlayer (48px) */
+@media (max-width: 819.98px) {
+  .scroll-to-top-btn {
+    bottom: 64px;
+    right: 16px;
+    padding: 8px 14px;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-to-top-btn {
+    bottom: 62px;
+    right: 14px;
+    padding: 8px 12px;
+  }
+  
+  .scroll-top-text {
+    font-size: 0.7rem;
+  }
+}

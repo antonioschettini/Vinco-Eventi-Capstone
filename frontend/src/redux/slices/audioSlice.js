@@ -5,7 +5,7 @@ const initialState = {
   volume: 0.05, // Default 5%
   currentTrackIndex: 0,
   isModalOpen: false,
-  autoplayBlocked: false,
+  autoplayBlocked: true,
   isMuted: false,
   prevVolume: 0.05,
   modalPosition: null, // { x: number, y: number } per persistere la posizione del modale trascinabile

@@ -1,5 +1,5 @@
 import { Container, Row, Col } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
 import footerBgImage from "../../assets/home/bannerFooter.png";
 import "./Footer.css";
@@ -7,6 +7,7 @@ import "./Footer.css";
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
 
 function Footer() {
+  const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].footer;
 
@@ -51,7 +52,7 @@ function Footer() {
                 <i className="bi bi-envelope-fill me-2 text-forest"></i>
                 <a
                   href={`mailto:${t.email}`}
-                  onClick={(e) => handleEmailClick(e, t.email)}
+                  onClick={(e) => handleEmailClick(e, t.email, dispatch)}
                   className="info-link"
                 >
                   {t.email}

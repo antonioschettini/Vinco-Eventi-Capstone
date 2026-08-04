@@ -16,6 +16,10 @@ const initialState = {
   theme: getInitialTheme(),
   language: getInitialLanguage(),
   globalError: null, // { message: string, type: 'danger'|'warning'|'info'|'success' }
+  emailModal: {
+    isOpen: false,
+    email: "vincoeventi@gmail.com",
+  },
 };
 
 const uiSlice = createSlice({
@@ -42,8 +46,24 @@ const uiSlice = createSlice({
     clearGlobalError: (state) => {
       state.globalError = null;
     },
+    openEmailModal: (state, action) => {
+      state.emailModal = {
+        isOpen: true,
+        email: action.payload || "vincoeventi@gmail.com",
+      };
+    },
+    closeEmailModal: (state) => {
+      state.emailModal.isOpen = false;
+    },
   },
 });
 
-export const { toggleTheme, setLanguage, setGlobalError, clearGlobalError } = uiSlice.actions;
+export const {
+  toggleTheme,
+  setLanguage,
+  setGlobalError,
+  clearGlobalError,
+  openEmailModal,
+  closeEmailModal,
+} = uiSlice.actions;
 export default uiSlice.reducer;

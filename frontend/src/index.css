@@ -154,7 +154,13 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
 /* Al passaggio del mouse sullo sfondo (hover), viene ripristinato il colore nativo dell'immagine */
 .hero-bio-section:hover .hero-bio-overlay {
-  opacity: 0.08;
+  opacity: 0.85;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(12, 18, 14, 0.65) 0%,
+    rgba(8, 12, 10, 0.30) 60%,
+    rgba(0, 0, 0, 0.05) 100%
+  ) !important;
 }
 
 .hero-bio-content {
@@ -193,7 +199,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 .hero-bio-section:hover .hero-bio-card h1,
 .hero-bio-section:hover .hero-bio-card p {
   color: #ffffff !important;
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.95),
+    0 4px 16px rgba(0, 0, 0, 0.85),
+    0 0 30px rgba(0, 0, 0, 0.75),
+    0 0 50px rgba(0, 0, 0, 0.5);
 }
 
 /* Stili Hero Section Galleria (Testo Sovrapposto Direttamente allo Sfondo) */
@@ -235,30 +245,64 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 }
 
 .hero-gallery-section:hover .hero-gallery-overlay {
-  opacity: 0.08;
+  opacity: 0.85;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(12, 18, 14, 0.65) 0%,
+    rgba(8, 12, 10, 0.30) 60%,
+    rgba(0, 0, 0, 0.05) 100%
+  ) !important;
+}
+
+[data-bs-theme="light"] .hero-gallery-section:hover .hero-gallery-overlay {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.60) 0%,
+    rgba(0, 0, 0, 0.25) 60%,
+    rgba(0, 0, 0, 0.05) 100%
+  ) !important;
 }
 
 .hero-gallery-content {
   position: relative;
   z-index: 2;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 1.5rem 1rem;
+  border-radius: 1.5rem;
+}
+
+.hero-gallery-section:hover .hero-gallery-content {
+  background: rgba(12, 18, 14, 0.38);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-bs-theme="light"] .hero-gallery-section:hover .hero-gallery-content {
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .hero-gallery-title {
   letter-spacing: -0.5px;
   line-height: 1.15;
-  transition: color 0.4s ease, text-shadow 0.4s ease;
+  transition: color 0.4s ease, text-shadow 0.4s ease, transform 0.4s ease;
 }
 
 .hero-gallery-subtitle {
-  transition: color 0.4s ease, text-shadow 0.4s ease;
+  transition: color 0.4s ease, text-shadow 0.4s ease, transform 0.4s ease;
 }
 
 .hero-gallery-section:hover .hero-gallery-title,
 .hero-gallery-section:hover .hero-gallery-subtitle,
 .hero-gallery-section:hover .hero-gallery-subtitle p {
   color: #ffffff !important;
-  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.95);
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.95),
+    0 4px 16px rgba(0, 0, 0, 0.85),
+    0 0 30px rgba(0, 0, 0, 0.75),
+    0 0 50px rgba(0, 0, 0, 0.5);
 }
 
 /* Stili Sezione Intrattenimento su Misura e Artisti */
@@ -438,5 +482,33 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   .container-xxl {
     max-width: 1920px;
   }
+}
+
+/* Glassmorphism Etereo & Leggero per Tutti i Modali dell'Applicazione */
+.modal-content {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 1.25rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+[data-bs-theme="dark"] .modal-content {
+  background-color: rgba(18, 26, 21, 0.78) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45) !important;
+  color: #f8f9fa !important;
+}
+
+[data-bs-theme="light"] .modal-content {
+  background-color: rgba(255, 255, 255, 0.82) !important;
+  border: 1px solid rgba(32, 74, 53, 0.16) !important;
+  box-shadow: 0 20px 45px rgba(32, 74, 53, 0.12) !important;
+  color: #212529 !important;
+}
+
+.modal-backdrop.show {
+  opacity: 0.65;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 

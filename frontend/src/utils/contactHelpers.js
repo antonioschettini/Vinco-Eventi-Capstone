@@ -1,6 +1,4 @@
-/**
- * Utility per la gestione universale dei link email e dei numeri di telefono su Desktop e Mobile.
- */
+import { openEmailModal } from "../redux/slices/uiSlice";
 
 export const isMobileDevice = () => {
   if (typeof window === "undefined" || !window.navigator) return false;
@@ -13,22 +11,27 @@ export const isMobileDevice = () => {
 
 /**
  * Gestisce il click sull'email.
- * - Su Mobile: scatena il mailto: nativo aprendo l'app di posta di sistema.
- * - Su Desktop: apre la schermata di composizione di Gmail Web in una nuova scheda,
- *   permettendo l'invio immediato anche a chi non ha un client desktop (es. Outlook) configurato.
+ * - Su Mobile: scatena il mailto: nativo aprendo l'app di posta di sistema (Outlook, Mail, Gmail app).
+ * - Su Desktop: apre un modale di scelta rapida (Outlook Desktop, Outlook Web, Gmail Web, Copia Email)
+ *   per garantire zero blocchi e massima flessibilità d'uso.
  */
-export const handleEmailClick = (e, email = "vincoeventi@gmail.com") => {
+export const handleEmailClick = (e, email = "vincoeventi@gmail.com", dispatch = null) => {
   const isMobile = isMobileDevice();
 
   if (!isMobile) {
     if (e && e.preventDefault) e.preventDefault();
-    window.open(
-      `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
-        email
-      )}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    if (dispatch) {
+      dispatch(openEmailModal(email));
+    } else {
+      // Fallback nel caso in cui dispatch non sia passato
+      window.open(
+        `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+          email
+        )}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
   }
 };
 

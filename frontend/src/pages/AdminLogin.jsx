@@ -92,7 +92,7 @@ function AdminLogin() {
           </div>
           <h2 className="fw-bold mb-1 fs-3">Accesso Riservato</h2>
           <p className="text-muted small mb-0">
-            Pannello di Amministrazione Vinco Eventi
+            Pannello di Amministrazione VINCO EVENTI
           </p>
         </div>
 

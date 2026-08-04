@@ -34,6 +34,7 @@ public class QuoteService {
                 .tipoCerimonia(dto.tipoCerimonia())
                 .messaggio(dto.messaggio())
                 .budget(dto.budget())
+                .lingua(dto.lingua() != null && !dto.lingua().isBlank() ? dto.lingua() : "it")
                 .stato(QuoteStatus.PENDING)
                 .build();
 

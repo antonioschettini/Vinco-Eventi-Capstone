@@ -150,17 +150,37 @@
 
 /* Dropdown Menu Custom Styling */
 .phone-prefix-menu {
-  max-height: 250px;
-  overflow-y: auto;
-  min-width: 220px;
+  min-width: 250px;
+  max-width: 310px;
   border-radius: 12px;
-  padding: 6px;
+  padding: 8px;
   z-index: 1060;
+}
+
+.prefix-menu-items-scroll {
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.prefix-search-input {
+  font-size: 0.8rem;
+}
+
+.prefix-search-input:focus {
+  box-shadow: none;
+  border-color: rgba(32, 74, 53, 0.4);
 }
 
 [data-bs-theme="dark"] .phone-prefix-menu {
   background-color: #18221c;
   border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-bs-theme="dark"] .prefix-search-input {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #f0f0f0;
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 [data-bs-theme="dark"] .phone-prefix-menu .dropdown-item {

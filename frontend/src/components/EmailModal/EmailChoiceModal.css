@@ -1,0 +1,91 @@
+.email-modal-backdrop {
+  background-color: rgba(10, 15, 12, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1060;
+}
+
+.email-modal-dialog {
+  max-width: 480px;
+  width: 92%;
+}
+
+.email-modal-content {
+  border-radius: 1.25rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.email-modal-content,
+[data-bs-theme="dark"] .email-modal-content {
+  background-color: rgba(18, 26, 21, 0.78) !important;
+  color: #f8f9fa !important;
+  border: 1px solid rgba(212, 175, 55, 0.3) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-bs-theme="light"] .email-modal-content {
+  background-color: rgba(255, 255, 255, 0.82) !important;
+  color: #212529 !important;
+  border: 1px solid rgba(212, 175, 55, 0.35) !important;
+  box-shadow: 0 20px 45px rgba(32, 74, 53, 0.12) !important;
+}
+
+.email-modal-icon-badge {
+  width: 44px;
+  height: 44px;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.email-option-card {
+  background: var(--bs-tertiary-bg, rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.email-option-card:hover {
+  transform: translateY(-2px);
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+}
+
+.email-option-card.active-copied {
+  background: rgba(25, 135, 84, 0.15);
+  border-color: rgba(25, 135, 84, 0.5);
+}
+
+.option-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+}
+
+.bg-gold-subtle {
+  background-color: rgba(212, 175, 55, 0.15) !important;
+}
+
+.text-gold {
+  color: var(--gold-accent, #d4af37) !important;
+}
+
+.border-gold-subtle {
+  border-color: rgba(212, 175, 55, 0.3) !important;
+}
+
+.extra-small {
+  font-size: 0.78rem;
+}
+
+.btn-close-custom {
+  filter: var(--bs-btn-close-white-filter, invert(1) grayscale(100%) brightness(200%));
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.btn-close-custom:hover {
+  opacity: 1;
+}

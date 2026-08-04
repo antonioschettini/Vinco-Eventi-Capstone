@@ -33,5 +33,6 @@ public record QuoteRequestDTO(
         String orarioGiornata,
         String tipoCerimonia,
         String messaggio,
-        String budget
+        String budget,
+        String lingua
 ) {}

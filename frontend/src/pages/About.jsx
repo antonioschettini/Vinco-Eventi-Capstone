@@ -55,7 +55,7 @@ function About() {
               <div className="story-img-wrapper">
                 <img
                   src={storyImage}
-                  alt="Vincenzo Colaluca - Vinco Eventi"
+                  alt="Vincenzo Colaluca - VINCO EVENTI"
                   loading="lazy"
                 />
               </div>
@@ -65,7 +65,7 @@ function About() {
             <Col xs={12} lg={6}>
               <div className="story-content">
                 <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill font-body fw-semibold text-uppercase tracking-wider mb-2">
-                  <i className="bi bi-patch-check-fill me-1"></i> Vinco Eventi Story
+                  <i className="bi bi-patch-check-fill me-1"></i> VINCO EVENTI Story
                 </span>
                 <h2 className="display-5 font-heading text-body fw-bold mb-4">
                   {t.storyTitle}
