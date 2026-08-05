@@ -5,6 +5,7 @@ import { authApiFetch } from "../utils/apiClient";
 import { handleEmailClick, handlePhoneClick } from "../utils/contactHelpers";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
+import CalendarChoiceModal from "../components/CalendarChoiceModal/CalendarChoiceModal";
 import "./AdminQuotes.css";
 
 const getEventTypeBadgeClass = (tipo) => {
@@ -34,8 +35,10 @@ function AdminQuotes() {
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [calendarQuote, setCalendarQuote] = useState(null);
   const [translatedText, setTranslatedText] = useState("");
   const [translating, setTranslating] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(10);
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
@@ -73,6 +76,22 @@ function AdminQuotes() {
       active = false;
     };
   }, [token, dispatch]);
+
+  // Gestione Tasto ESC per la chiusura dei modali Admin
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        if (deleteConfirmId) {
+          setDeleteConfirmId(null);
+        } else if (showDetailModal) {
+          setShowDetailModal(false);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [deleteConfirmId, showDetailModal]);
 
   const handleUpdateStatus = async (id, newStatus) => {
     setActionError("");
@@ -128,9 +147,7 @@ function AdminQuotes() {
       handleUpdateStatus(quote.id, "READ");
     }
 
-    const isForeignLang = quote.lingua && quote.lingua.toLowerCase() !== "it";
-
-    if (isForeignLang && quote.messaggio && quote.messaggio.trim() !== "") {
+    if (quote.messaggio && quote.messaggio.trim() !== "") {
       setTranslating(true);
       try {
         const res = await authApiFetch(
@@ -140,14 +157,29 @@ function AdminQuotes() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               text: quote.messaggio,
-              sourceLang: quote.lingua || "autodetect",
+              sourceLang: "autodetect",
               targetLang: "it",
             }),
           },
           token,
           dispatch
         );
-        if (res?.translatedText && res.translatedText.trim() !== quote.messaggio.trim()) {
+        const isErrorResp = (str) => {
+          if (!str) return true;
+          const u = str.toUpperCase();
+          return (
+            u.includes("PLEASE SELECT TWO DISTINCT LANGUAGES") ||
+            u.includes("QUERY LENGTH LIMIT EXCEEDED") ||
+            u.includes("INVALID LANGUAGE PAIR") ||
+            u.includes("NO VALID PAIR FOUND")
+          );
+        };
+
+        if (
+          res?.translatedText &&
+          res.translatedText.trim().toLowerCase() !== quote.messaggio.trim().toLowerCase() &&
+          !isErrorResp(res.translatedText)
+        ) {
           setTranslatedText(res.translatedText);
         }
       } catch (err) {
@@ -156,6 +188,11 @@ function AdminQuotes() {
         setTranslating(false);
       }
     }
+  };
+
+  const handleFilterSelect = (newFilter) => {
+    setActiveFilter(newFilter);
+    setVisibleCount(10);
   };
 
   // Conteggi KPI — calcolati in tempo reale sull'intero dataset
@@ -187,6 +224,11 @@ function AdminQuotes() {
     );
   });
 
+  // Paginazione batch responsive (10 preventivi per volta)
+  const visibleQuotes = filteredQuotes.slice(0, visibleCount);
+  const hasMoreQuotes = filteredQuotes.length > visibleCount;
+  const remainingQuotesCount = filteredQuotes.length - visibleCount;
+
   return (
     <div className="container admin-quotes-page">
       {/* 1. Header Card con KPI e Titolo */}
@@ -213,7 +255,7 @@ function AdminQuotes() {
         {/* KPI Summary Cards Grid */}
         <div className="row g-3 mb-3">
           <div className="col-6 col-md-3">
-            <div className="kpi-card d-flex align-items-center gap-3 cursor-pointer" onClick={() => setActiveFilter("ALL")}>
+            <div className="kpi-card d-flex align-items-center gap-3 cursor-pointer" onClick={() => handleFilterSelect("ALL")}>
               <div className="kpi-icon-wrapper bg-secondary bg-opacity-10 text-secondary">
                 <i className="bi bi-inbox-fill"></i>
               </div>
@@ -224,7 +266,7 @@ function AdminQuotes() {
             </div>
           </div>
           <div className="col-6 col-md-3">
-            <div className="kpi-card d-flex align-items-center gap-3 cursor-pointer" onClick={() => setActiveFilter("PENDING")}>
+            <div className="kpi-card d-flex align-items-center gap-3 cursor-pointer" onClick={() => handleFilterSelect("PENDING")}>
               <div className="kpi-icon-wrapper bg-warning bg-opacity-10 text-warning">
                 <i className="bi bi-clock-history"></i>
               </div>
@@ -235,7 +277,7 @@ function AdminQuotes() {
             </div>
           </div>
           <div className="col-6 col-md-3">
-            <div className="kpi-card d-flex align-items-center gap-3 cursor-pointer" onClick={() => setActiveFilter("READ")}>
+            <div className="kpi-card d-flex align-items-center gap-3 cursor-pointer" onClick={() => handleFilterSelect("READ")}>
               <div className="kpi-icon-wrapper bg-info bg-opacity-10 text-info">
                 <i className="bi bi-envelope-open-fill"></i>
               </div>
@@ -246,7 +288,7 @@ function AdminQuotes() {
             </div>
           </div>
           <div className="col-6 col-md-3">
-            <div className="kpi-card d-flex align-items-center gap-3 cursor-pointer" onClick={() => setActiveFilter("PROCESSED")}>
+            <div className="kpi-card d-flex align-items-center gap-3 cursor-pointer" onClick={() => handleFilterSelect("PROCESSED")}>
               <div className="kpi-icon-wrapper bg-success bg-opacity-10 text-success">
                 <i className="bi bi-check-circle-fill"></i>
               </div>
@@ -262,25 +304,25 @@ function AdminQuotes() {
         <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 pt-3 border-top border-secondary border-opacity-10">
           <div className="filter-btn-group d-flex flex-wrap gap-2">
             <button
-              onClick={() => setActiveFilter("ALL")}
+              onClick={() => handleFilterSelect("ALL")}
               className={`btn ${activeFilter === "ALL" ? "btn-success" : "btn-outline-secondary"}`}
             >
               Tutti ({countAll})
             </button>
             <button
-              onClick={() => setActiveFilter("PENDING")}
+              onClick={() => handleFilterSelect("PENDING")}
               className={`btn ${activeFilter === "PENDING" ? "btn-warning text-dark fw-bold" : "btn-outline-warning"}`}
             >
               <i className="bi bi-clock-history me-1"></i> In Attesa ({countPending})
             </button>
             <button
-              onClick={() => setActiveFilter("READ")}
+              onClick={() => handleFilterSelect("READ")}
               className={`btn ${activeFilter === "READ" ? "btn-info text-white fw-bold" : "btn-outline-info"}`}
             >
               <i className="bi bi-envelope-open me-1"></i> Letti ({countRead})
             </button>
             <button
-              onClick={() => setActiveFilter("PROCESSED")}
+              onClick={() => handleFilterSelect("PROCESSED")}
               className={`btn ${activeFilter === "PROCESSED" ? "btn-success fw-bold" : "btn-outline-success"}`}
             >
               <i className="bi bi-check-circle me-1"></i> Gestiti ({countProcessed})
@@ -292,7 +334,10 @@ function AdminQuotes() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setVisibleCount(10);
+              }}
               className="form-control"
               placeholder="Cerca nome, email, città..."
             />
@@ -355,7 +400,7 @@ function AdminQuotes() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredQuotes.map((q) => (
+                  {visibleQuotes.map((q) => (
                     <tr key={q.id}>
                       <td className="small client-date-text text-nowrap">
                         <i className="bi bi-clock me-1"></i>
@@ -432,7 +477,7 @@ function AdminQuotes() {
                         )}
                       </td>
                       <td className="text-end">
-                        <div className="btn-group btn-group-sm">
+                        <div className="admin-action-btn-group btn-group-sm">
                           <button
                             onClick={() => openDetail(q)}
                             className="btn btn-outline-primary"
@@ -440,6 +485,16 @@ function AdminQuotes() {
                           >
                             <i className="bi bi-eye-fill"></i>
                           </button>
+
+                          {q.dataEvento && (
+                            <button
+                              onClick={() => setCalendarQuote(q)}
+                              className="btn btn-outline-success"
+                              title="Salva in Calendario (Google / Apple)"
+                            >
+                              <i className="bi bi-calendar-plus-fill"></i>
+                            </button>
+                          )}
 
                           {q.stato !== "PENDING" && (
                             <button
@@ -490,7 +545,7 @@ function AdminQuotes() {
           {/* 3. VISTA MOBILE / TABLET: Card Responsive Grid (< 992px) */}
           <div className="d-block d-lg-none">
             <div className="row g-3">
-              {filteredQuotes.map((q) => (
+              {visibleQuotes.map((q) => (
                 <div className="col-12 col-md-6" key={q.id}>
                   <div className="quote-card-mobile h-100 d-flex flex-column justify-content-between">
                     <div>
@@ -577,7 +632,18 @@ function AdminQuotes() {
                         <i className="bi bi-eye me-1"></i> Dettagli
                       </button>
 
-                      <div className="btn-group btn-group-sm">
+                      {q.dataEvento && (
+                        <button
+                          onClick={() => setCalendarQuote(q)}
+                          className="btn btn-outline-success btn-sm fw-semibold d-flex align-items-center gap-1"
+                          title="Salva in Calendario"
+                        >
+                          <i className="bi bi-calendar-plus-fill"></i>
+                          <span className="d-none d-sm-inline">Calendario</span>
+                        </button>
+                      )}
+
+                      <div className="admin-action-btn-group btn-group-sm">
                         {q.stato !== "PENDING" && (
                           <button
                             onClick={() => handleUpdateStatus(q.id, "PENDING")}
@@ -622,16 +688,46 @@ function AdminQuotes() {
               ))}
             </div>
           </div>
+
+          {/* Pulsante "Mostra Altri Preventivi" (Paginazione batch da 10) */}
+          {hasMoreQuotes && (
+            <div className="text-center mt-4">
+              <button
+                onClick={() => setVisibleCount((prev) => prev + 10)}
+                className="btn btn-load-more rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2"
+              >
+                <i className="bi bi-arrow-down-circle-fill fs-5"></i>
+                <span>Mostra Altri Preventivi</span>
+                <span className="badge bg-success text-white rounded-pill ms-2 px-2 py-1 fs-7">
+                  +{remainingQuotesCount} rimanenti
+                </span>
+              </button>
+              <div className="text-body-secondary small mt-2 font-body">
+                Visualizzati {visibleQuotes.length} di {filteredQuotes.length}
+              </div>
+            </div>
+          )}
         </>
       )}
 
       {/* Modale Dettaglio Preventivo */}
       {showDetailModal && selectedQuote && (
-        <div className="modal fade show d-block" tabIndex={-1} style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <div className="modal-dialog modal-lg modal-dialog-centered">
+        <div
+          className="modal fade show d-block"
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="quoteDetailModalTitle"
+          onClick={() => setShowDetailModal(false)}
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div
+            className="modal-dialog modal-lg modal-dialog-centered"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-content shadow-lg border-0">
               <div className="modal-header bg-success text-white">
-                <h5 className="modal-title font-heading fw-bold">
+                <h5 className="modal-title font-heading fw-bold" id="quoteDetailModalTitle">
                   <i className="bi bi-file-earmark-person me-2"></i>
                   Dettaglio Richiesta Preventivo #{selectedQuote.id.substring(0, 8)}
                 </h5>
@@ -691,7 +787,20 @@ function AdminQuotes() {
 
                   <div className="col-md-4">
                     <label className="text-muted small fw-semibold d-block">Data Evento</label>
-                    <p className="mb-0 fw-bold">{selectedQuote.dataEvento || "Non specificata"}</p>
+                    <div className="d-flex align-items-center gap-2">
+                      <p className="mb-0 fw-bold">{selectedQuote.dataEvento || "Non specificata"}</p>
+                      {selectedQuote.dataEvento && (
+                        <button
+                          type="button"
+                          onClick={() => setCalendarQuote(selectedQuote)}
+                          className="btn btn-sm btn-outline-success py-0 px-2 fw-semibold d-inline-flex align-items-center gap-1"
+                          title="Salva in Calendario"
+                        >
+                          <i className="bi bi-calendar-plus"></i>
+                          <span>Salva</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="col-md-4">
                     <label className="text-muted small fw-semibold d-block mb-1">Tipo Evento</label>
@@ -800,11 +909,22 @@ function AdminQuotes() {
 
       {/* Modale Conferma Eliminazione */}
       {deleteConfirmId && (
-        <div className="modal fade show d-block" tabIndex={-1} style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <div className="modal-dialog modal-dialog-centered">
+        <div
+          className="modal fade show d-block"
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="deleteConfirmModalTitle"
+          onClick={() => setDeleteConfirmId(null)}
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div
+            className="modal-dialog modal-dialog-centered"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-content shadow-lg">
               <div className="modal-header bg-danger text-white">
-                <h5 className="modal-title font-heading fw-bold">
+                <h5 className="modal-title font-heading fw-bold" id="deleteConfirmModalTitle">
                   <i className="bi bi-exclamation-triangle-fill me-2"></i> Conferma Eliminazione
                 </h5>
                 <button
@@ -835,6 +955,14 @@ function AdminQuotes() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modale Scelta Calendario (Google, Apple iCal, Outlook) */}
+      {calendarQuote && (
+        <CalendarChoiceModal
+          quote={calendarQuote}
+          onClose={() => setCalendarQuote(null)}
+        />
       )}
     </div>
   );

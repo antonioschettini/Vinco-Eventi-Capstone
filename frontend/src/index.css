@@ -245,7 +245,8 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(240, 245, 242, 0.70) 100%);
 }
 
-.hero-gallery-section:hover .hero-gallery-overlay {
+.hero-gallery-section:hover .hero-gallery-overlay,
+.hero-bio-section:hover .hero-bio-overlay {
   opacity: 0.85;
   background: radial-gradient(
     ellipse at center,
@@ -268,21 +269,26 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   position: relative;
   z-index: 2;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 1.5rem 1rem;
+  padding: 2rem 1.5rem;
   border-radius: 1.5rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+[data-bs-theme="dark"] .hero-gallery-content {
+  background: rgba(18, 26, 21, 0.50);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="light"] .hero-gallery-content {
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(32, 74, 53, 0.18);
+  box-shadow: 0 16px 40px rgba(32, 74, 53, 0.1);
 }
 
 .hero-gallery-section:hover .hero-gallery-content {
-  background: rgba(12, 18, 14, 0.38);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-[data-bs-theme="light"] .hero-gallery-section:hover .hero-gallery-content {
-  background: rgba(0, 0, 0, 0.42);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .hero-gallery-title {
@@ -306,6 +312,18 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
     0 0 50px rgba(0, 0, 0, 0.5);
 }
 
+/* Su mobile e touch screen, garantiamo leggibilità ed intensità nativa senza richiedere l'hover */
+@media (hover: none), (max-width: 991.98px) {
+  .hero-gallery-overlay,
+  .hero-bio-overlay {
+    opacity: 0.85 !important;
+  }
+  .hero-gallery-title,
+  .hero-bio-card h1 {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  }
+}
+
 /* Stili Sezione Intrattenimento su Misura e Artisti */
 .entertainment-section {
   position: relative;
@@ -327,14 +345,14 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   border-radius: 2px;
 }
 
-/* Card Senza Bordi e Immagine Grayscale -> Colori su Hover */
+/* Card Senza Bordi ed Effetto Scroll Reveal / Hover Dynamico per Grayscale -> Colori Nativi */
 .entertainment-card {
   border: none !important;
   border-radius: 16px;
   overflow: hidden;
   /* Le card sono SEMPRE verticali — nessun layout orizzontale */
   flex-direction: column !important;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   height: 100%;
 }
 
@@ -346,18 +364,6 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 [data-bs-theme="light"] .entertainment-card {
   background-color: rgba(0, 0, 0, 0.02);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-}
-
-.entertainment-card:hover {
-  transform: translateY(-8px);
-}
-
-[data-bs-theme="dark"] .entertainment-card:hover {
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-bs-theme="light"] .entertainment-card:hover {
-  box-shadow: 0 16px 36px rgba(32, 74, 53, 0.12) !important;
 }
 
 /* Wrapper immagine: altezza base per mobile e tablet */
@@ -379,17 +385,50 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Ancoraggio esplicito al centro — mantiene il soggetto centrato
-     su qualsiasi larghezza/altezza del wrapper */
+  /* Ancoraggio esplicito al centro — mantiene il soggetto centrato su qualsiasi larghezza/altezza del wrapper */
   object-position: center center;
   transform-origin: center center;
-  filter: grayscale(100%);
-  transition: filter 0.5s ease-in-out, transform 0.5s ease-in-out;
+  transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.entertainment-card:hover .entertainment-card-img {
-  filter: grayscale(0%);
-  transform: scale(1.06);
+/* Hover esclusivo per DESKTOP: partenza da grayscale(85%) e colore vivo + glow all'hover */
+@media (hover: hover) and (pointer: fine) {
+  .entertainment-card-img {
+    filter: grayscale(85%);
+    opacity: 0.88;
+  }
+
+  .entertainment-card:hover {
+    transform: translateY(-6px);
+  }
+
+  [data-bs-theme="dark"] .entertainment-card:hover {
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 25px rgba(76, 166, 121, 0.25) !important;
+  }
+
+  [data-bs-theme="light"] .entertainment-card:hover {
+    box-shadow: 0 16px 36px rgba(32, 74, 53, 0.16) !important;
+  }
+
+  .entertainment-card:hover .entertainment-card-img {
+    filter: grayscale(0%) !important;
+    opacity: 1 !important;
+    transform: scale(1.05);
+  }
+}
+
+/* Dispositivi Touch & Mobile: Colori SEMPRE vivi e nitidi per default + feedback attivo al tocco/tap */
+@media (hover: none), (max-width: 991.98px) {
+  .entertainment-card-img {
+    filter: grayscale(0%) !important;
+    opacity: 1 !important;
+  }
+
+  .entertainment-card:active {
+    transform: scale(0.98) !important;
+  }
 }
 
 /*
@@ -512,4 +551,24 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
+
+/* Accessibilità Tastiera (a11y & SEO): Stili :focus-visible unificati per la navigazione via Tab */
+:focus-visible {
+  outline: 2px solid var(--emerald-accent) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px var(--emerald-glow) !important;
+}
+
+[data-bs-theme="light"] :focus-visible {
+  outline: 2px solid var(--primary-forest) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(32, 74, 53, 0.25) !important;
+}
+
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
 

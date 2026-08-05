@@ -50,7 +50,7 @@ function AudioController() {
     }
   }, [volume]);
 
-  // Sincronizza cambio traccia
+  // Sincronizza cambio traccia e MediaSession API per controlli mobile / schermata di blocco
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -59,7 +59,36 @@ function AudioController() {
     if (isPlaying) {
       audio.play().catch((err) => console.warn("Errore cambio traccia:", err));
     }
-  }, [currentTrackIndex, currentTrack.src, isPlaying]);
+
+    // Integrazione Media Session API (Controlli mobile da schermata di blocco, tasti volume ed auto/bluetooth)
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: currentTrack.title,
+        artist: currentTrack.artist || "Vincenzo Colaluca",
+        album: "VINCO EVENTI",
+        artwork: [
+          {
+            src: currentTrack.cover,
+            sizes: "512x512",
+            type: "image/jpeg",
+          },
+        ],
+      });
+
+      navigator.mediaSession.setActionHandler("play", () =>
+        dispatch(setIsPlaying(true))
+      );
+      navigator.mediaSession.setActionHandler("pause", () =>
+        dispatch(setIsPlaying(false))
+      );
+      navigator.mediaSession.setActionHandler("previoustrack", () =>
+        dispatch(prevTrack(tracks.length))
+      );
+      navigator.mediaSession.setActionHandler("nexttrack", () =>
+        dispatch(nextTrack(tracks.length))
+      );
+    }
+  }, [currentTrackIndex, currentTrack, isPlaying, dispatch]);
 
   // Evento di fine traccia -> Passa automaticamente alla traccia successiva
   const handleEnded = () => {

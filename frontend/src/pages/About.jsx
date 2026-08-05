@@ -6,9 +6,11 @@ import LocationMap from "../components/LocationMap/LocationMap";
 import MatrimonioWidgets from "../components/MatrimonioWidgets/MatrimonioWidgets";
 import heroBgImage from "../assets/home/foto enzo dj set.jpeg";
 import storyImage from "../assets/home/foto sfondo banner enzo.jpeg";
+import useScrollReveal from "../utils/useScrollReveal";
 import "./About.css";
 
 function About() {
+  useScrollReveal(".stat-card, .pillar-card, .hero-gallery-section, .about-quote-wrapper");
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].about;
   const navigate = useNavigate();

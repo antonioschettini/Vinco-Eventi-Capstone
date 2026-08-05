@@ -3,8 +3,10 @@ import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
 import heroBgImage from "../assets/home/foto sfondo banner enzo.jpeg";
 import GallerySection from "../components/GallerySection/GallerySection";
+import useScrollReveal from "../utils/useScrollReveal";
 
 function Gallery() {
+  useScrollReveal(".hero-gallery-section");
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].gallery;
 

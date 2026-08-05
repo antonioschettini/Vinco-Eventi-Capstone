@@ -1,7 +1,7 @@
 /* Variables & Styling Base per la Navbar */
 :root {
   --nav-font-size: 0.95rem;
-  --transition-speed: 0.3s;
+  --transition-speed: 0.15s;
 }
 
 /* Container Generale Navbar */
@@ -188,6 +188,18 @@
   transform: scale(1.08);
 }
 
+/* Responsiveness Admin Toggle Button: Nasconde il testo sotto i 1200px lasciando solo l'icona/logo */
+@media (max-width: 1199.98px) {
+  .admin-login-btn-toggle .admin-btn-text {
+    display: none !important;
+  }
+  .admin-login-btn-toggle {
+    padding: 6px 10px;
+    border-radius: 50px;
+    justify-content: center;
+  }
+}
+
 /* Modale / Popover Login Dropdown */
 .login-dropdown-popover {
   position: absolute;
@@ -206,8 +218,9 @@
 
 @media (max-width: 480px) {
   .login-dropdown-popover {
-    max-width: calc(100vw - 2rem);
-    width: calc(100vw - 2rem);
+    max-width: calc(100vw - 1.5rem);
+    width: calc(100vw - 1.5rem);
+    right: 0;
   }
 }
 
@@ -326,6 +339,20 @@
     background-color: rgba(255, 255, 255, 0.60);
     border: 1px solid rgba(32, 74, 53, 0.16);
     box-shadow: 0 4px 20px rgba(32, 74, 53, 0.08);
+  }
+}
+
+/* Responsiveness per Schermi Intermedi (820px - 1199.98px): compattiamo il pod audio mantenendo sia il titolo che la barra volume */
+@media (min-width: 820px) and (max-width: 1199.98px) {
+  .top-center-player {
+    padding: 3px 10px;
+  }
+  .top-center-player .track-marquee-wrapper {
+    max-width: 150px;
+  }
+  .top-center-player .top-volume-slider {
+    width: 45px;
+    display: inline-block !important;
   }
 }
 
@@ -760,7 +787,7 @@
   width: 0;
   height: 2px;
   background-color: #204a35;
-  transition: width 0.3s ease, left 0.3s ease;
+  transition: width 0.15s ease-out, left 0.15s ease-out;
 }
 
 [data-bs-theme="dark"] .custom-nav-link::after {

@@ -78,8 +78,10 @@
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.story-img-wrapper:hover img {
-  transform: scale(1.04);
+@media (hover: hover) and (pointer: fine) {
+  .story-img-wrapper:hover img {
+    transform: scale(1.04);
+  }
 }
 
 /* Card Statistiche */
@@ -103,18 +105,20 @@
   border: 1px solid rgba(32, 74, 53, 0.1);
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-}
+@media (hover: hover) and (pointer: fine) {
+  .stat-card:hover {
+    transform: translateY(-4px);
+  }
 
-[data-bs-theme="dark"] .stat-card:hover {
-  border-color: rgba(88, 188, 130, 0.4);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-}
+  [data-bs-theme="dark"] .stat-card:hover {
+    border-color: rgba(88, 188, 130, 0.4);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  }
 
-[data-bs-theme="light"] .stat-card:hover {
-  border-color: rgba(32, 74, 53, 0.3);
-  box-shadow: 0 10px 25px rgba(32, 74, 53, 0.08);
+  [data-bs-theme="light"] .stat-card:hover {
+    border-color: rgba(32, 74, 53, 0.3);
+    box-shadow: 0 10px 25px rgba(32, 74, 53, 0.08);
+  }
 }
 
 .stat-number {
@@ -213,18 +217,30 @@
   box-shadow: 0 10px 30px rgba(32, 74, 53, 0.05);
 }
 
-.pillar-card:hover {
-  transform: translateY(-8px);
+@media (hover: hover) and (pointer: fine) {
+  .pillar-card:hover {
+    transform: translateY(-8px);
+  }
+
+  [data-bs-theme="dark"] .pillar-card:hover {
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  [data-bs-theme="light"] .pillar-card:hover {
+    box-shadow: 0 18px 40px rgba(32, 74, 53, 0.12);
+    border-color: rgba(32, 74, 53, 0.25);
+  }
+
+  .pillar-card:hover .pillar-icon-box {
+    transform: scale(1.1) rotate(-3deg);
+  }
 }
 
-[data-bs-theme="dark"] .pillar-card:hover {
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-[data-bs-theme="light"] .pillar-card:hover {
-  box-shadow: 0 18px 40px rgba(32, 74, 53, 0.12);
-  border-color: rgba(32, 74, 53, 0.25);
+@media (hover: none), (max-width: 991.98px) {
+  .pillar-card:active {
+    transform: scale(0.98);
+  }
 }
 
 .pillar-icon-box {
@@ -249,10 +265,6 @@
   background: linear-gradient(135deg, rgba(32, 74, 53, 0.12), rgba(32, 74, 53, 0.05));
   color: var(--primary-forest, #204a35);
   border: 1px solid rgba(32, 74, 53, 0.15);
-}
-
-.pillar-card:hover .pillar-icon-box {
-  transform: scale(1.1) rotate(-3deg);
 }
 
 /* Sezione Call to Action */

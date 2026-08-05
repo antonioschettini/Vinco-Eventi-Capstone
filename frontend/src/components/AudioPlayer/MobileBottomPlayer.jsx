@@ -1,8 +1,10 @@
+import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   togglePlay,
   nextTrack,
   prevTrack,
+  setVolume,
   toggleMute,
   toggleModal,
 } from "../../redux/slices/audioSlice";
@@ -16,6 +18,28 @@ function MobileBottomPlayer() {
   );
 
   const currentTrack = tracks[currentTrackIndex] || tracks[0];
+  const [showVolumePopover, setShowVolumePopover] = useState(false);
+  const volumePopoverRef = useRef(null);
+
+  // Chiude il popover se si clicca all'esterno di esso
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        volumePopoverRef.current &&
+        !volumePopoverRef.current.contains(event.target)
+      ) {
+        setShowVolumePopover(false);
+      }
+    }
+    if (showVolumePopover) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [showVolumePopover]);
 
   return (
     <div className="mobile-bottom-player align-items-center justify-content-between px-3">
@@ -37,7 +61,7 @@ function MobileBottomPlayer() {
         </span>
       </button>
 
-      {/* Controlli Compatti Play/Pause, Prev, Next, Mute */}
+      {/* Controlli Compatti Play/Pause, Prev, Next, Mute & Popover Volume */}
       <div className="mobile-controls d-flex align-items-center gap-1">
         <button
           onClick={() => dispatch(prevTrack(tracks.length))}
@@ -66,22 +90,58 @@ function MobileBottomPlayer() {
           <i className="bi bi-skip-end-fill"></i>
         </button>
 
-        <button
-          onClick={() => dispatch(toggleMute())}
-          className="top-player-btn volume-btn ms-1"
-          title={isMuted || volume === 0 ? "Attiva audio" : "Muto"}
-          aria-label="Volume audio"
-        >
-          <i
-            className={`bi ${
-              isMuted || volume === 0
-                ? "bi-volume-mute-fill text-danger"
-                : volume < 0.5
-                ? "bi-volume-down-fill"
-                : "bi-volume-up-fill"
+        {/* Contenitore e Popover Volume Mobile */}
+        <div className="mobile-volume-wrapper position-relative" ref={volumePopoverRef}>
+          <button
+            onClick={() => setShowVolumePopover(!showVolumePopover)}
+            className={`top-player-btn volume-btn ms-1 ${
+              showVolumePopover ? "active" : ""
             }`}
-          ></i>
-        </button>
+            title="Regola Volume Audio"
+            aria-label="Regola Volume Audio"
+          >
+            <i
+              className={`bi ${
+                isMuted || volume === 0
+                  ? "bi-volume-mute-fill text-danger"
+                  : volume < 0.5
+                  ? "bi-volume-down-fill"
+                  : "bi-volume-up-fill"
+              }`}
+            ></i>
+          </button>
+
+          {/* Popover Slider Volume Mobile */}
+          {showVolumePopover && (
+            <div className="mobile-volume-popover p-2 shadow-lg rounded-3 d-flex align-items-center gap-2">
+              <button
+                onClick={() => dispatch(toggleMute())}
+                className="btn btn-sm p-0 text-body border-0 flex-shrink-0"
+                title={isMuted || volume === 0 ? "Attiva audio" : "Muto"}
+              >
+                <i
+                  className={`bi ${
+                    isMuted || volume === 0
+                      ? "bi-volume-mute-fill text-danger"
+                      : "bi-volume-up-fill text-success"
+                  }`}
+                ></i>
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={isMuted ? 0 : volume}
+                onChange={(e) => dispatch(setVolume(parseFloat(e.target.value)))}
+                className="mobile-volume-slider flex-grow-1"
+              />
+              <span className="mobile-volume-text extra-small fw-bold flex-shrink-0">
+                {isMuted ? "0%" : `${Math.round(volume * 100)}%`}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

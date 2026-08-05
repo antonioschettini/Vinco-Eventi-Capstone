@@ -15,9 +15,11 @@ import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import { handlePhoneClick } from "../utils/contactHelpers";
 import imageCompression from "browser-image-compression";
+import useScrollReveal from "../utils/useScrollReveal";
 import "./Services.css";
 
 function Services() {
+  useScrollReveal(".service-card-box, .hero-gallery-section");
   const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const { isAuthenticated, token } = useSelector((state) => state.auth);

@@ -21,4 +21,15 @@ public class QuoteController {
         QuoteRequest created = quoteService.createQuote(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
+
+    @GetMapping("/{id}/calendar.ics")
+    public ResponseEntity<byte[]> getQuoteCalendarIcs(@PathVariable java.util.UUID id) {
+        String icsContent = quoteService.generateIcsContent(id);
+        byte[] bytes = icsContent.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.parseMediaType("text/calendar; charset=UTF-8"));
+        headers.setContentDisposition(org.springframework.http.ContentDisposition.inline().filename("evento-vinco-" + id + ".ics").build());
+        headers.setCacheControl("no-cache, no-store, must-revalidate");
+        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+    }
 }

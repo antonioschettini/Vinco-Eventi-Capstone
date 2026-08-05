@@ -3,6 +3,8 @@ package antonioschettini.backend.services;
 import antonioschettini.backend.entities.QuoteRequest;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -19,6 +21,17 @@ public class EmailService {
 
     @Autowired
     private TranslationService translationService;
+
+    @Autowired
+    @Lazy
+    private QuoteService quoteService;
+
+    @Value("${app.backend-base-url:http://localhost:8080}")
+    private String backendBaseUrl;
+
+    @Value("${app.frontend-base-url:http://localhost:5173}")
+    private String frontendBaseUrl;
+
 
     private void attachInlineResources(MimeMessageHelper helper) {
         try {
@@ -37,6 +50,18 @@ public class EmailService {
             ClassPathResource phoneRes = new ClassPathResource("static/images/phone-icon.png");
             if (phoneRes.exists()) {
                 helper.addInline("phoneIcon", phoneRes, "image/png");
+            }
+            ClassPathResource dashRes = new ClassPathResource("static/images/dashboard-icon.png");
+            if (dashRes.exists()) {
+                helper.addInline("dashboardIcon", dashRes, "image/png");
+            }
+            ClassPathResource gcalRes = new ClassPathResource("static/images/google-icon.png");
+            if (gcalRes.exists()) {
+                helper.addInline("googleIcon", gcalRes, "image/png");
+            }
+            ClassPathResource acalRes = new ClassPathResource("static/images/apple-icon.png");
+            if (acalRes.exists()) {
+                helper.addInline("appleIcon", acalRes, "image/png");
             }
         } catch (Exception e) {
             System.err.println("[WARN EmailService] Impossibile allegare immagini inline CID: " + e.getMessage());
@@ -83,13 +108,19 @@ public class EmailService {
             boolean isMatrimonio = quote.getTipoEvento() != null && quote.getTipoEvento().toLowerCase().contains("matrimonio");
             boolean hasTipoCerimonia = isMatrimonio && quote.getTipoCerimonia() != null && !quote.getTipoCerimonia().isBlank();
 
-            // Traduzione messaggi/textarea per l'admin SOLO se l'utente ha compilato il form in lingua estera (es. en)
+            // Traduzione messaggi/textarea per l'admin se il messaggio dell'utente è in lingua straniera (con autodetect)
             String messaggioOriginale = quote.getMessaggio() != null && !quote.getMessaggio().isBlank() ? quote.getMessaggio() : "-";
             String messaggioTradotto = "";
-            boolean isForeignLang = userLang.equals("en");
 
-            if (isForeignLang && !messaggioOriginale.equals("-")) {
-                messaggioTradotto = translationService.translate(messaggioOriginale, "en", "it");
+            if (!messaggioOriginale.equals("-")) {
+                try {
+                    String tr = translationService.translate(messaggioOriginale, "autodetect", "it");
+                    if (tr != null && !tr.isBlank() && !tr.trim().equalsIgnoreCase(messaggioOriginale.trim())) {
+                        messaggioTradotto = tr.trim();
+                    }
+                } catch (Exception ex) {
+                    System.err.println("[WARN EmailService] Impossibile tradurre il messaggio per l'admin: " + ex.getMessage());
+                }
             }
 
             StringBuilder plainTextBuilder = new StringBuilder();
@@ -134,7 +165,7 @@ public class EmailService {
                     messaggioOriginale
             ));
 
-            if (isForeignLang && !messaggioTradotto.isBlank()) {
+            if (!messaggioTradotto.isBlank()) {
                 plainTextBuilder.append(String.format("""
                 
                 Traduzione Messaggio per Admin (in Italiano):
@@ -144,11 +175,12 @@ public class EmailService {
 
             plainTextBuilder.append(String.format("""
                 
-                Dashboard Admin Direct Link: http://localhost:5173/admin/preventivi
+                Dashboard Admin Direct Link: %s/admin/preventivi
                 --------------------------------------------
                 Data Invio Richiesta: %s
                 Email automatica dal sistema VINCO EVENTI.
                 """,
+                    frontendBaseUrl,
                     dataRichiestaFormatted
             ));
 
@@ -168,7 +200,7 @@ public class EmailService {
                       <table style="width: 100%%; text-align: center;">
                         <tr>
                           <td>
-                            <a href="http://localhost:5173/admin/preventivi" target="_blank" style="text-decoration: none; display: inline-block;">
+                            <a href="%s/admin/preventivi" target="_blank" style="text-decoration: none; display: inline-block;">
                               <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="68" height="68" style="display: block; margin: 0 auto 10px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                             </a>
                             <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h2>
@@ -230,6 +262,7 @@ public class EmailService {
                           <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
                         </tr>
                 """.formatted(
+                    frontendBaseUrl,
                     quote.getNome(), quote.getCognome(),
                     quote.getEmail(), quote.getEmail(),
                     telHref, phoneFormatted,
@@ -258,7 +291,7 @@ public class EmailService {
                       </table>
                 """.formatted(quote.getBudget() != null ? quote.getBudget() : "Non specificato"));
 
-            // Sezione Text Area e Traduzione Automatica per Admin (SOLO se il form è stato compilato in lingua straniera)
+            // Sezione Text Area e Traduzione Automatica per Admin se il messaggio è in lingua straniera
             htmlBuilder.append("""
                       <h3 style="color: #064e3b; margin-top: 22px; border-bottom: 2px solid #10b981; padding-bottom: 8px; font-size: 16px; font-weight: bold;">
                         💬 Messaggio / Note Aggiuntive
@@ -269,7 +302,7 @@ public class EmailService {
                       </div>
                 """.formatted(messaggioOriginale));
 
-            if (isForeignLang && !messaggioTradotto.isBlank() && !messaggioTradotto.equalsIgnoreCase(messaggioOriginale)) {
+            if (!messaggioTradotto.isBlank()) {
                 String translationTitle = "🇮🇹 Traduzione in Italiano per Admin (Italian Translation):";
                 htmlBuilder.append("""
                       <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 14px 16px; margin-bottom: 16px; border-radius: 6px; font-size: 14px;">
@@ -279,12 +312,43 @@ public class EmailService {
                 """.formatted(translationTitle, messaggioTradotto));
             }
 
-            // Direct CTA Dashboard Link Button for Admin
+            // Direct CTA Dashboard & Calendar Links Buttons for Admin
+            String googleCalUrl = quote.getDataEvento() != null ? buildGoogleCalendarUrl(quote) : "";
+            String appleCalUrl = quote.getDataEvento() != null ? buildAppleCalendarUrl(quote) : "";
+
+            if (!googleCalUrl.isBlank()) {
+                plainTextBuilder.append(String.format("""
+                    
+                    Salva Evento in Calendario:
+                    - Google Calendar: %s
+                    - Apple Calendar / iCal (.ics): %s
+                    """, googleCalUrl, appleCalUrl));
+            }
+
             htmlBuilder.append("""
                       <div style="text-align: center; margin: 28px 0 15px 0;">
-                        <a href="http://localhost:5173/admin/preventivi" target="_blank" style="background: linear-gradient(135deg, #10b981 0%%, #059669 100%%); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
-                          📊 Apri Dashboard Preventivi
+                        <a href="%s/admin/preventivi" target="_blank" style="background: linear-gradient(135deg, #10b981 0%%, #059669 100%%); color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); margin-bottom: 14px;">
+                          <img src="cid:dashboardIcon" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" alt="Dashboard" />
+                          <span>Apri Dashboard Preventivi</span>
                         </a>
+                """.formatted(frontendBaseUrl));
+
+            if (quote.getDataEvento() != null && !googleCalUrl.isBlank()) {
+                htmlBuilder.append("""
+                        <div style="margin-top: 10px; text-align: center;">
+                          <a href="%s" target="_blank" style="background-color: #ffffff; color: #3c4043; border: 1px solid #dadce0; padding: 10px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; box-shadow: 0 2px 6px rgba(60,64,67,0.15); margin: 4px;">
+                            <img src="cid:googleIcon" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" alt="Google Logo" />
+                            <span>Salva su Google Calendar</span>
+                          </a>
+                          <a href="%s" target="_blank" style="background-color: #000000; color: #ffffff; padding: 10px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin: 4px;">
+                            <img src="cid:appleIcon" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" alt="Apple Logo" />
+                            <span>Salva su Apple iCal (.ics)</span>
+                          </a>
+                        </div>
+                    """.formatted(googleCalUrl, appleCalUrl));
+            }
+
+            htmlBuilder.append("""
                       </div>
 
                       <div style="background-color: #f1f5f9; padding: 12px 15px; border-radius: 8px; font-size: 13px; color: #64748b; margin-top: 20px;">
@@ -304,11 +368,59 @@ public class EmailService {
 
             helper.setText(plainTextBuilder.toString(), htmlBuilder.toString());
             attachInlineResources(helper);
+
+            // Allegato .ics per Apple Mail / iOS / Outlook: salvataggio istantaneo in 1 tap senza chiamate al server
+            if (quote.getDataEvento() != null && quoteService != null) {
+                try {
+                    String icsContent = quoteService.generateIcsContent(quote);
+                    if (icsContent != null && !icsContent.isBlank()) {
+                        byte[] icsBytes = icsContent.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                        helper.addAttachment("evento-vinco.ics", new org.springframework.core.io.ByteArrayResource(icsBytes), "text/calendar; charset=UTF-8");
+                    }
+                } catch (Exception icsEx) {
+                    System.err.println("[WARN EmailService] Impossibile allegare file .ics all'email: " + icsEx.getMessage());
+                }
+            }
+
             mailSender.send(mimeMessage);
             System.out.println(">>> Email di notifica preventivo inviata con successo all'admin VINCO EVENTI!");
         } catch (Exception ex) {
             System.err.println("[ERROR EmailService] Impossibile inviare l'email di notifica all'admin: " + ex.getMessage());
         }
+    }
+
+    private String buildGoogleCalendarUrl(QuoteRequest quote) {
+        if (quote.getDataEvento() == null) return "";
+        try {
+            String dtStart = quote.getDataEvento().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String dtEnd = quote.getDataEvento().plusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String title = java.net.URLEncoder.encode("Evento VINCO EVENTI - " + quote.getNome() + " " + quote.getCognome(), java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20");
+
+            StringBuilder detailsSb = new StringBuilder();
+            detailsSb.append("Cliente: ").append(quote.getNome()).append(" ").append(quote.getCognome()).append("\n");
+            detailsSb.append("Tipo Evento: ").append(quote.getTipoEvento() != null ? quote.getTipoEvento() : "N/D").append("\n");
+            detailsSb.append("Email: ").append(quote.getEmail()).append("\n");
+            detailsSb.append("Telefono: ").append(quote.getTelefono() != null ? quote.getTelefono() : "N/D").append("\n");
+            if (quote.getNumeroOspiti() != null) detailsSb.append("Ospiti: ").append(quote.getNumeroOspiti()).append("\n");
+            if (quote.getOrarioGiornata() != null) detailsSb.append("Fascia Oraria: ").append(quote.getOrarioGiornata()).append("\n");
+            if (quote.getMessaggio() != null && !quote.getMessaggio().isBlank()) {
+                detailsSb.append("Messaggio: ").append(quote.getMessaggio());
+            }
+
+            String details = java.net.URLEncoder.encode(detailsSb.toString(), java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20");
+            String location = java.net.URLEncoder.encode(quote.getLocation() != null ? quote.getLocation() : "", java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20");
+
+            return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + title + "&dates=" + dtStart + "/" + dtEnd + "&details=" + details + "&location=" + location;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private String buildAppleCalendarUrl(QuoteRequest quote) {
+        if (quote.getDataEvento() == null || quote.getId() == null) return "";
+        // URL HTTP/HTTPS standard perfettamente supportato in tutti i client mail (Gmail, Apple Mail, Outlook).
+        // Su dispositivi iOS (iPhone/iPad) e Mac (macOS), il sistema intercetta il tipo text/calendar ed apre direttamente l'App Calendario Apple.
+        return backendBaseUrl + "/api/quotes/" + quote.getId() + "/calendar.ics";
     }
 
     @Async
@@ -322,6 +434,21 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
             boolean isEnglish = quote.getLingua() != null && quote.getLingua().equalsIgnoreCase("en");
+            String messaggioOriginale = quote.getMessaggio() != null ? quote.getMessaggio().trim() : "";
+
+            boolean isForeignMessage = false;
+            if (!messaggioOriginale.isBlank() && !isEnglish) {
+                try {
+                    String testTr = translationService.translate(messaggioOriginale, "autodetect", "it");
+                    if (testTr != null && !testTr.isBlank() && !testTr.trim().equalsIgnoreCase(messaggioOriginale)) {
+                        isForeignMessage = true;
+                    }
+                } catch (Exception e) {
+                    // Fallback silenzioso
+                }
+            }
+
+            boolean showItalianNotice = isEnglish || isForeignMessage;
 
             helper.setFrom("vincoeventi@gmail.com", "VINCO EVENTI");
             helper.setTo(quote.getEmail());
@@ -355,7 +482,7 @@ public class EmailService {
                     https://www.instagram.com/vincoeventi/
                     
                     💬 DIRECT CONTACT & ASSISTANCE:
-                    - Phone Call: +39 349 294 9669 (tel:+393492949669)
+                    - Phone Call: +39 349 294 9669 (tel:+393492949669) - Note: Admin speaks Italian; WhatsApp chat or email recommended for English/foreign language inquiries.
                     - WhatsApp Direct Chat: https://wa.me/393492949669
                     - Email: vincoeventi@gmail.com
                     
@@ -451,6 +578,9 @@ public class EmailService {
                                 </td>
                               </tr>
                             </table>
+                            <div style="background-color: #fefce8; border: 1px solid #fef08a; border-radius: 8px; padding: 12px 14px; margin-top: 14px; font-size: 13px; color: #854d0e; text-align: left; line-height: 1.5;">
+                              <strong>ℹ️ Important Note:</strong> Our management team speaks exclusively Italian. For inquiries in English or other foreign languages, we kindly recommend contacting us via <strong>WhatsApp chat</strong> or <strong>Email</strong> so we can assist you promptly and accurately.
+                            </div>
                           </div>
 
                           <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;" />
@@ -493,7 +623,7 @@ public class EmailService {
                     https://www.instagram.com/vincoeventi/
                     
                     💬 CONTATTO DIRETTO & CHIAMATA RAPIDA:
-                    - Chiamata Telefonica: +39 349 294 9669 (tel:+393492949669)
+                    - Chiamata Telefonica: +39 349 294 9669 (tel:+393492949669)%s
                     - Chat WhatsApp: https://wa.me/393492949669
                     - Email: vincoeventi@gmail.com
                     
@@ -502,8 +632,15 @@ public class EmailService {
                     """,
                         quote.getNome(), quote.getCognome(),
                         dataEventoFormatted,
-                        quote.getTelefono()
+                        quote.getTelefono(),
+                        showItalianNotice ? " (Nota: La direzione parla solo italiano; consigliamo WhatsApp o email per lingue straniere)" : ""
                 );
+
+                String itLanguageNoticeHtml = showItalianNotice ? """
+                            <div style="background-color: #fefce8; border: 1px solid #fef08a; border-radius: 8px; padding: 12px 14px; margin-top: 14px; font-size: 13px; color: #854d0e; text-align: left; line-height: 1.5;">
+                              <strong>ℹ️ Nota sulle Chiamate Telefoniche:</strong> La nostra direzione parla esclusivamente in lingua italiana. In caso di comunicazioni in lingua straniera, vi consigliamo di contattarci via <strong>WhatsApp</strong> o <strong>Email</strong> per offrirvi la migliore assistenza.
+                            </div>
+                    """ : "";
 
                 htmlBody = String.format("""
                     <!DOCTYPE html>
@@ -589,6 +726,7 @@ public class EmailService {
                                 </td>
                               </tr>
                             </table>
+                            %s
                           </div>
 
                           <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;" />
@@ -615,7 +753,8 @@ public class EmailService {
                         quote.getTipoEvento() != null ? quote.getTipoEvento() : "Non specificato",
                         quote.getLocation() != null ? quote.getLocation() : "Non specificata",
                         quote.getNumeroOspiti() != null ? quote.getNumeroOspiti() : "Non specificato",
-                        quote.getBudget() != null ? quote.getBudget() : "Non specificato"
+                        quote.getBudget() != null ? quote.getBudget() : "Non specificato",
+                        itLanguageNoticeHtml
                 );
             }
 

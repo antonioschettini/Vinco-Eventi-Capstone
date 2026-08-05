@@ -285,6 +285,8 @@ function Navbar() {
                 showLogin ? "active" : ""
               }`}
               aria-expanded={showLogin}
+              aria-label={isAuthenticated ? t.adminPanel : t.adminLogin}
+              title={isAuthenticated ? t.adminPanel : t.adminLogin}
             >
               {isAuthenticated ? (
                 <img
@@ -296,7 +298,9 @@ function Navbar() {
               ) : (
                 <i className="bi bi-lock-fill admin-btn-icon"></i>
               )}
-              <span>{isAuthenticated ? t.adminPanel : t.adminLogin}</span>
+              <span className="admin-btn-text">
+                {isAuthenticated ? t.adminPanel : t.adminLogin}
+              </span>
             </button>
 
             {/* Modale Login / Admin Menu Dropdown Popover */}
@@ -496,6 +500,18 @@ function Navbar() {
                   {t.about}
                 </NavLink>
               </li>
+              {isAuthenticated && (
+                <li className="nav-item">
+                  <NavLink
+                    to="/admin/preventivi"
+                    className={({ isActive }) => `nav-link custom-nav-link ${isActive ? "active" : ""}`}
+                    onClick={() => setExpanded(false)}
+                  >
+                    <i className="bi bi-file-earmark-text-fill me-1 text-success"></i>
+                    <span>{t.adminDashboard || "Dashboard Preventivi"}</span>
+                  </NavLink>
+                </li>
+              )}
             </ul>
           </div>
         </div>

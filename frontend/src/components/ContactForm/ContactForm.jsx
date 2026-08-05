@@ -792,10 +792,12 @@ function ContactForm() {
         onHide={() => setShowResetModal(false)}
         centered
         backdrop="static"
+        keyboard={true}
+        aria-labelledby="contactResetModalTitle"
         className="reset-confirmation-modal"
       >
         <Modal.Header closeButton className="border-0 pb-0">
-          <Modal.Title className="font-heading fw-bold h5 text-body">
+          <Modal.Title className="font-heading fw-bold h5 text-body" id="contactResetModalTitle">
             <i className="bi bi-exclamation-circle text-warning me-2"></i>
             {t.resetModalTitle}
           </Modal.Title>

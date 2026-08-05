@@ -10,8 +10,10 @@ import afterPartyImg from "../assets/home/dancefloor.webp";
 
 import InstagramMockup from "../components/InstagramMockup/InstagramMockup";
 import ContactForm from "../components/ContactForm/ContactForm";
+import useScrollReveal from "../utils/useScrollReveal";
 
 function Home() {
+  useScrollReveal();
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].home;
 

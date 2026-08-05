@@ -58,4 +58,15 @@ public class AdminQuoteController {
         String translated = translationService.translate(dto.text(), dto.sourceLang(), dto.targetLang());
         return ResponseEntity.ok(Map.of("translatedText", translated));
     }
+
+    @GetMapping("/{id}/calendar.ics")
+    public ResponseEntity<byte[]> getQuoteCalendarIcs(@PathVariable UUID id) {
+        String icsContent = quoteService.generateIcsContent(id);
+        byte[] bytes = icsContent.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.parseMediaType("text/calendar; charset=UTF-8"));
+        headers.setContentDisposition(org.springframework.http.ContentDisposition.inline().filename("evento-vinco-" + id + ".ics").build());
+        headers.setCacheControl("no-cache, no-store, must-revalidate");
+        return new ResponseEntity<>(bytes, headers, org.springframework.http.HttpStatus.OK);
+    }
 }

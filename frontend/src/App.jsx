@@ -1,5 +1,5 @@
-import { useEffect, lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
@@ -8,25 +8,29 @@ import MobileBottomPlayer from "./components/AudioPlayer/MobileBottomPlayer";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import EmailChoiceModal from "./components/EmailModal/EmailChoiceModal";
 import ProtectedRoute from "./components/Admin/ProtectedRoute";
-import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 import ErrorBanner from "./components/ErrorBanner/ErrorBanner";
 import { clearGlobalError } from "./redux/slices/uiSlice";
 import { useSEO } from "./utils/useSEO";
 import "./App.css";
 
-// Lazy loading delle pagine per Code Splitting e massimizzazione del punteggio Lighthouse Performance
-const Home = lazy(() => import("./pages/Home"));
-const Services = lazy(() => import("./pages/Services"));
-const Gallery = lazy(() => import("./pages/Gallery"));
-const About = lazy(() => import("./pages/About"));
-const AdminLogin = lazy(() => import("./pages/AdminLogin"));
-const AdminQuotes = lazy(() => import("./pages/AdminQuotes"));
+import Home from "./pages/Home";
+import Services from "./pages/Services";
+import Gallery from "./pages/Gallery";
+import About from "./pages/About";
+import AdminLogin from "./pages/AdminLogin";
+import AdminQuotes from "./pages/AdminQuotes";
 
 // Layout base condiviso da tutte le pagine
 function Layout() {
   useSEO();
+  const location = useLocation();
   const dispatch = useDispatch();
   const globalError = useSelector((state) => state.ui.globalError);
+
+  // Reset immediato dello scroll in cima alla pagina ad ogni cambio rotta per la massima reattività
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -49,9 +53,7 @@ function Layout() {
       )}
 
       <main className="flex-grow-1 d-flex flex-column">
-        <Suspense fallback={<LoadingSpinner variant="inline" message="Caricamento pagina in corso..." size="lg" />}>
-          <Outlet />
-        </Suspense>
+        <Outlet />
       </main>
       <Footer />
     </div>

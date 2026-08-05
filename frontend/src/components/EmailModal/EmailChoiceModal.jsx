@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeEmailModal } from "../../redux/slices/uiSlice";
 import { translations } from "../../utils/translations";
@@ -6,6 +6,7 @@ import "./EmailChoiceModal.css";
 
 export default function EmailChoiceModal() {
   const dispatch = useDispatch();
+  const modalDialogRef = useRef(null);
   const { isOpen, email } = useSelector((state) => state.ui.emailModal);
   const language = useSelector((state) => state.ui.language);
   const t = translations[language]?.emailModal || translations.it.emailModal;
@@ -21,11 +22,32 @@ export default function EmailChoiceModal() {
     }
   }
 
-  // Gestione tasto ESC per chiudere il modale
+  // Gestione tasto ESC e Focus Trap per il modale
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleKeyDown = (e) => {
-      if (e.key === "Escape" && isOpen) {
+      if (e.key === "Escape") {
         dispatch(closeEmailModal());
+      } else if (e.key === "Tab" && modalDialogRef.current) {
+        const focusables = modalDialogRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -60,6 +82,7 @@ export default function EmailChoiceModal() {
       aria-labelledby="emailChoiceModalTitle"
     >
       <div
+        ref={modalDialogRef}
         className="modal-dialog modal-dialog-centered email-modal-dialog"
         onClick={(e) => e.stopPropagation()}
       >
