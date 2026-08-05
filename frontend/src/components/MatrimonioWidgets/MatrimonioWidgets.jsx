@@ -136,7 +136,7 @@ function MatrimonioWidgets() {
                 </div>
               </div>
               <h3 className="h6 font-heading fw-bold text-body mb-1">
-                {t.badge100Title}
+                {t.badge100Title || "100 Recensioni a 5 Stelle"}
               </h3>
               <p className="small text-body-secondary mb-0 font-body">
                 Suggerito e Raccomandato al 100% dalle nostre coppie.
@@ -166,7 +166,7 @@ function MatrimonioWidgets() {
                 </div>
               </div>
               <h3 className="h6 font-heading fw-bold text-body mb-1">
-                {t.award2023Title}
+                {t.award2023Title || "Wedding Awards 2023"}
               </h3>
               <p className="small text-body-secondary mb-0 font-body">
                 Vincitore del premio per la categoria Musica Matrimonio.
@@ -196,7 +196,7 @@ function MatrimonioWidgets() {
                 </div>
               </div>
               <h3 className="h6 font-heading fw-bold text-body mb-1">
-                {t.award2024Title}
+                {t.award2024Title || "Wedding Awards 2024"}
               </h3>
               <p className="small text-body-secondary mb-0 font-body">
                 Riconferma tra i migliori fornitori per il secondo anno.
@@ -226,7 +226,7 @@ function MatrimonioWidgets() {
                 </div>
               </div>
               <h3 className="h6 font-heading fw-bold text-body mb-1">
-                {t.award2025Title}
+                {t.award2025Title || "Wedding Awards 2025"}
               </h3>
               <p className="small text-body-secondary mb-0 font-body">
                 Prestigioso riconoscimento confermato per tre anni consecutivi.

@@ -284,12 +284,8 @@
   background: var(--primary-forest, #204a35);
 }
 
-/* Media Type Tag (Top-Left) */
+/* Media Type & Category Tags */
 .media-type-tag {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 3;
   background-color: rgba(10, 15, 12, 0.7);
   color: #ffffff;
   backdrop-filter: blur(6px);
@@ -297,6 +293,18 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   font-size: 0.75rem;
   padding: 5px 10px;
+}
+
+.media-category-tag {
+  background-color: rgba(32, 74, 53, 0.85);
+  color: #ffffff;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  font-size: 0.75rem;
+  padding: 5px 10px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* Bottom Card Info Overlay */
@@ -393,6 +401,62 @@
   border-color: var(--primary-forest, #204a35) !important;
   box-shadow: 0 8px 24px rgba(32, 74, 53, 0.25);
   transform: translateY(-2px);
+}
+
+/* Category Filter Dropdown Styling */
+.filter-category-btn {
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+[data-bs-theme="dark"] .filter-category-btn {
+  color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-bs-theme="light"] .filter-category-btn {
+  color: var(--primary-forest, #204a35);
+  background-color: rgba(32, 74, 53, 0.08);
+  border-color: rgba(32, 74, 53, 0.2) !important;
+}
+
+.filter-category-btn.active-category-btn,
+.filter-category-btn:hover {
+  background-color: var(--primary-forest, #204a35) !important;
+  color: #ffffff !important;
+  border-color: #ffc107 !important;
+  box-shadow: 0 4px 12px rgba(32, 74, 53, 0.35);
+}
+
+.category-dropdown-menu {
+  min-width: 240px;
+  background: rgba(20, 28, 23, 0.96) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-bs-theme="light"] .category-dropdown-menu {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid rgba(32, 74, 53, 0.15) !important;
+}
+
+.category-dropdown-menu .dropdown-item {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+[data-bs-theme="light"] .category-dropdown-menu .dropdown-item {
+  color: #212529;
+}
+
+.category-dropdown-menu .dropdown-item:hover,
+.category-dropdown-menu .dropdown-item.active {
+  background-color: var(--primary-forest, #204a35);
+  color: #ffffff !important;
 }
 
 

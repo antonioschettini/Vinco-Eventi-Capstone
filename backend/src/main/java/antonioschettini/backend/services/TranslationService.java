@@ -28,10 +28,10 @@ public class TranslationService {
         }
 
         try {
-            String src = (sourceLang != null && !sourceLang.isBlank()) ? sourceLang.toLowerCase() : "it";
-            String tgt = (targetLang != null && !targetLang.isBlank()) ? targetLang.toLowerCase() : "en";
+            String src = (sourceLang != null && !sourceLang.isBlank()) ? sourceLang.toLowerCase() : "autodetect";
+            String tgt = (targetLang != null && !targetLang.isBlank()) ? targetLang.toLowerCase() : "it";
 
-            if (src.equalsIgnoreCase(tgt)) {
+            if (src.equalsIgnoreCase(tgt) && !src.equalsIgnoreCase("autodetect")) {
                 tgt = src.equalsIgnoreCase("it") ? "en" : "it";
             }
 
@@ -41,6 +41,7 @@ public class TranslationService {
                     .fromUriString("https://api.mymemory.translated.net/get")
                     .queryParam("q", text)
                     .queryParam("langpair", pair)
+                    .queryParam("de", "vincoeventi@gmail.com")
                     .build()
                     .toUri();
 

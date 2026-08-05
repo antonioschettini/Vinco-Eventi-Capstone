@@ -80,15 +80,20 @@ public class EmailService {
             String phoneFormatted = quote.getTelefono() != null && !quote.getTelefono().isBlank() ? quote.getTelefono() : "Non specificato";
             String telHref = quote.getTelefono() != null ? quote.getTelefono().replaceAll("[^\\d+]", "") : "";
 
-            // Traduzione messaggi/textarea per l'admin se presenti
+            boolean isMatrimonio = quote.getTipoEvento() != null && quote.getTipoEvento().toLowerCase().contains("matrimonio");
+            boolean hasTipoCerimonia = isMatrimonio && quote.getTipoCerimonia() != null && !quote.getTipoCerimonia().isBlank();
+
+            // Traduzione messaggi/textarea per l'admin SOLO se l'utente ha compilato il form in lingua estera (es. en)
             String messaggioOriginale = quote.getMessaggio() != null && !quote.getMessaggio().isBlank() ? quote.getMessaggio() : "-";
             String messaggioTradotto = "";
-            if (!messaggioOriginale.equals("-")) {
-                String targetLang = userLang.equals("it") ? "en" : "it";
-                messaggioTradotto = translationService.translate(messaggioOriginale, userLang, targetLang);
+            boolean isForeignLang = userLang.equals("en");
+
+            if (isForeignLang && !messaggioOriginale.equals("-")) {
+                messaggioTradotto = translationService.translate(messaggioOriginale, "en", "it");
             }
 
-            String plainText = String.format("""
+            StringBuilder plainTextBuilder = new StringBuilder();
+            plainTextBuilder.append(String.format("""
                 NUOVA RICHIESTA DI PREVENTIVO - VINCO EVENTI
                 ============================================
                 
@@ -104,18 +109,6 @@ public class EmailService {
                 - Location / Luogo: %s
                 - Numero Ospiti: %s
                 - Momento della Giornata: %s
-                - Tipo Cerimonia: %s
-                - Fascia Budget: %s
-                
-                Messaggio / Note Aggiuntive (Originale):
-                %s
-                
-                Traduzione Messaggio per Admin:
-                %s
-                
-                --------------------------------------------
-                Data Invio Richiesta: %s
-                Email automatica dal sistema VINCO EVENTI.
                 """,
                     quote.getNome(), quote.getCognome(),
                     quote.getEmail(), quote.getTelefono(),
@@ -124,13 +117,40 @@ public class EmailService {
                     quote.getTipoEvento() != null ? quote.getTipoEvento() : "Non specificato",
                     quote.getLocation() != null ? quote.getLocation() : "Non specificata",
                     quote.getNumeroOspiti() != null ? quote.getNumeroOspiti() : "Non specificato",
-                    quote.getOrarioGiornata() != null ? quote.getOrarioGiornata() : "Non specificato",
-                    quote.getTipoCerimonia() != null && !quote.getTipoCerimonia().isBlank() ? quote.getTipoCerimonia() : "Non specificato",
+                    quote.getOrarioGiornata() != null ? quote.getOrarioGiornata() : "Non specificato"
+            ));
+
+            if (hasTipoCerimonia) {
+                plainTextBuilder.append(String.format("- Tipo Cerimonia: %s\n", quote.getTipoCerimonia()));
+            }
+
+            plainTextBuilder.append(String.format("""
+                - Fascia Budget: %s
+                
+                Messaggio / Note Aggiuntive (Originale):
+                %s
+                """,
                     quote.getBudget() != null ? quote.getBudget() : "Non specificato",
-                    messaggioOriginale,
-                    !messaggioTradotto.isBlank() ? messaggioTradotto : "Nessuna traduzione richiesta o disponibile.",
+                    messaggioOriginale
+            ));
+
+            if (isForeignLang && !messaggioTradotto.isBlank()) {
+                plainTextBuilder.append(String.format("""
+                
+                Traduzione Messaggio per Admin (in Italiano):
+                %s
+                """, messaggioTradotto));
+            }
+
+            plainTextBuilder.append(String.format("""
+                
+                Dashboard Admin Direct Link: http://localhost:5173/admin/preventivi
+                --------------------------------------------
+                Data Invio Richiesta: %s
+                Email automatica dal sistema VINCO EVENTI.
+                """,
                     dataRichiestaFormatted
-            );
+            ));
 
             StringBuilder htmlBuilder = new StringBuilder();
             htmlBuilder.append("""
@@ -140,80 +160,75 @@ public class EmailService {
                   <meta charset="UTF-8">
                   <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 </head>
-                <body style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #222222; background-color: #f4f6f8; margin: 0; padding: 20px;">
-                  <div style="max-width: 650px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.06);">
+                <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; margin: 0; padding: 20px;">
+                  <div style="max-width: 650px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid rgba(226, 232, 240, 0.9); box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
                     
-                    <!-- Header -->
-                    <div style="background-color: #0b3c26; color: #ffffff; padding: 25px 20px; text-align: center;">
+                    <!-- Frosted Glass Header -->
+                    <div style="background: linear-gradient(135deg, #ffffff 0%%, #f0fdf4 100%%); border-bottom: 1px solid rgba(22, 163, 74, 0.2); padding: 26px 20px; text-align: center;">
                       <table style="width: 100%%; text-align: center;">
                         <tr>
                           <td>
-                            <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="64" height="64" style="display: block; margin: 0 auto 10px auto; border-radius: 50%%;" />
-                            <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 1px; color: #ffffff;">VINCO EVENTI</h2>
-                            <p style="margin: 6px 0 0 0; font-size: 14px; color: #cbd5e1;">🔔 Nuova Richiesta di Preventivo</p>
+                            <a href="http://localhost:5173/admin/preventivi" target="_blank" style="text-decoration: none; display: inline-block;">
+                              <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="68" height="68" style="display: block; margin: 0 auto 10px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                            </a>
+                            <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h2>
+                            <span style="display: inline-block; margin-top: 6px; background-color: #dcfce7; color: #15803d; font-size: 13px; font-weight: 600; padding: 4px 14px; border-radius: 20px; border: 1px solid #bbf7d0;">
+                              🔔 Nuova Richiesta di Preventivo
+                            </span>
                           </td>
                         </tr>
                       </table>
                     </div>
 
                     <!-- Body Content -->
-                    <div style="padding: 25px 20px;">
+                    <div style="padding: 28px 24px;">
                       
-                      <h3 style="color: #0b3c26; margin-top: 0; border-bottom: 2px solid #0b3c26; padding-bottom: 8px; font-size: 16px;">
+                      <h3 style="color: #064e3b; margin-top: 0; border-bottom: 2px solid #10b981; padding-bottom: 8px; font-size: 16px; font-weight: bold;">
                         👤 Dati del Cliente / Client Contact Info
                       </h3>
-                      <table style="width: 100%%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
+                      <table style="width: 100%%; border-collapse: collapse; margin-bottom: 22px; font-size: 14px;">
                         <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; width: 40%%; color: #0b3c26;">Nome e Cognome:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;">%s %s</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; width: 40%%; color: #064e3b;">Nome e Cognome:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s %s</td>
                         </tr>
                         <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #0b3c26;">Email:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;"><a href="mailto:%s" style="color: #0b3c26; font-weight: bold; text-decoration: underline;">%s</a></td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #064e3b;">Email:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;"><a href="mailto:%s" style="color: #059669; font-weight: bold; text-decoration: underline;">%s</a></td>
                         </tr>
                         <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #0b3c26;">Telefono / Phone:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;"><a href="tel:%s" style="color: #0b3c26; font-weight: bold; text-decoration: underline;">%s</a></td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #064e3b;">Telefono / Phone:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;"><a href="tel:%s" style="color: #059669; font-weight: bold; text-decoration: underline;">%s</a></td>
                         </tr>
                         <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #0b3c26;">Lingua Form / Language:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;">%s</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #064e3b;">Lingua Form / Language:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
                         </tr>
                       </table>
 
-                      <h3 style="color: #0b3c26; margin-top: 20px; border-bottom: 2px solid #0b3c26; padding-bottom: 8px; font-size: 16px;">
+                      <h3 style="color: #064e3b; margin-top: 22px; border-bottom: 2px solid #10b981; padding-bottom: 8px; font-size: 16px; font-weight: bold;">
                         🎉 Dettagli Evento / Event Details
                       </h3>
-                      <table style="width: 100%%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
+                      <table style="width: 100%%; border-collapse: collapse; margin-bottom: 22px; font-size: 14px;">
                         <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; width: 40%%; color: #0b3c26;">Data Evento / Date:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;">%s</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; width: 40%%; color: #064e3b;">Data Evento / Date:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
                         </tr>
                         <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #0b3c26;">Tipo Evento / Event Type:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;">%s</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #064e3b;">Tipo Evento / Event Type:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
                         </tr>
                         <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #0b3c26;">Location / Venue:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;">%s</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #064e3b;">Location / Venue:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
                         </tr>
                         <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #0b3c26;">Numero Ospiti / Guests:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;">%s</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #064e3b;">Numero Ospiti / Guests:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
                         </tr>
                         <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #0b3c26;">Momento Giornata / Time:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;">%s</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #064e3b;">Momento Giornata / Time:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
                         </tr>
-                        <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #0b3c26;">Tipo Cerimonia / Ceremony:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;">%s</td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #0b3c26;">Budget Estimato:</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #edf2f7;">%s</td>
-                        </tr>
-                      </table>
                 """.formatted(
                     quote.getNome(), quote.getCognome(),
                     quote.getEmail(), quote.getEmail(),
@@ -223,51 +238,71 @@ public class EmailService {
                     quote.getTipoEvento() != null ? quote.getTipoEvento() : "Non specificato",
                     quote.getLocation() != null ? quote.getLocation() : "Non specificata",
                     quote.getNumeroOspiti() != null ? quote.getNumeroOspiti() : "Non specificato",
-                    quote.getOrarioGiornata() != null ? quote.getOrarioGiornata() : "Non specificato",
-                    quote.getTipoCerimonia() != null && !quote.getTipoCerimonia().isBlank() ? quote.getTipoCerimonia() : "Non specificato",
-                    quote.getBudget() != null ? quote.getBudget() : "Non specificato"
+                    quote.getOrarioGiornata() != null ? quote.getOrarioGiornata() : "Non specificato"
             ));
 
-            // Sezione Text Area e Traduzione Automatica per Admin
+            if (hasTipoCerimonia) {
+                htmlBuilder.append("""
+                        <tr>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #064e3b;">Tipo Cerimonia / Ceremony:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
+                        </tr>
+                    """.formatted(quote.getTipoCerimonia()));
+            }
+
             htmlBuilder.append("""
-                      <h3 style="color: #0b3c26; margin-top: 20px; border-bottom: 2px solid #0b3c26; padding-bottom: 8px; font-size: 16px;">
-                        💬 Messaggio / Note Aggiuntive e Traduzione
+                        <tr>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #064e3b;">Budget Stimato:</td>
+                          <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
+                        </tr>
+                      </table>
+                """.formatted(quote.getBudget() != null ? quote.getBudget() : "Non specificato"));
+
+            // Sezione Text Area e Traduzione Automatica per Admin (SOLO se il form è stato compilato in lingua straniera)
+            htmlBuilder.append("""
+                      <h3 style="color: #064e3b; margin-top: 22px; border-bottom: 2px solid #10b981; padding-bottom: 8px; font-size: 16px; font-weight: bold;">
+                        💬 Messaggio / Note Aggiuntive
                       </h3>
-                      <div style="background-color: #f8fafc; border-left: 4px solid #0b3c26; padding: 12px 15px; margin-bottom: 15px; border-radius: 4px; font-size: 14px;">
-                        <strong style="color: #0b3c26;">Testo Originale dall'Utente:</strong><br/>
+                      <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 14px 16px; margin-bottom: 16px; border-radius: 6px; font-size: 14px;">
+                        <strong style="color: #064e3b;">Testo Originale dall'Utente:</strong><br/>
                         <span style="white-space: pre-wrap; color: #334155;">%s</span>
                       </div>
                 """.formatted(messaggioOriginale));
 
-            if (!messaggioTradotto.isBlank() && !messaggioTradotto.equalsIgnoreCase(messaggioOriginale)) {
-                String translationTitle = userLang.equals("it") 
-                        ? "🇬🇧 Traduzione in Inglese per Admin (English Translation):" 
-                        : "🇮🇹 Traduzione in Italiano per Admin (Italian Translation):";
+            if (isForeignLang && !messaggioTradotto.isBlank() && !messaggioTradotto.equalsIgnoreCase(messaggioOriginale)) {
+                String translationTitle = "🇮🇹 Traduzione in Italiano per Admin (Italian Translation):";
                 htmlBuilder.append("""
-                      <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 12px 15px; margin-bottom: 15px; border-radius: 4px; font-size: 14px;">
+                      <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 14px 16px; margin-bottom: 16px; border-radius: 6px; font-size: 14px;">
                         <strong style="color: #166534;">%s</strong><br/>
                         <span style="white-space: pre-wrap; color: #15803d;">%s</span>
                       </div>
                 """.formatted(translationTitle, messaggioTradotto));
             }
 
+            // Direct CTA Dashboard Link Button for Admin
             htmlBuilder.append("""
-                      <div style="background-color: #f1f5f9; padding: 12px 15px; border-radius: 6px; font-size: 13px; color: #64748b; margin-top: 20px;">
+                      <div style="text-align: center; margin: 28px 0 15px 0;">
+                        <a href="http://localhost:5173/admin/preventivi" target="_blank" style="background: linear-gradient(135deg, #10b981 0%%, #059669 100%%); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
+                          📊 Apri Dashboard Preventivi
+                        </a>
+                      </div>
+
+                      <div style="background-color: #f1f5f9; padding: 12px 15px; border-radius: 8px; font-size: 13px; color: #64748b; margin-top: 20px;">
                         <strong>Data e Ora Ricezione:</strong> %s
                       </div>
                     </div>
 
-                    <!-- Footer -->
-                    <div style="background-color: #0f172a; color: #94a3b8; padding: 20px; text-align: center; font-size: 12px;">
-                      <p style="margin: 0 0 8px 0; color: #ffffff; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">VINCO EVENTI</p>
-                      <p style="margin: 0;">Email automatica generata dal sito web <strong>VINCO EVENTI</strong>.</p>
+                    <!-- Frosted Glass Footer -->
+                    <div style="background: linear-gradient(135deg, #f8fafc 0%%, #f1f5f9 100%%); border-top: 1px solid #e2e8f0; color: #64748b; padding: 22px 20px; text-align: center; font-size: 12px;">
+                      <p style="margin: 0 0 6px 0; color: #0f172a; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">VINCO EVENTI</p>
+                      <p style="margin: 0; color: #64748b;">Email automatica generata dal sistema <strong>VINCO EVENTI</strong>.</p>
                     </div>
                   </div>
                 </body>
                 </html>
                 """.formatted(dataRichiestaFormatted));
 
-            helper.setText(plainText, htmlBuilder.toString());
+            helper.setText(plainTextBuilder.toString(), htmlBuilder.toString());
             attachInlineResources(helper);
             mailSender.send(mimeMessage);
             System.out.println(">>> Email di notifica preventivo inviata con successo all'admin VINCO EVENTI!");
@@ -320,7 +355,7 @@ public class EmailService {
                     https://www.instagram.com/vincoeventi/
                     
                     💬 DIRECT CONTACT & ASSISTANCE:
-                    - Phone Call (Direct Dialer): +39 349 294 9669 (tel:+393492949669)
+                    - Phone Call: +39 349 294 9669 (tel:+393492949669)
                     - WhatsApp Direct Chat: https://wa.me/393492949669
                     - Email: vincoeventi@gmail.com
                     
@@ -339,17 +374,19 @@ public class EmailService {
                       <meta charset="UTF-8">
                       <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     </head>
-                    <body style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #222222; background-color: #f4f6f8; margin: 0; padding: 20px;">
-                      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.06);">
+                    <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; margin: 0; padding: 20px;">
+                      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid rgba(226, 232, 240, 0.9); box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
                         
-                        <!-- Header Banner -->
-                        <div style="background-color: #0b3c26; color: #ffffff; padding: 28px 20px; text-align: center;">
+                        <!-- Frosted Glass Header Banner -->
+                        <div style="background: linear-gradient(135deg, #ffffff 0%%, #f0fdf4 100%%); border-bottom: 1px solid rgba(22, 163, 74, 0.2); padding: 28px 20px; text-align: center;">
                           <table style="width: 100%%; text-align: center;">
                             <tr>
                               <td>
-                                <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%;" />
-                                <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #ffffff;">VINCO EVENTI</h1>
-                                <p style="margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0;">Exclusive Events & Musical Entertainment</p>
+                                <a href="https://www.vincoeventi.it" target="_blank" style="text-decoration: none; display: inline-block;">
+                                  <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                                </a>
+                                <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h1>
+                                <p style="margin: 5px 0 0 0; font-size: 14px; color: #059669; font-weight: 600;">Exclusive Events & Musical Entertainment</p>
                               </td>
                             </tr>
                           </table>
@@ -357,7 +394,7 @@ public class EmailService {
 
                         <!-- Body Content -->
                         <div style="padding: 30px 25px;">
-                          <h2 style="color: #0b3c26; margin-top: 0; font-size: 20px;">Dear %s %s,</h2>
+                          <h2 style="color: #064e3b; margin-top: 0; font-size: 20px;">Dear %s %s,</h2>
                           <p style="font-size: 15px; color: #334155; margin-bottom: 20px;">
                             Thank you for contacting <strong>VINCO EVENTI</strong>!
                           </p>
@@ -366,27 +403,27 @@ public class EmailService {
                           </p>
 
                           <!-- Event Summary Card -->
-                          <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 18px 20px; margin-bottom: 25px;">
-                            <h4 style="margin: 0 0 12px 0; color: #0b3c26; font-size: 15px; font-weight: bold;">📋 Request Summary:</h4>
+                          <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px 20px; margin-bottom: 25px;">
+                            <h4 style="margin: 0 0 12px 0; color: #064e3b; font-size: 15px; font-weight: bold;">📋 Request Summary:</h4>
                             <table style="width: 100%%; font-size: 14px; color: #334155;">
-                              <tr><td style="padding: 4px 0; font-weight: bold; width: 40%%;">Event Type:</td><td>%s</td></tr>
-                              <tr><td style="padding: 4px 0; font-weight: bold;">Location:</td><td>%s</td></tr>
-                              <tr><td style="padding: 4px 0; font-weight: bold;">Guest Count:</td><td>%s</td></tr>
-                              <tr><td style="padding: 4px 0; font-weight: bold;">Estimated Budget:</td><td>%s</td></tr>
+                              <tr><td style="padding: 5px 0; font-weight: bold; width: 40%%; color: #064e3b;">Event Type:</td><td>%s</td></tr>
+                              <tr><td style="padding: 5px 0; font-weight: bold; color: #064e3b;">Location:</td><td>%s</td></tr>
+                              <tr><td style="padding: 5px 0; font-weight: bold; color: #064e3b;">Guest Count:</td><td>%s</td></tr>
+                              <tr><td style="padding: 5px 0; font-weight: bold; color: #064e3b;">Estimated Budget:</td><td>%s</td></tr>
                             </table>
                           </div>
 
                           <!-- Instagram CTA Card -->
-                          <div style="background: linear-gradient(135deg, #fdfbfb 0%%, #ebedee 100%%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: center;">
+                          <div style="background: linear-gradient(135deg, #fdfbfb 0%%, #ebedee 100%%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: center;">
                             <table style="width: 100%%; text-align: center;">
                               <tr>
                                 <td>
                                   <a href="https://www.instagram.com/vincoeventi/" target="_blank" style="text-decoration: none;">
-                                    <img src="cid:instagramIcon" alt="Instagram VINCO EVENTI" width="36" height="36" style="margin-bottom: 8px; display: inline-block; vertical-align: middle;" />
+                                    <img src="cid:instagramIcon" alt="Instagram VINCO EVENTI" width="38" height="38" style="margin-bottom: 8px; display: inline-block; vertical-align: middle;" />
                                   </a>
-                                  <h4 style="margin: 5px 0; color: #0b3c26; font-size: 16px; font-weight: bold;">Follow VINCO EVENTI on Instagram!</h4>
+                                  <h4 style="margin: 5px 0; color: #064e3b; font-size: 16px; font-weight: bold;">Follow VINCO EVENTI on Instagram!</h4>
                                   <p style="margin: 0 0 15px 0; font-size: 14px; color: #475569;">Don't miss our latest shows, live performances, news, and behind-the-scenes content!</p>
-                                  <a href="https://www.instagram.com/vincoeventi/" target="_blank" style="background-color: #E1306C; color: #ffffff; padding: 10px 22px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 2px 6px rgba(225,48,108,0.3);">
+                                  <a href="https://www.instagram.com/vincoeventi/" target="_blank" style="background-color: #E1306C; color: #ffffff; padding: 10px 22px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 3px 10px rgba(225,48,108,0.3);">
                                     Follow @vincoeventi
                                   </a>
                                 </td>
@@ -395,7 +432,7 @@ public class EmailService {
                           </div>
 
                           <!-- Direct Contact & Dialer CTA Card -->
-                          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 20px; margin-bottom: 25px;">
+                          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
                             <h4 style="margin: 0 0 8px 0; color: #166534; font-size: 16px; font-weight: bold; text-align: center;">💬 Direct Contact & Fast Mobile Calling</h4>
                             <p style="margin: 0 0 15px 0; font-size: 14px; color: #15803d; text-align: center;">
                               Would you like to speak directly with us or ask a quick question? Tap below to call or chat!
@@ -403,12 +440,10 @@ public class EmailService {
                             <table style="width: 100%%; text-align: center;" cellspacing="0" cellpadding="0">
                               <tr>
                                 <td style="padding: 6px; text-align: center;">
-                                  <!-- Mobile Dialer Link -->
-                                  <a href="tel:+393492949669" style="background-color: #0b3c26; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
+                                  <a href="tel:+393492949669" style="background-color: #064e3b; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
                                     <img src="cid:phoneIcon" alt="Phone" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
                                     Call +39 349 294 9669
                                   </a>
-                                  <!-- WhatsApp Link -->
                                   <a href="https://wa.me/393492949669" target="_blank" style="background-color: #25D366; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
                                     <img src="cid:whatsappIcon" alt="WhatsApp" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
                                     WhatsApp Chat
@@ -422,15 +457,15 @@ public class EmailService {
 
                           <p style="margin-bottom: 0; font-size: 14px; color: #475569;">
                             Best regards,<br/>
-                            <strong style="color: #0b3c26; font-size: 15px;">Team VINCO EVENTI</strong><br/>
-                            ✉️ <a href="mailto:vincoeventi@gmail.com" style="color: #0b3c26; text-decoration: none; font-weight: bold;">vincoeventi@gmail.com</a>
+                            <strong style="color: #064e3b; font-size: 15px;">Team VINCO EVENTI</strong><br/>
+                            ✉️ <a href="mailto:vincoeventi@gmail.com" style="color: #059669; text-decoration: none; font-weight: bold;">vincoeventi@gmail.com</a>
                           </p>
                         </div>
 
-                        <!-- Footer -->
-                        <div style="background-color: #0f172a; color: #94a3b8; padding: 20px; text-align: center; font-size: 12px;">
-                          <p style="margin: 0 0 6px 0; color: #ffffff; font-weight: bold; font-size: 14px;">VINCO EVENTI</p>
-                          <p style="margin: 0;">© VINCO EVENTI - All rights reserved.</p>
+                        <!-- Frosted Glass Footer -->
+                        <div style="background: linear-gradient(135deg, #f8fafc 0%%, #f1f5f9 100%%); border-top: 1px solid #e2e8f0; color: #64748b; padding: 22px 20px; text-align: center; font-size: 12px;">
+                          <p style="margin: 0 0 6px 0; color: #0f172a; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">VINCO EVENTI</p>
+                          <p style="margin: 0; color: #64748b;">© VINCO EVENTI - All rights reserved.</p>
                         </div>
                       </div>
                     </body>
@@ -458,7 +493,7 @@ public class EmailService {
                     https://www.instagram.com/vincoeventi/
                     
                     💬 CONTATTO DIRETTO & CHIAMATA RAPIDA:
-                    - Chiamata Telefonica (Rubrica / Mobile): +39 349 294 9669 (tel:+393492949669)
+                    - Chiamata Telefonica: +39 349 294 9669 (tel:+393492949669)
                     - Chat WhatsApp: https://wa.me/393492949669
                     - Email: vincoeventi@gmail.com
                     
@@ -477,17 +512,19 @@ public class EmailService {
                       <meta charset="UTF-8">
                       <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     </head>
-                    <body style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #222222; background-color: #f4f6f8; margin: 0; padding: 20px;">
-                      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.06);">
+                    <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; margin: 0; padding: 20px;">
+                      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid rgba(226, 232, 240, 0.9); box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
                         
-                        <!-- Header Banner -->
-                        <div style="background-color: #0b3c26; color: #ffffff; padding: 28px 20px; text-align: center;">
+                        <!-- Frosted Glass Header Banner -->
+                        <div style="background: linear-gradient(135deg, #ffffff 0%%, #f0fdf4 100%%); border-bottom: 1px solid rgba(22, 163, 74, 0.2); padding: 28px 20px; text-align: center;">
                           <table style="width: 100%%; text-align: center;">
                             <tr>
                               <td>
-                                <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%;" />
-                                <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #ffffff;">VINCO EVENTI</h1>
-                                <p style="margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0;">Organizzazione Eventi & Intrattenimento Musicale</p>
+                                <a href="https://www.vincoeventi.it" target="_blank" style="text-decoration: none; display: inline-block;">
+                                  <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                                </a>
+                                <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h1>
+                                <p style="margin: 5px 0 0 0; font-size: 14px; color: #059669; font-weight: 600;">Organizzazione Eventi & Intrattenimento Musicale</p>
                               </td>
                             </tr>
                           </table>
@@ -495,7 +532,7 @@ public class EmailService {
 
                         <!-- Body Content -->
                         <div style="padding: 30px 25px;">
-                          <h2 style="color: #0b3c26; margin-top: 0; font-size: 20px;">Gentile %s %s,</h2>
+                          <h2 style="color: #064e3b; margin-top: 0; font-size: 20px;">Gentile %s %s,</h2>
                           <p style="font-size: 15px; color: #334155; margin-bottom: 20px;">
                             Grazie per aver contattato <strong>VINCO EVENTI</strong>!
                           </p>
@@ -504,27 +541,27 @@ public class EmailService {
                           </p>
 
                           <!-- Event Summary Card -->
-                          <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 18px 20px; margin-bottom: 25px;">
-                            <h4 style="margin: 0 0 12px 0; color: #0b3c26; font-size: 15px; font-weight: bold;">📋 Riepilogo della tua Richiesta:</h4>
+                          <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px 20px; margin-bottom: 25px;">
+                            <h4 style="margin: 0 0 12px 0; color: #064e3b; font-size: 15px; font-weight: bold;">📋 Riepilogo della tua Richiesta:</h4>
                             <table style="width: 100%%; font-size: 14px; color: #334155;">
-                              <tr><td style="padding: 4px 0; font-weight: bold; width: 40%%;">Tipo Evento:</td><td>%s</td></tr>
-                              <tr><td style="padding: 4px 0; font-weight: bold;">Location:</td><td>%s</td></tr>
-                              <tr><td style="padding: 4px 0; font-weight: bold;">Numero Ospiti:</td><td>%s</td></tr>
-                              <tr><td style="padding: 4px 0; font-weight: bold;">Fascia Budget:</td><td>%s</td></tr>
+                              <tr><td style="padding: 5px 0; font-weight: bold; width: 40%%; color: #064e3b;">Tipo Evento:</td><td>%s</td></tr>
+                              <tr><td style="padding: 5px 0; font-weight: bold; color: #064e3b;">Location:</td><td>%s</td></tr>
+                              <tr><td style="padding: 5px 0; font-weight: bold; color: #064e3b;">Numero Ospiti:</td><td>%s</td></tr>
+                              <tr><td style="padding: 5px 0; font-weight: bold; color: #064e3b;">Fascia Budget:</td><td>%s</td></tr>
                             </table>
                           </div>
 
                           <!-- Instagram CTA Card -->
-                          <div style="background: linear-gradient(135deg, #fdfbfb 0%%, #ebedee 100%%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: center;">
+                          <div style="background: linear-gradient(135deg, #fdfbfb 0%%, #ebedee 100%%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: center;">
                             <table style="width: 100%%; text-align: center;">
                               <tr>
                                 <td>
                                   <a href="https://www.instagram.com/vincoeventi/" target="_blank" style="text-decoration: none;">
-                                    <img src="cid:instagramIcon" alt="Instagram VINCO EVENTI" width="36" height="36" style="margin-bottom: 8px; display: inline-block; vertical-align: middle;" />
+                                    <img src="cid:instagramIcon" alt="Instagram VINCO EVENTI" width="38" height="38" style="margin-bottom: 8px; display: inline-block; vertical-align: middle;" />
                                   </a>
-                                  <h4 style="margin: 5px 0; color: #0b3c26; font-size: 16px; font-weight: bold;">Segui VINCO EVENTI su Instagram!</h4>
+                                  <h4 style="margin: 5px 0; color: #064e3b; font-size: 16px; font-weight: bold;">Segui VINCO EVENTI su Instagram!</h4>
                                   <p style="margin: 0 0 15px 0; font-size: 14px; color: #475569;">Non perderti tutte le novità, i video delle nostre esibizioni dal vivo e i momenti più spettacolari!</p>
-                                  <a href="https://www.instagram.com/vincoeventi/" target="_blank" style="background-color: #E1306C; color: #ffffff; padding: 10px 22px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 2px 6px rgba(225,48,108,0.3);">
+                                  <a href="https://www.instagram.com/vincoeventi/" target="_blank" style="background-color: #E1306C; color: #ffffff; padding: 10px 22px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 3px 10px rgba(225,48,108,0.3);">
                                     Segui @vincoeventi
                                   </a>
                                 </td>
@@ -533,7 +570,7 @@ public class EmailService {
                           </div>
 
                           <!-- Direct Contact & Dialer CTA Card -->
-                          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 20px; margin-bottom: 25px;">
+                          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
                             <h4 style="margin: 0 0 8px 0; color: #166534; font-size: 16px; font-weight: bold; text-align: center;">💬 Contatto Diretto & Chiamata Rapida</h4>
                             <p style="margin: 0 0 15px 0; font-size: 14px; color: #15803d; text-align: center;">
                               Vuoi parlare direttamente con noi o porci una domanda immediata? Clicca qui sotto per chiamare o scriverci su WhatsApp:
@@ -541,12 +578,10 @@ public class EmailService {
                             <table style="width: 100%%; text-align: center;" cellspacing="0" cellpadding="0">
                               <tr>
                                 <td style="padding: 6px; text-align: center;">
-                                  <!-- Link Chiamata Diretto per Rubrica Mobile -->
-                                  <a href="tel:+393492949669" style="background-color: #0b3c26; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
+                                  <a href="tel:+393492949669" style="background-color: #064e3b; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
                                     <img src="cid:phoneIcon" alt="Telefono" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
                                     Chiama +39 349 294 9669
                                   </a>
-                                  <!-- Link WhatsApp Diretto -->
                                   <a href="https://wa.me/393492949669" target="_blank" style="background-color: #25D366; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
                                     <img src="cid:whatsappIcon" alt="WhatsApp" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
                                     Scrivici su WhatsApp
@@ -560,15 +595,15 @@ public class EmailService {
 
                           <p style="margin-bottom: 0; font-size: 14px; color: #475569;">
                             Cordiali saluti,<br/>
-                            <strong style="color: #0b3c26; font-size: 15px;">Team VINCO EVENTI</strong><br/>
-                            ✉️ <a href="mailto:vincoeventi@gmail.com" style="color: #0b3c26; text-decoration: none; font-weight: bold;">vincoeventi@gmail.com</a>
+                            <strong style="color: #064e3b; font-size: 15px;">Team VINCO EVENTI</strong><br/>
+                            ✉️ <a href="mailto:vincoeventi@gmail.com" style="color: #059669; text-decoration: none; font-weight: bold;">vincoeventi@gmail.com</a>
                           </p>
                         </div>
 
-                        <!-- Footer -->
-                        <div style="background-color: #0f172a; color: #94a3b8; padding: 20px; text-align: center; font-size: 12px;">
-                          <p style="margin: 0 0 6px 0; color: #ffffff; font-weight: bold; font-size: 14px;">VINCO EVENTI</p>
-                          <p style="margin: 0;">© VINCO EVENTI - Tutti i diritti riservati.</p>
+                        <!-- Frosted Glass Footer -->
+                        <div style="background: linear-gradient(135deg, #f8fafc 0%%, #f1f5f9 100%%); border-top: 1px solid #e2e8f0; color: #64748b; padding: 22px 20px; text-align: center; font-size: 12px;">
+                          <p style="margin: 0 0 6px 0; color: #0f172a; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">VINCO EVENTI</p>
+                          <p style="margin: 0; color: #64748b;">© VINCO EVENTI - Tutti i diritti riservati.</p>
                         </div>
                       </div>
                     </body>

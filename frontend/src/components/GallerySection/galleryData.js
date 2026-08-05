@@ -1,11 +1,11 @@
 // NOTA: Questo file è usato come fallback di emergenza quando il backend non è raggiungibile.
 // La fonte primaria dei dati è il DB (PostgreSQL via Spring Boot) con URL Cloudinary.
 
-// Import SOLO delle foto da assets/home/ (usate anche da altri componenti)
 import fumogeniColor2 from "../../assets/home/14. fumogeni color 2.jpg";
 import cieloStellato from "../../assets/home/cielo stellato.jpg";
 import fotoBacioSposi from "../../assets/home/foto bacio sposi.jpg";
 import fotoBandAperitivo from "../../assets/home/foto band aperitivo.jpg";
+import fotoBandSera from "../../assets/home/foto band sera.jpg";
 import fotoBandPng from "../../assets/home/foto band.png";
 import fotoBrindisiTorta from "../../assets/home/foto brindisi torta.jpg";
 import fotoCantanteSera from "../../assets/home/foto cantante sera.webp";
@@ -17,7 +17,9 @@ export const galleryItems = [
   {
     id: "a94264ce-4bdd-47a4-b41b-22120dc471a2",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571180/vinco_eventi_galleria/vaz9o4beyovfhcr5triw.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571180/vinco_eventi_galleria/vaz9o4beyovfhcr5triw.mov",
+    posterUrl: fotoEnzoDjSet,
     titleIta: "Set ELETTRICO - Promo on Fire!",
     titleEng: "ELECTRICAL Set - Promo on Fire!",
     subtitleIta: "La carica travolgente del nostro set elettrico live",
@@ -30,7 +32,9 @@ export const galleryItems = [
   {
     id: "1bca78ef-e6c6-4285-98e6-9b989c3d91f2",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571802/vinco_eventi_galleria/vbybme8q65ywkaisvhfo.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571802/vinco_eventi_galleria/vbybme8q65ywkaisvhfo.mov",
+    posterUrl: fotoBandAperitivo,
     titleIta: "Crossroads Live Performance",
     titleEng: "Crossroads Live Performance",
     subtitleIta: "Spettacolo musicale d'impatto e ritmo coinvolgente",
@@ -43,7 +47,9 @@ export const galleryItems = [
   {
     id: "9ea48442-9008-4b27-bc8b-70d31d5c0c44",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571184/vinco_eventi_galleria/kz0w0hx5a8lhts8czb6l.mp4",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571184/vinco_eventi_galleria/kz0w0hx5a8lhts8czb6l.mp4",
+    posterUrl: fotoEnzoDjSet,
     titleIta: "DJ Set Exclusive Live",
     titleEng: "DJ Set Exclusive Live",
     subtitleIta: "Carica ed energia per eventi unici",
@@ -57,6 +63,7 @@ export const galleryItems = [
     id: "85df4170-f0c2-4bae-8fda-774edede2bf7",
     type: "image",
     src: fotoEnzoDjSet,
+    posterUrl: fotoEnzoDjSet,
     titleIta: "Console DJ Set",
     titleEng: "Console DJ Set",
     subtitleIta: "Musica e regia per la serata",
@@ -69,7 +76,9 @@ export const galleryItems = [
   {
     id: "738176f5-6252-4a14-abe5-0a86c900c22d",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571817/vinco_eventi_galleria/gdj0cjbkmoakcpipxhmq.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571817/vinco_eventi_galleria/gdj0cjbkmoakcpipxhmq.mov",
+    posterUrl: fotoEnzoDjSet,
     titleIta: "Exclusive Night Party",
     titleEng: "Exclusive Night Party",
     subtitleIta: "Pista piena e grande energia per una serata indimenticabile",
@@ -82,7 +91,9 @@ export const galleryItems = [
   {
     id: "7f29e574-f99a-4090-861b-c91bf754f336",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571191/vinco_eventi_galleria/un507woyugpftspgjajb.mp4",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571191/vinco_eventi_galleria/un507woyugpftspgjajb.mp4",
+    posterUrl: fotoBandSera,
     titleIta: "Live Band Night Performance",
     titleEng: "Live Band Night Performance",
     subtitleIta: "Spettacolo e musica dal vivo",
@@ -96,6 +107,7 @@ export const galleryItems = [
     id: "be0d8b55-7727-4176-a3dd-783dcdee674d",
     type: "image",
     src: fotoCantanteSera,
+    posterUrl: fotoCantanteSera,
     titleIta: "Esibizione Vocalist & Cantante",
     titleEng: "Vocalist & Singer Performance",
     subtitleIta: "Emozione pura durante il party",
@@ -108,7 +120,9 @@ export const galleryItems = [
   {
     id: "1321e1d7-4b8a-4d7a-b969-4bc352eb80f5",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571198/vinco_eventi_galleria/mulpxihugmquppcreyp5.mp4",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571198/vinco_eventi_galleria/mulpxihugmquppcreyp5.mp4",
+    posterUrl: cieloStellato,
     titleIta: "Luci LED & Console Show",
     titleEng: "LED Lights & Console Show",
     subtitleIta: "Scenografie luminose e sound system",
@@ -121,7 +135,9 @@ export const galleryItems = [
   {
     id: "5dcf4d5b-75aa-449e-bab5-153ea9c55a34",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571204/vinco_eventi_galleria/tyz1zx989veguuhhfvdq.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571204/vinco_eventi_galleria/tyz1zx989veguuhhfvdq.mov",
+    posterUrl: fotoEnzoDjSet,
     titleIta: "Live Energy & Dj Set",
     titleEng: "Live Energy & Dj Set",
     subtitleIta: "Intrattenimento e regia musicale sul palco",
@@ -135,6 +151,7 @@ export const galleryItems = [
     id: "233b39d0-1edb-4b2f-836b-674bc1294f0c",
     type: "image",
     src: cieloStellato,
+    posterUrl: cieloStellato,
     titleIta: "Illuminazione Cielo Stellato",
     titleEng: "Starry Sky Lighting",
     subtitleIta: "Atmosfera magica per la cena all'aperto",
@@ -147,7 +164,9 @@ export const galleryItems = [
   {
     id: "e5a53a1e-fbfe-4fce-838a-2d76ba0c47fc",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571212/vinco_eventi_galleria/wnqshvydnagmut5a4bw1.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571212/vinco_eventi_galleria/wnqshvydnagmut5a4bw1.mov",
+    posterUrl: fotoBacioSposi,
     titleIta: "Wedding Party Highlights",
     titleEng: "Wedding Party Highlights",
     subtitleIta: "I momenti più belli ed emozionanti del party",
@@ -160,7 +179,9 @@ export const galleryItems = [
   {
     id: "2b9b7c2a-a8bb-4667-ba0b-2fb335865e2d",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571218/vinco_eventi_galleria/qfqfjc1lalwtrgnuwj0r.mp4",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571218/vinco_eventi_galleria/qfqfjc1lalwtrgnuwj0r.mp4",
+    posterUrl: fotoEnzoDjSet,
     titleIta: "Party & Clubbing Vibe",
     titleEng: "Party & Clubbing Vibe",
     subtitleIta: "Pista piena e divertimento assicurato",
@@ -174,6 +195,7 @@ export const galleryItems = [
     id: "7f4e6e2c-e9c9-4a92-827d-cff62fc2819d",
     type: "image",
     src: fotoBacioSposi,
+    posterUrl: fotoBacioSposi,
     titleIta: "Il Primo Bacio degli Sposi",
     titleEng: "The Bride & Groom First Kiss",
     subtitleIta: "Momento romantico accompagnato dalla musica",
@@ -186,7 +208,9 @@ export const galleryItems = [
   {
     id: "60c67e73-1b60-4126-a66e-688cfe2e381d",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571223/vinco_eventi_galleria/h6lvl6whetifsprevnn0.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571223/vinco_eventi_galleria/h6lvl6whetifsprevnn0.mov",
+    posterUrl: fotoCantanteSera,
     titleIta: "Live Vibes & Social Reel",
     titleEng: "Live Vibes & Social Reel",
     subtitleIta: "La magia dell'evento vista da vicino",
@@ -199,7 +223,9 @@ export const galleryItems = [
   {
     id: "4bd803bc-7069-42a7-87f6-d937ef88c56a",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571226/vinco_eventi_galleria/e5cd0uz0698qnnwnmgqs.mp4",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571226/vinco_eventi_galleria/e5cd0uz0698qnnwnmgqs.mp4",
+    posterUrl: fotoBandAperitivo,
     titleIta: "Live Acoustics Aperitivo",
     titleEng: "Live Acoustics Cocktail Hour",
     subtitleIta: "Musica dal vivo elegante durante il cocktail",
@@ -212,7 +238,9 @@ export const galleryItems = [
   {
     id: "96f04bd3-ede7-4e7f-b1b8-502106aaf699",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571229/vinco_eventi_galleria/hlxlk2jz64hd7pbq4u5k.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571229/vinco_eventi_galleria/hlxlk2jz64hd7pbq4u5k.mov",
+    posterUrl: cieloStellato,
     titleIta: "Atmosphere & Lights",
     titleEng: "Atmosphere & Lights",
     subtitleIta: "Service luci ed effetti per un'atmosfera elegante",
@@ -226,6 +254,7 @@ export const galleryItems = [
     id: "87574b9b-15a7-4b05-a4db-6314f62b3a71",
     type: "image",
     src: fotoBrindisiTorta,
+    posterUrl: fotoBrindisiTorta,
     titleIta: "Brindisi & Taglio Torta",
     titleEng: "Toast & Cake Cutting",
     subtitleIta: "Il culmine dei festeggiamenti",
@@ -238,7 +267,9 @@ export const galleryItems = [
   {
     id: "3beaf748-4d77-4710-aa52-3a76b0669385",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571234/vinco_eventi_galleria/vunxsnh0lc2jkqdxuop9.mp4",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571234/vinco_eventi_galleria/vunxsnh0lc2jkqdxuop9.mp4",
+    posterUrl: fumogeniColor2,
     titleIta: "Fumogeni & Effetti Scenografici",
     titleEng: "Smoke Effects & Special Effects",
     subtitleIta: "Effetti speciali per ingressi e momenti clou",
@@ -251,7 +282,9 @@ export const galleryItems = [
   {
     id: "b4d8dc39-f64c-4f42-9922-50f311cd3b9f",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571237/vinco_eventi_galleria/m86cnpmuhvavvo6u4ccd.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571237/vinco_eventi_galleria/m86cnpmuhvavvo6u4ccd.mov",
+    posterUrl: fotoBrindisiTorta,
     titleIta: "Festeggiamenti in Musica",
     titleEng: "Music Celebrations",
     subtitleIta: "Ritmo e divertimento scatenato per gli invitati",
@@ -265,6 +298,7 @@ export const galleryItems = [
     id: "aded5d5d-0512-45c4-b6ba-d719811f3c68",
     type: "image",
     src: fumogeniColor2,
+    posterUrl: fumogeniColor2,
     titleIta: "Fumogeni Colorati Sposi",
     titleEng: "Colored Smoke Effects",
     subtitleIta: "Esplosione di colori per un ricordo indimenticabile",
@@ -277,7 +311,9 @@ export const galleryItems = [
   {
     id: "2699052c-1bce-4e3c-9567-419240ade6b4",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571242/vinco_eventi_galleria/yuhpya4xt3ipx3znwyl0.mp4",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571242/vinco_eventi_galleria/yuhpya4xt3ipx3znwyl0.mp4",
+    posterUrl: fotoEnzoDjSet,
     titleIta: "DJ Set & Live Mix",
     titleEng: "DJ Set & Live Mix",
     subtitleIta: "Selezione musicale personalizzata",
@@ -290,7 +326,9 @@ export const galleryItems = [
   {
     id: "9882feea-50a0-42c7-a544-4c3328f4bb7e",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571246/vinco_eventi_galleria/y2e73pox3aetvywkyfre.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571246/vinco_eventi_galleria/y2e73pox3aetvywkyfre.mov",
+    posterUrl: fotoEnzoDjSet,
     titleIta: "Live Show Console",
     titleEng: "Live Show Console",
     subtitleIta: "Performance ed energia con la regia di VINCO EVENTI",
@@ -304,6 +342,7 @@ export const galleryItems = [
     id: "3ddcd687-d701-414b-a15d-508d44264ed8",
     type: "image",
     src: fotoBandAperitivo,
+    posterUrl: fotoBandAperitivo,
     titleIta: "Band Live Aperitivo",
     titleEng: "Live Band Cocktail Hour",
     subtitleIta: "Ritmi lounge e pop acustico",
@@ -316,7 +355,9 @@ export const galleryItems = [
   {
     id: "719d9028-fce7-492f-af8b-71e85028588e",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571250/vinco_eventi_galleria/deljvnzddlc8arskk15z.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571250/vinco_eventi_galleria/deljvnzddlc8arskk15z.mov",
+    posterUrl: fotoEnzoDjSet,
     titleIta: "DJ Set Moment",
     titleEng: "DJ Set Moment",
     subtitleIta: "Sound system e selezione musicale d'eccellenza",
@@ -329,7 +370,9 @@ export const galleryItems = [
   {
     id: "3fbc227f-4679-407a-b9d1-55b861c3a374",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571253/vinco_eventi_galleria/tacxrqeuinco1mfvsemr.mp4",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571253/vinco_eventi_galleria/tacxrqeuinco1mfvsemr.mp4",
+    posterUrl: fotoBandSera,
     titleIta: "Live Show Finale",
     titleEng: "Live Show Finale",
     subtitleIta: "Gran finale con la band al completo",
@@ -342,7 +385,9 @@ export const galleryItems = [
   {
     id: "c718cb6c-3d8a-4ed1-a2c2-124f3f3ba3c5",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571256/vinco_eventi_galleria/lf8rkdrcvgu2fjl2glo3.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571256/vinco_eventi_galleria/lf8rkdrcvgu2fjl2glo3.mov",
+    posterUrl: fotoCantanteSera,
     titleIta: "Show dal Vivo",
     titleEng: "Live Performance Show",
     subtitleIta: "Coinvolgimento e spettacolo per tutti gli ospiti",
@@ -356,6 +401,7 @@ export const galleryItems = [
     id: "5305f9b7-d471-4c00-b115-17b494916735",
     type: "image",
     src: fotoMusicaAperitivo,
+    posterUrl: fotoMusicaAperitivo,
     titleIta: "Cocktail & Sax Vibe",
     titleEng: "Cocktail & Sax Vibe",
     subtitleIta: "Eleganza e sonorità moderne",
@@ -368,7 +414,9 @@ export const galleryItems = [
   {
     id: "363126b4-d0ac-4432-8341-753bf974b0c7",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571260/vinco_eventi_galleria/o0n56p2rf3rfe0kexuvi.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571260/vinco_eventi_galleria/o0n56p2rf3rfe0kexuvi.mov",
+    posterUrl: fotoBandAperitivo,
     titleIta: "Live Session Highlight",
     titleEng: "Live Session Highlight",
     subtitleIta: "Un assaggio del nostro intrattenimento dal vivo",
@@ -382,6 +430,7 @@ export const galleryItems = [
     id: "3e8f613c-360e-4a00-8832-99c14ad816a6",
     type: "image",
     src: fotoBandPng,
+    posterUrl: fotoBandPng,
     titleIta: "I Nostri Musicisti",
     titleEng: "Our Musicians",
     subtitleIta: "Professionisti al servizio del tuo evento",
@@ -394,7 +443,9 @@ export const galleryItems = [
   {
     id: "5166c260-3a07-4c61-8f41-78c3c044f1bd",
     type: "video",
-    src: "https://res.cloudinary.com/y9rfpsut/video/upload/v1785571265/vinco_eventi_galleria/si66dzezw5mvdellz50x.mov",
+    isFallback: true,
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785571265/vinco_eventi_galleria/si66dzezw5mvdellz50x.mov",
+    posterUrl: fotoBandPng,
     titleIta: "Live Sound Experience",
     titleEng: "Live Sound Experience",
     subtitleIta: "Musica e passione al servizio del tuo evento",
@@ -408,6 +459,7 @@ export const galleryItems = [
     id: "187ee2ad-2832-418e-a096-b5e22d1a762e",
     type: "image",
     src: fotoBandAperitivoWebp,
+    posterUrl: fotoBandAperitivoWebp,
     titleIta: "Accoglienza Ospiti in Musica",
     titleEng: "Guest Welcome in Music",
     subtitleIta: "L'atmosfera ideale fin dai primi minuti",

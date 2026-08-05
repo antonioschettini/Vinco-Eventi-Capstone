@@ -288,7 +288,7 @@ function ContactForm() {
 
       {showValidationBanner && (
         <ErrorBanner
-          message={t.validationBannerText}
+          message={t.validationBanner || t.validationBannerText}
           type="warning"
           className="mb-4"
           onDismiss={() => setShowValidationBanner(false)}

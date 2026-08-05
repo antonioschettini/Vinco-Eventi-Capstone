@@ -5,6 +5,10 @@
   z-index: 1060;
 }
 
+[data-bs-theme="light"] .email-modal-backdrop {
+  background-color: rgba(32, 74, 53, 0.35);
+}
+
 .email-modal-dialog {
   max-width: 480px;
   width: 92%;
@@ -19,17 +23,17 @@
 
 .email-modal-content,
 [data-bs-theme="dark"] .email-modal-content {
-  background-color: rgba(18, 26, 21, 0.78) !important;
+  background-color: rgba(18, 26, 21, 0.92) !important;
   color: #f8f9fa !important;
   border: 1px solid rgba(212, 175, 55, 0.3) !important;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45) !important;
 }
 
 [data-bs-theme="light"] .email-modal-content {
-  background-color: rgba(255, 255, 255, 0.82) !important;
-  color: #212529 !important;
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  color: #1c2b22 !important;
   border: 1px solid rgba(212, 175, 55, 0.35) !important;
-  box-shadow: 0 20px 45px rgba(32, 74, 53, 0.12) !important;
+  box-shadow: 0 20px 45px rgba(32, 74, 53, 0.15) !important;
 }
 
 .email-modal-icon-badge {
@@ -46,11 +50,22 @@
   cursor: pointer;
 }
 
+[data-bs-theme="light"] .email-option-card {
+  background: rgba(32, 74, 53, 0.04);
+  border: 1px solid rgba(32, 74, 53, 0.12);
+}
+
 .email-option-card:hover {
   transform: translateY(-2px);
   background: rgba(212, 175, 55, 0.08);
   border-color: rgba(212, 175, 55, 0.4);
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+}
+
+[data-bs-theme="light"] .email-option-card:hover {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: rgba(143, 108, 10, 0.4);
+  box-shadow: 0 4px 12px rgba(143, 108, 10, 0.15);
 }
 
 .email-option-card.active-copied {
@@ -72,6 +87,10 @@
   color: var(--gold-accent, #d4af37) !important;
 }
 
+[data-bs-theme="light"] .text-gold {
+  color: #8f6c0a !important;
+}
+
 .border-gold-subtle {
   border-color: rgba(212, 175, 55, 0.3) !important;
 }
@@ -81,9 +100,17 @@
 }
 
 .btn-close-custom {
-  filter: var(--bs-btn-close-white-filter, invert(1) grayscale(100%) brightness(200%));
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.btn-close-custom,
+[data-bs-theme="dark"] .btn-close-custom {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-bs-theme="light"] .btn-close-custom {
+  filter: none;
 }
 
 .btn-close-custom:hover {

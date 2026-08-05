@@ -521,7 +521,7 @@ function Services() {
 
       {/* MODALE AMMINISTRAZIONE (AGGIUNGI / MODIFICA SERVIZIO CON UPLOAD CLOUDINARY) */}
       {showAddModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div className="modal fade show d-block" tabIndex={-1} style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content shadow-lg border-0">
               <div className="modal-header bg-success text-white">

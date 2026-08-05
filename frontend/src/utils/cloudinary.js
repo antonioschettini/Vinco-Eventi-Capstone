@@ -86,11 +86,6 @@ export function getOptimizedCloudinaryUrl(url, options = {}) {
     }
   }
 
-  // Converti estensioni legacy .mov in .mp4 per massima compatibilità streaming dei browser con f_auto
-  if (isVideo && publicIdPath.endsWith(".mov")) {
-    publicIdPath = publicIdPath.replace(/\.mov$/, ".mp4");
-  }
-
   const versionPath = version ? `${version}/` : "";
   return `${prefix}${transformList.join(",")}/${versionPath}${publicIdPath}`;
 }

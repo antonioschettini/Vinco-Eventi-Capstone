@@ -34,6 +34,8 @@ function AdminQuotes() {
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [translatedText, setTranslatedText] = useState("");
+  const [translating, setTranslating] = useState(false);
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
@@ -116,11 +118,43 @@ function AdminQuotes() {
     }
   };
 
-  const openDetail = (quote) => {
+  const openDetail = async (quote) => {
     setSelectedQuote(quote);
     setShowDetailModal(true);
+    setTranslatedText("");
+    setTranslating(false);
+
     if (quote.stato === "PENDING") {
       handleUpdateStatus(quote.id, "READ");
+    }
+
+    const isForeignLang = quote.lingua && quote.lingua.toLowerCase() !== "it";
+
+    if (isForeignLang && quote.messaggio && quote.messaggio.trim() !== "") {
+      setTranslating(true);
+      try {
+        const res = await authApiFetch(
+          `${API_BASE_URL}/api/admin/quotes/translate`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: quote.messaggio,
+              sourceLang: quote.lingua || "autodetect",
+              targetLang: "it",
+            }),
+          },
+          token,
+          dispatch
+        );
+        if (res?.translatedText && res.translatedText.trim() !== quote.messaggio.trim()) {
+          setTranslatedText(res.translatedText);
+        }
+      } catch (err) {
+        console.warn("[WARN AdminQuotes] Errore caricamento traduzione:", err);
+      } finally {
+        setTranslating(false);
+      }
     }
   };
 
@@ -593,7 +627,7 @@ function AdminQuotes() {
 
       {/* Modale Dettaglio Preventivo */}
       {showDetailModal && selectedQuote && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div className="modal fade show d-block" tabIndex={-1} style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content shadow-lg border-0">
               <div className="modal-header bg-success text-white">
@@ -680,10 +714,14 @@ function AdminQuotes() {
                     <label className="text-muted small fw-semibold d-block">Orario Giornata</label>
                     <p className="mb-0">{selectedQuote.orarioGiornata || "Non specificato"}</p>
                   </div>
-                  <div className="col-md-4">
-                    <label className="text-muted small fw-semibold d-block">Tipo Cerimonia</label>
-                    <p className="mb-0">{selectedQuote.tipoCerimonia || "Non specificato"}</p>
-                  </div>
+                  {selectedQuote.tipoCerimonia &&
+                   selectedQuote.tipoEvento &&
+                   selectedQuote.tipoEvento.toLowerCase().includes("matrimonio") && (
+                    <div className="col-md-4">
+                      <label className="text-muted small fw-semibold d-block">Tipo Cerimonia</label>
+                      <p className="mb-0">{selectedQuote.tipoCerimonia}</p>
+                    </div>
+                  )}
 
                   {selectedQuote.budget && (
                     <div className="col-md-12">
@@ -700,6 +738,29 @@ function AdminQuotes() {
                       </p>
                     </div>
                   </div>
+
+                  {translating && (
+                    <div className="col-md-12 mt-2">
+                      <div className="text-muted small d-flex align-items-center gap-2">
+                        <span className="spinner-border spinner-border-sm text-success" role="status"></span>
+                        <span>Traduzione messaggio per Admin in corso...</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {translatedText && !translating && (
+                    <div className="col-md-12 mt-3">
+                      <div className="p-3 rounded bg-success bg-opacity-10 border border-success border-opacity-25">
+                        <div className="fw-bold text-success mb-1 small d-flex align-items-center gap-1">
+                          <i className="bi bi-translate"></i>
+                          <span>🇮🇹 Traduzione in Italiano per Admin:</span>
+                        </div>
+                        <p className="mb-0 text-success-emphasis" style={{ whiteSpace: "pre-wrap" }}>
+                          {translatedText}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="modal-footer bg-body-tertiary d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -739,7 +800,7 @@ function AdminQuotes() {
 
       {/* Modale Conferma Eliminazione */}
       {deleteConfirmId && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div className="modal fade show d-block" tabIndex={-1} style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content shadow-lg">
               <div className="modal-header bg-danger text-white">

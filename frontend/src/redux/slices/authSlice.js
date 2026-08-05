@@ -1,16 +1,51 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialToken = localStorage.getItem("vinco_token") || null;
-const initialUser = localStorage.getItem("vinco_user")
-  ? JSON.parse(localStorage.getItem("vinco_user"))
-  : null;
+const isTokenValid = (token) => {
+  if (!token) return false;
+  try {
+    const payloadBase64 = token.split(".")[1];
+    if (!payloadBase64) return false;
+    const decodedJson = atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/"));
+    const decoded = JSON.parse(decodedJson);
+    if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const getValidInitialState = () => {
+  const token = localStorage.getItem("vinco_token");
+  const userStr = localStorage.getItem("vinco_user");
+
+  if (token && isTokenValid(token)) {
+    return {
+      token,
+      user: userStr ? JSON.parse(userStr) : null,
+      isAuthenticated: true,
+    };
+  }
+
+  // Token assente o scaduto: pulizia sicura del localStorage
+  localStorage.removeItem("vinco_token");
+  localStorage.removeItem("vinco_user");
+  return {
+    token: null,
+    user: null,
+    isAuthenticated: false,
+  };
+};
+
+const initialStateFromStorage = getValidInitialState();
 
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    token: initialToken,
-    user: initialUser,
-    isAuthenticated: !!initialToken,
+    token: initialStateFromStorage.token,
+    user: initialStateFromStorage.user,
+    isAuthenticated: initialStateFromStorage.isAuthenticated,
     loading: false,
     error: null,
   },

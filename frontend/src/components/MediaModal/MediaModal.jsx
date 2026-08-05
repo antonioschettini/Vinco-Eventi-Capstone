@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Modal } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { setIsPlaying } from "../../redux/slices/audioSlice";
-import { translations } from "../../utils/translations";
+import { translations, getCategoryLabel } from "../../utils/translations";
 import { getOptimizedCloudinaryUrl } from "../../utils/cloudinary";
 import "./MediaModal.css";
 
@@ -13,6 +13,15 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
   const t = translations[lang].gallery;
 
   const currentMedia = items && items[currentIndex] ? items[currentIndex] : null;
+
+  const [videoError, setVideoError] = useState(false);
+  const [prevMediaKey, setPrevMediaKey] = useState(null);
+
+  const currentMediaKey = `${show}-${currentIndex}`;
+  if (currentMediaKey !== prevMediaKey) {
+    setPrevMediaKey(currentMediaKey);
+    setVideoError(false);
+  }
 
   const isAudioPlayingRef = useRef(isAudioPlaying);
   const wasAudioPlayingRef = useRef(false);
@@ -103,22 +112,28 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
         backdropClassName="media-modal-backdrop"
       >
         <div className="media-modal-header d-flex justify-content-between align-items-center p-3 p-md-4">
-          <div className="media-modal-info text-white">
-            <span className="badge rounded-pill bg-success-subtle text-success border border-success-subtle me-2 px-3 py-2">
+          <div className="media-modal-info">
+            <span className="badge rounded-pill media-badge-type me-2 px-3 py-2">
               {currentMedia.type === "video" ? t.videoBadge : t.photoBadge}
             </span>
-            <span className="text-white-50 fs-6">
+            {currentMedia.category && (
+              <span className="badge rounded-pill media-badge-category me-2 px-3 py-2">
+                <i className="bi bi-tag-fill me-1"></i>
+                {getCategoryLabel(currentMedia.category, lang)}
+              </span>
+            )}
+            <span className="media-modal-counter fs-6">
               {t.mediaCounter} {currentIndex + 1} {t.of} {items.length}
             </span>
             {currentMedia.title && (
-              <h5 className="h5 font-heading text-white mb-0 mt-1">
+              <h5 className="h5 font-heading media-modal-title mb-0 mt-1">
                 {currentMedia.title}
               </h5>
             )}
           </div>
           <button
             type="button"
-            className="btn-close btn-close-white media-modal-close-btn p-2"
+            className="btn-close media-modal-close-btn p-2"
             onClick={onHide}
             aria-label={t.modalClose}
           ></button>
@@ -139,7 +154,7 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
 
           {/* Media Container */}
           <div className="media-display-wrapper d-flex justify-content-center align-items-center w-100 h-100">
-            {currentMedia.type === "video" ? (
+            {currentMedia.type === "video" && !videoError ? (
               <video
                 ref={(el) => {
                   if (el) el.volume = 0.2;
@@ -152,11 +167,12 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
                 loop
                 preload="auto"
                 playsInline
+                onError={() => setVideoError(true)}
                 className="media-player-element rounded-3"
               />
             ) : (
               <img
-                src={modalMediaUrl}
+                src={currentMedia.type === "video" ? posterUrl : modalMediaUrl}
                 alt={currentMedia.title || "Gallery image"}
                 className="media-image-element rounded-3"
               />
@@ -177,7 +193,7 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
         </div>
 
         {currentMedia.subtitle && (
-          <div className="media-modal-footer p-3 text-center text-white-50 border-top border-secondary border-opacity-25 fs-6">
+          <div className="media-modal-footer p-3 text-center fs-6">
             {currentMedia.subtitle}
           </div>
         )}

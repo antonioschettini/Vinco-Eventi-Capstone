@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import API_BASE_URL from "../config/api";
 import { apiFetch } from "../utils/apiClient";
@@ -13,6 +13,8 @@ import {
 function AdminLogin() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState("");
@@ -21,12 +23,15 @@ function AdminLogin() {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [cooldown, setCooldown] = useState(0);
 
+  const rawRedirect = searchParams.get("redirect") || location.state?.from?.pathname || "/admin/preventivi";
+  const redirectTarget = rawRedirect.startsWith("/") ? rawRedirect : "/admin/preventivi";
+
   // Reindirizza automaticamente se già autenticato come Admin
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/admin/preventivi", { replace: true });
+      navigate(redirectTarget, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, redirectTarget]);
 
   // Gestione del timer di cooldown (se troppi tentativi falliti in locale)
   useEffect(() => {
@@ -57,7 +62,7 @@ function AdminLogin() {
       setEmail("");
       setPassword("");
       setFailedAttempts(0);
-      navigate("/admin/preventivi");
+      navigate(redirectTarget, { replace: true });
     } catch (err) {
       const msg = err.message || "Credenziali non valide! Verifica e riprova.";
       setLoginError(msg);

@@ -9,7 +9,7 @@ import imgAperitivo from "../../assets/home/foto band aperitivo.jpg";
 import imgDancefloor from "../../assets/home/dancefloor.webp";
 import imgFumogeni from "../../assets/home/14. fumogeni color.jpg";
 import imgCielo from "../../assets/home/cielo stellato.jpg";
-import logoEnzo from "../../assets/home/foto sfondo banner enzo.jpeg";
+
 
 const slideImages = [
   { id: 1, src: imgSposi, alt: "Sposi VINCO EVENTI" },
@@ -207,7 +207,7 @@ function InstagramMockup() {
           {/* Likes & Caption Section (Fixed Fitted Height) */}
           <div className="ig-caption-section">
             <div className="fw-bold mb-1">
-              Piace a <span className="fw-bold">vincoeventi</span> altri{" "}
+              {t.likedBy || "Piace a"} <span className="fw-bold">vincoeventi</span> e {t.andOthers || "altri"}{" "}
               <span className="fw-bold">{likeCount}</span>
             </div>
             <div className="ig-caption-text">

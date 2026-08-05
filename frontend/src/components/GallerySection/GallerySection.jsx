@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Container, Row, Col, Carousel, Nav, Modal } from "react-bootstrap";
-import { useSelector } from "react-redux";
-import { translations } from "../../utils/translations";
+import { Container, Row, Col, Carousel, Nav, Modal, Dropdown } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import { translations, getCategoryLabel } from "../../utils/translations";
 import { galleryItems as staticGalleryItems } from "./galleryData";
 import { getOptimizedCloudinaryUrl } from "../../utils/cloudinary";
 import API_BASE_URL from "../../config/api";
+import { authApiFetch } from "../../utils/apiClient";
 import MediaModal from "../MediaModal/MediaModal";
 import imageCompression from "browser-image-compression";
 import "./GallerySection.css";
@@ -12,12 +13,12 @@ import "./GallerySection.css";
 // Componente helper per la riproduzione lazy dei video in griglia tramite Intersection Observer
 function LazyGridVideo({ src, posterUrl, item, className }) {
   const videoRef = useRef(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const target = videoRef.current;
-    if (!target) return;
+    if (!target || hasError || item.isFallback) return;
 
-    // Tenta l'avvio della riproduzione al mount del video
     target.play().catch(() => {});
 
     const observer = new IntersectionObserver(
@@ -41,13 +42,24 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
     return () => {
       if (target) observer.unobserve(target);
     };
-  }, []);
+  }, [hasError, item.isFallback]);
+
+  const poster = posterUrl || (src && !src.startsWith("http") ? src : getOptimizedCloudinaryUrl(src, { type: "poster" }));
+
+  if (item.isFallback || hasError || !src) {
+    return (
+      <img
+        src={poster}
+        alt={item.title}
+        className={className}
+        loading="lazy"
+      />
+    );
+  }
 
   const videoSrc = item.startTime
     ? `${getOptimizedCloudinaryUrl(src, { type: "grid" })}#t=${item.startTime}`
     : getOptimizedCloudinaryUrl(src, { type: "grid" });
-
-  const poster = posterUrl || getOptimizedCloudinaryUrl(src, { type: "poster" });
 
   return (
     <video
@@ -59,6 +71,7 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
       playsInline
       autoPlay
       preload="metadata"
+      onError={() => setHasError(true)}
       onLoadedMetadata={(e) => {
         if (item.startTime && e.target) {
           e.target.currentTime = item.startTime;
@@ -70,16 +83,23 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
 }
 
 function GallerySection() {
+  const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const { isAuthenticated, token } = useSelector((state) => state.auth);
   const t = translations[lang].gallery;
 
   const [dbItems, setDbItems] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [visibleCount, setVisibleCount] = useState(8);
 
   const handleFilterSelect = (selectedKey) => {
     setActiveFilter(selectedKey);
+    setVisibleCount(8);
+  };
+
+  const handleCategorySelect = (categoryKey) => {
+    setSelectedCategory(categoryKey || "all");
     setVisibleCount(8);
   };
 
@@ -151,19 +171,40 @@ function GallerySection() {
 
   const allItems = rawList.map((item) => {
     const isEng = lang === "en";
+    const isFallback = item.isFallback || (!dbItems.length && item.src && item.src.includes("vinco_eventi_galleria"));
     return {
       ...item,
+      isFallback,
       src: getItemSrc(item),
       title: isEng ? item.titleEng || item.titleIta || item.title : item.titleIta || item.title,
       subtitle: isEng ? item.subtitleEng || item.subtitleIta || item.subtitle : item.subtitleIta || item.subtitle,
     };
   });
 
-  // Filter items based on active tab
+  // Unique category keys for filter options
+  const categoryKeys = Array.from(
+    new Set([
+      "djset", "band", "wedding", "lightshow", "live", "effects", "decor",
+      ...allItems.map((i) => i.category).filter(Boolean)
+    ])
+  );
+
+  const getCategoryCount = (catKey) => {
+    return allItems.filter((i) => {
+      if (i.category !== catKey) return false;
+      if (activeFilter === "photos") return i.type === "image";
+      if (activeFilter === "videos") return i.type === "video";
+      if (activeFilter === "featured") return i.featured;
+      return true;
+    }).length;
+  };
+
+  // Filter items based on active type tab and active category
   const filteredItems = allItems.filter((item) => {
-    if (activeFilter === "photos") return item.type === "image";
-    if (activeFilter === "videos") return item.type === "video";
-    if (activeFilter === "featured") return item.featured;
+    if (activeFilter === "photos" && item.type !== "image") return false;
+    if (activeFilter === "videos" && item.type !== "video") return false;
+    if (activeFilter === "featured" && !item.featured) return false;
+    if (selectedCategory !== "all" && item.category !== selectedCategory) return false;
     return true;
   });
 
@@ -280,16 +321,17 @@ function GallerySection() {
     uploadData.append("file", fileToUpload);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/gallery/upload-media`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const data = await authApiFetch(
+        `${API_BASE_URL}/api/admin/gallery/upload-media`,
+        {
+          method: "POST",
+          body: uploadData,
         },
-        body: uploadData,
-      });
+        token,
+        dispatch
+      );
 
-      if (res.ok) {
-        const data = await res.json();
+      if (data?.url) {
         setFormData((prev) => ({
           ...prev,
           src: data.url,
@@ -297,11 +339,9 @@ function GallerySection() {
           posterUrl: data.posterUrl || prev.posterUrl,
         }));
         alert("File multimediale caricato con successo!");
-      } else {
-        alert("Impossibile completare l'upload del file. Puoi comunque inserire o incollare l'URL della risorsa multimediale direttamente nel campo sottostante.");
       }
-    } catch {
-      alert("Errore di connessione durante l'upload multimediale. Puoi comunque inserire l'URL direttamente nel campo sottostante.");
+    } catch (err) {
+      alert(err.message || "Impossibile completare l'upload del file.");
     } finally {
       setUploadingMedia(false);
     }
@@ -334,24 +374,22 @@ function GallerySection() {
         : `${API_BASE_URL}/api/admin/gallery`;
       const method = isEdit ? "PUT" : "POST";
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      await authApiFetch(
+        url,
+        {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+        token,
+        dispatch
+      );
 
-      if (response.ok) {
-        setShowAdminModal(false);
-        setEditingItem(null);
-        fetchGalleryItems();
-      } else {
-        alert("Errore nel salvataggio dell'elemento della galleria.");
-      }
-    } catch {
-      alert("Errore di connessione con il server backend.");
+      setShowAdminModal(false);
+      setEditingItem(null);
+      fetchGalleryItems();
+    } catch (err) {
+      alert(err.message || "Errore nel salvataggio dell'elemento della galleria.");
     }
   };
 
@@ -360,19 +398,15 @@ function GallerySection() {
     if (!window.confirm(t.confirmDeleteMedia)) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/gallery/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        fetchGalleryItems();
-      } else {
-        alert("Impossibile eliminare l'elemento selezionato.");
-      }
-    } catch {
-      alert("Errore di connessione durante l'eliminazione.");
+      await authApiFetch(
+        `${API_BASE_URL}/api/admin/gallery/${id}`,
+        { method: "DELETE" },
+        token,
+        dispatch
+      );
+      fetchGalleryItems();
+    } catch (err) {
+      alert(err.message || "Errore di connessione durante l'eliminazione.");
     }
   };
 
@@ -436,7 +470,7 @@ function GallerySection() {
                     className="gallery-carousel-item cursor-pointer position-relative"
                   >
                     <div className="carousel-media-wrapper">
-                      {item.type === "video" ? (
+                      {item.type === "video" && !item.isFallback ? (
                         isActive ? (
                           <video
                             src={item.startTime ? `${getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}#t=${item.startTime}` : getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}
@@ -462,7 +496,7 @@ function GallerySection() {
                         )
                       ) : (
                         <img
-                          src={getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}
+                          src={itemPoster}
                           alt={item.title}
                           className="carousel-media-content"
                         />
@@ -471,6 +505,12 @@ function GallerySection() {
                         <span className="badge bg-success px-3 py-2 rounded-pill mb-2">
                           {item.type === "video" ? t.videoBadge : t.photoBadge}
                         </span>
+                        {item.category && (
+                          <span className="badge bg-warning text-dark px-3 py-2 rounded-pill mb-2 ms-2 fw-bold">
+                            <i className="bi bi-tag-fill me-1"></i>
+                            {getCategoryLabel(item.category, lang)}
+                          </span>
+                        )}
                         <h3 className="h3 font-heading text-white mb-1 fw-bold">
                           {item.title}
                         </h3>
@@ -493,40 +533,135 @@ function GallerySection() {
             {t.sectionSubtitle}
           </p>
 
-          {/* Filter Nav Tabs */}
-          <Nav
-            activeKey={activeFilter}
-            onSelect={handleFilterSelect}
-            className="gallery-filter-tabs justify-content-center mt-4 gap-2"
-          >
-            <Nav.Item>
-              <Nav.Link eventKey="all" className="filter-btn rounded-pill px-4 py-2">
-                <i className="bi bi-grid-fill me-2"></i>
-                {t.filterAll} ({allItems.length})
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="photos" className="filter-btn rounded-pill px-4 py-2">
-                <i className="bi bi-camera-fill me-2"></i>
-                {t.filterPhotos} ({allItems.filter((i) => i.type === "image").length})
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="videos" className="filter-btn rounded-pill px-4 py-2">
-                <i className="bi bi-film me-2"></i>
-                {t.filterVideos} ({allItems.filter((i) => i.type === "video").length})
-              </Nav.Link>
-            </Nav.Item>
-            {isAuthenticated && (
+          {/* Filter Nav Tabs & Category Dropdown */}
+          <div className="d-flex flex-wrap justify-content-center align-items-center gap-2 mt-4">
+            <Nav
+              activeKey={activeFilter}
+              onSelect={handleFilterSelect}
+              className="gallery-filter-tabs gap-2"
+            >
               <Nav.Item>
-                <Nav.Link eventKey="featured" className="filter-btn filter-btn-featured rounded-pill px-4 py-2">
-                  <i className="bi bi-star-fill me-2 text-warning"></i>
-                  {t.filterFeatured} ({allItems.filter((i) => i.featured).length})
+                <Nav.Link eventKey="all" className="filter-btn rounded-pill px-4 py-2">
+                  <i className="bi bi-grid-fill me-2"></i>
+                  {t.filterAll} ({allItems.filter((i) => selectedCategory === "all" || i.category === selectedCategory).length})
                 </Nav.Link>
               </Nav.Item>
-            )}
-          </Nav>
+              <Nav.Item>
+                <Nav.Link eventKey="photos" className="filter-btn rounded-pill px-4 py-2">
+                  <i className="bi bi-camera-fill me-2"></i>
+                  {t.filterPhotos} ({allItems.filter((i) => i.type === "image" && (selectedCategory === "all" || i.category === selectedCategory)).length})
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="videos" className="filter-btn rounded-pill px-4 py-2">
+                  <i className="bi bi-film me-2"></i>
+                  {t.filterVideos} ({allItems.filter((i) => i.type === "video" && (selectedCategory === "all" || i.category === selectedCategory)).length})
+                </Nav.Link>
+              </Nav.Item>
+              {isAuthenticated && (
+                <Nav.Item>
+                  <Nav.Link eventKey="featured" className="filter-btn filter-btn-featured rounded-pill px-4 py-2">
+                    <i className="bi bi-star-fill me-2 text-warning"></i>
+                    {t.filterFeatured} ({allItems.filter((i) => i.featured && (selectedCategory === "all" || i.category === selectedCategory)).length})
+                  </Nav.Link>
+                </Nav.Item>
+              )}
+            </Nav>
+
+            {/* Pulsante/Dropdown per filtro per Categoria */}
+            <Dropdown onSelect={handleCategorySelect} className="category-filter-dropdown">
+              <Dropdown.Toggle
+                variant={selectedCategory !== "all" ? "success" : "outline-secondary"}
+                className={`filter-btn filter-category-btn rounded-pill px-4 py-2 border d-inline-flex align-items-center gap-2 ${
+                  selectedCategory !== "all" ? "active-category-btn" : ""
+                }`}
+              >
+                <i className="bi bi-funnel-fill text-warning"></i>
+                <span>
+                  {selectedCategory === "all"
+                    ? (t.filterByCategory || "Filtra per Categoria")
+                    : `${getCategoryLabel(selectedCategory, lang)}`}
+                </span>
+                {selectedCategory !== "all" && (
+                  <span
+                    className="badge bg-white text-dark rounded-circle ms-1 px-1 py-0 fs-7 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedCategory("all");
+                      setVisibleCount(8);
+                    }}
+                    title="Rimuovi filtro categoria"
+                  >
+                    ✕
+                  </span>
+                )}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu className="category-dropdown-menu rounded-4 shadow-lg border-0 p-2">
+                <Dropdown.Item
+                  eventKey="all"
+                  active={selectedCategory === "all"}
+                  className="rounded-3 py-2 px-3 d-flex justify-content-between align-items-center"
+                >
+                  <span>
+                    <i className="bi bi-grid-3x3-gap-fill me-2 text-success"></i>
+                    {t.allCategories || "Tutte le Categorie"}
+                  </span>
+                  <span className="badge bg-dark-subtle text-body rounded-pill ms-2">
+                    {allItems.filter((i) => {
+                      if (activeFilter === "photos") return i.type === "image";
+                      if (activeFilter === "videos") return i.type === "video";
+                      if (activeFilter === "featured") return i.featured;
+                      return true;
+                    }).length}
+                  </span>
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                {categoryKeys.map((catKey) => {
+                  const count = getCategoryCount(catKey);
+                  return (
+                    <Dropdown.Item
+                      key={catKey}
+                      eventKey={catKey}
+                      active={selectedCategory === catKey}
+                      className="rounded-3 py-2 px-3 d-flex justify-content-between align-items-center"
+                    >
+                      <span>
+                        <i className="bi bi-tag-fill me-2 text-warning fs-7"></i>
+                        {getCategoryLabel(catKey, lang)}
+                      </span>
+                      <span className="badge bg-dark-subtle text-body rounded-pill ms-2">
+                        {count}
+                      </span>
+                    </Dropdown.Item>
+                  );
+                })}
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         </div>
+
+        {/* Zero state se nessun elemento soddisfa entrambi i filtri */}
+        {filteredItems.length === 0 && (
+          <div className="text-center py-5 my-4 bg-body-tertiary rounded-4 border p-4">
+            <i className="bi bi-funnel text-muted display-4 mb-3 d-block"></i>
+            <h4 className="h5 fw-bold font-heading text-body mb-2">Nessun media trovato</h4>
+            <p className="text-body-secondary font-body small mb-3">
+              Non ci sono elementi che soddisfano contemporaneamente i filtri selezionati.
+            </p>
+            <button
+              onClick={() => {
+                setActiveFilter("all");
+                setSelectedCategory("all");
+                setVisibleCount(8);
+              }}
+              className="btn btn-outline-success rounded-pill px-4 py-2 fw-semibold"
+            >
+              <i className="bi bi-arrow-counterclockwise me-2"></i>
+              Ripristina Tutti i Filtri
+            </button>
+          </div>
+        )}
 
         {/* Multimedia Grid */}
         <Row className="g-3 g-md-4">
@@ -587,18 +722,27 @@ function GallerySection() {
                     </>
                   )}
 
-                  {/* Badge top-left (Foto/Video) */}
-                  <span className="media-type-tag badge rounded-pill">
-                    {item.type === "video" ? (
-                      <>
-                        <i className="bi bi-play-fill me-1"></i> {t.videoBadge}
-                      </>
-                    ) : (
-                      <>
-                        <i className="bi bi-image me-1"></i> {t.photoBadge}
-                      </>
+                  {/* Badges Top-Left (Foto/Video + Categoria) */}
+                  <div className="card-badges-container position-absolute top-0 start-0 m-2 z-3 d-flex flex-wrap gap-1 align-items-center pe-5">
+                    <span className="media-type-tag badge rounded-pill">
+                      {item.type === "video" ? (
+                        <>
+                          <i className="bi bi-play-fill me-1"></i> {t.videoBadge}
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-image me-1"></i> {t.photoBadge}
+                        </>
+                      )}
+                    </span>
+
+                    {item.category && (
+                      <span className="media-category-tag badge rounded-pill">
+                        <i className="bi bi-tag-fill me-1 text-warning"></i>
+                        {getCategoryLabel(item.category, lang)}
+                      </span>
                     )}
-                  </span>
+                  </div>
 
                   {/* Badge "In Evidenza" - VISIBILE SOLO ALL'ADMIN in BASSO A DESTRA della card */}
                   {isAuthenticated && item.featured && (

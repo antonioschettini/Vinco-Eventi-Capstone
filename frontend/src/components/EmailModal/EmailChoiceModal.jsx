@@ -12,12 +12,14 @@ export default function EmailChoiceModal() {
 
   const [copied, setCopied] = useState(false);
 
-  // Reset del feedback "Copiato" alla chiusura o al cambio email
-  useEffect(() => {
+  // Reset del feedback "Copiato" quando il modale si chiude
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (!isOpen) {
       setCopied(false);
     }
-  }, [isOpen]);
+  }
 
   // Gestione tasto ESC per chiudere il modale
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function EmailChoiceModal() {
   return (
     <div
       className="modal fade show d-block email-modal-backdrop"
-      tabIndex="-1"
+      tabIndex={-1}
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
@@ -125,7 +127,7 @@ export default function EmailChoiceModal() {
                 className="email-option-card d-flex align-items-center p-3 rounded-3 text-decoration-none transition-all"
                 onClick={handleClose}
               >
-                <div className="option-icon-wrapper rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center me-3">
+                <div className="option-icon-wrapper rounded-circle gmail-icon-wrapper d-flex align-items-center justify-content-center me-3">
                   <i className="bi bi-google fs-4"></i>
                 </div>
                 <div className="flex-grow-1">
@@ -171,7 +173,7 @@ export default function EmailChoiceModal() {
                 <div className="flex-grow-1">
                   <div className="fw-bold text-body d-flex align-items-center gap-2">
                     {t.copyEmail}
-                    {copied && <span className="badge bg-success ms-auto fs-7">Copiato!</span>}
+                    {copied && <span className="badge bg-success ms-auto fs-7">{t.copiedBadge || "Copiato!"}</span>}
                   </div>
                   <div className="text-muted extra-small">{t.copyEmailSub}</div>
                 </div>

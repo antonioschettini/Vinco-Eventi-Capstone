@@ -154,6 +154,17 @@ export const translations = {
       uploading: "Upload in corso...",
       saveMedia: "Salva Elemento Galleria",
       startTimeLabel: "Avvio Video (Secondi, es. 60 per minuto 1:00)",
+      filterByCategory: "Filtra per Categoria",
+      allCategories: "Tutte le Categorie",
+      categories: {
+        djset: "DJ Set",
+        band: "Live Band",
+        wedding: "Matrimonio",
+        lightshow: "Service & Luci",
+        live: "Live Show",
+        effects: "Effetti Scenografici",
+        decor: "Scenografie & Decor",
+      },
     },
     about: {
       title: "Chi Siamo",
@@ -214,6 +225,10 @@ export const translations = {
       reviewsSectionSub:
         "La voce dei nostri sposi e i premi ufficiali nazionali attribuiti a VINCO EVENTI.",
       reviewsBadgeTag: "Certificazione Matrimonio.com",
+      badge100Title: "100 Recensioni a 5 Stelle",
+      award2023Title: "Wedding Awards 2023",
+      award2024Title: "Wedding Awards 2024",
+      award2025Title: "Wedding Awards 2025",
       reviewsWidgetTitle: "Cosa Dicono le Nostre Coppie",
       ctaTitle: "Vuoi trasformare il tuo matrimonio in un evento unico?",
       ctaSub:
@@ -320,6 +335,7 @@ export const translations = {
       copyEmail: "Copia Indirizzo Email",
       copyEmailSub: "Copia negli appunti per incollarlo dove desideri",
       copiedSuccess: "Indirizzo email copiato negli appunti!",
+      copiedBadge: "Copiato!",
       close: "Chiudi",
     },
   },
@@ -477,6 +493,17 @@ export const translations = {
       uploading: "Uploading...",
       saveMedia: "Save Gallery Item",
       startTimeLabel: "Video Start Time (Seconds, e.g. 60 for 1:00)",
+      filterByCategory: "Filter by Category",
+      allCategories: "All Categories",
+      categories: {
+        djset: "DJ Set",
+        band: "Live Band",
+        wedding: "Wedding",
+        lightshow: "Lighting & Service",
+        live: "Live Show",
+        effects: "Special Effects",
+        decor: "Scenery & Decor",
+      },
     },
     about: {
       title: "About Us",
@@ -536,6 +563,10 @@ export const translations = {
       reviewsSectionSub:
         "The voice of our couples and official national awards earned by VINCO EVENTI.",
       reviewsBadgeTag: "Matrimonio.com Certification",
+      badge100Title: "100 5-Star Reviews",
+      award2023Title: "Wedding Awards 2023",
+      award2024Title: "Wedding Awards 2024",
+      award2025Title: "Wedding Awards 2025",
       reviewsWidgetTitle: "What Couples Say About Us",
       ctaTitle: "Want to turn your wedding into an unforgettable event?",
       ctaSub: "Tell us your vision and request a free, personalized quote.",
@@ -641,7 +672,17 @@ export const translations = {
       copyEmail: "Copy Email Address",
       copyEmailSub: "Copy to clipboard to paste into any webmail service",
       copiedSuccess: "Email address copied to clipboard successfully!",
+      copiedBadge: "Copied!",
       close: "Close",
     },
   },
+};
+
+export const getCategoryLabel = (categoryKey, lang = "it") => {
+  if (!categoryKey) return "";
+  const catMap = translations[lang]?.gallery?.categories || translations.it?.gallery?.categories;
+  if (catMap && catMap[categoryKey]) {
+    return catMap[categoryKey];
+  }
+  return categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
 };
