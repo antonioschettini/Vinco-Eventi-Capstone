@@ -33,40 +33,13 @@ public class EmailService {
     private String frontendBaseUrl;
 
 
-    private void attachInlineResources(MimeMessageHelper helper) {
-        try {
-            ClassPathResource logoRes = new ClassPathResource("static/images/logo-vinco-tondo.png");
-            if (logoRes.exists()) {
-                helper.addInline("logoVinco", logoRes, "image/png");
-            }
-            ClassPathResource instaRes = new ClassPathResource("static/images/instagram-icon.png");
-            if (instaRes.exists()) {
-                helper.addInline("instagramIcon", instaRes, "image/png");
-            }
-            ClassPathResource waRes = new ClassPathResource("static/images/whatsapp-icon.png");
-            if (waRes.exists()) {
-                helper.addInline("whatsappIcon", waRes, "image/png");
-            }
-            ClassPathResource phoneRes = new ClassPathResource("static/images/phone-icon.png");
-            if (phoneRes.exists()) {
-                helper.addInline("phoneIcon", phoneRes, "image/png");
-            }
-            ClassPathResource dashRes = new ClassPathResource("static/images/dashboard-icon.png");
-            if (dashRes.exists()) {
-                helper.addInline("dashboardIcon", dashRes, "image/png");
-            }
-            ClassPathResource gcalRes = new ClassPathResource("static/images/google-icon.png");
-            if (gcalRes.exists()) {
-                helper.addInline("googleIcon", gcalRes, "image/png");
-            }
-            ClassPathResource acalRes = new ClassPathResource("static/images/apple-icon.png");
-            if (acalRes.exists()) {
-                helper.addInline("appleIcon", acalRes, "image/png");
-            }
-        } catch (Exception e) {
-            System.err.println("[WARN EmailService] Impossibile allegare immagini inline CID: " + e.getMessage());
-        }
-    }
+    private static final String URL_LOGO_VINCO = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942217/vinco_email_assets/logo-vinco-tondo.png";
+    private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942366/vinco_email_assets/google-official-v2.png";
+    private static final String URL_APPLE_ICON = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942364/vinco_email_assets/apple-official-v2.png";
+    private static final String URL_DASHBOARD_ICON = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942216/vinco_email_assets/dashboard-icon.png";
+    private static final String URL_INSTAGRAM_ICON = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942217/vinco_email_assets/instagram-icon.png";
+    private static final String URL_PHONE_ICON = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942218/vinco_email_assets/phone-icon.png";
+    private static final String URL_WHATSAPP_ICON = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942218/vinco_email_assets/whatsapp-icon.png";
 
     @Async
     public void sendQuoteNotificationEmail(QuoteRequest quote) {
@@ -184,6 +157,11 @@ public class EmailService {
                     dataRichiestaFormatted
             ));
 
+            String logoVincoUri = URL_LOGO_VINCO;
+            String dashIconUri = URL_DASHBOARD_ICON;
+            String googleIconUri = URL_GOOGLE_ICON;
+            String appleIconUri = URL_APPLE_ICON;
+
             StringBuilder htmlBuilder = new StringBuilder();
             htmlBuilder.append("""
                 <!DOCTYPE html>
@@ -201,7 +179,7 @@ public class EmailService {
                         <tr>
                           <td>
                             <a href="%s/admin/preventivi" target="_blank" style="text-decoration: none; display: inline-block;">
-                              <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="68" height="68" style="display: block; margin: 0 auto 10px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                              <img src="%s" alt="VINCO EVENTI Logo" width="68" height="68" style="display: block; margin: 0 auto 10px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                             </a>
                             <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h2>
                             <span style="display: inline-block; margin-top: 6px; background-color: #dcfce7; color: #15803d; font-size: 13px; font-weight: 600; padding: 4px 14px; border-radius: 20px; border: 1px solid #bbf7d0;">
@@ -262,7 +240,7 @@ public class EmailService {
                           <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">%s</td>
                         </tr>
                 """.formatted(
-                    frontendBaseUrl,
+                    frontendBaseUrl, logoVincoUri,
                     quote.getNome(), quote.getCognome(),
                     quote.getEmail(), quote.getEmail(),
                     telHref, phoneFormatted,
@@ -328,24 +306,24 @@ public class EmailService {
             htmlBuilder.append("""
                       <div style="text-align: center; margin: 28px 0 15px 0;">
                         <a href="%s/admin/preventivi" target="_blank" style="background: linear-gradient(135deg, #10b981 0%%, #059669 100%%); color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); margin-bottom: 14px;">
-                          <img src="cid:dashboardIcon" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" alt="Dashboard" />
+                          <img src="%s" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" alt="Dashboard" />
                           <span>Apri Dashboard Preventivi</span>
                         </a>
-                """.formatted(frontendBaseUrl));
+                """.formatted(frontendBaseUrl, dashIconUri));
 
             if (quote.getDataEvento() != null && !googleCalUrl.isBlank()) {
                 htmlBuilder.append("""
                         <div style="margin-top: 10px; text-align: center;">
-                          <a href="%s" target="_blank" style="background-color: #ffffff; color: #3c4043; border: 1px solid #dadce0; padding: 10px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; box-shadow: 0 2px 6px rgba(60,64,67,0.15); margin: 4px;">
-                            <img src="cid:googleIcon" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" alt="Google Logo" />
-                            <span>Salva su Google Calendar</span>
+                          <a href="%s" target="_blank" style="background-color: #ffffff; color: #3c4043; border: 1px solid #dadce0; padding: 11px 20px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-block; box-shadow: 0 2px 6px rgba(60,64,67,0.15); margin: 5px; vertical-align: middle;">
+                            <img src="%s" width="18" height="18" style="vertical-align: middle; margin-right: 8px; display: inline-block;" alt="Google Logo" />
+                            <span style="vertical-align: middle;">Salva su Google Calendar</span>
                           </a>
-                          <a href="%s" target="_blank" style="background-color: #000000; color: #ffffff; padding: 10px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin: 4px;">
-                            <img src="cid:appleIcon" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" alt="Apple Logo" />
-                            <span>Salva su Apple iCal (.ics)</span>
+                          <a href="%s" target="_blank" style="background-color: #000000; color: #ffffff; padding: 11px 20px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-block; box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin: 5px; vertical-align: middle;">
+                            <img src="%s" width="18" height="18" style="vertical-align: middle; margin-right: 8px; display: inline-block;" alt="Apple Logo" />
+                            <span style="vertical-align: middle;">Salva su Apple iCal (.ics)</span>
                           </a>
                         </div>
-                    """.formatted(googleCalUrl, appleCalUrl));
+                    """.formatted(googleCalUrl, googleIconUri, appleCalUrl, appleIconUri));
             }
 
             htmlBuilder.append("""
@@ -367,7 +345,6 @@ public class EmailService {
                 """.formatted(dataRichiestaFormatted));
 
             helper.setText(plainTextBuilder.toString(), htmlBuilder.toString());
-            attachInlineResources(helper);
 
             // Allegato .ics per Apple Mail / iOS / Outlook: salvataggio istantaneo in 1 tap senza chiamate al server
             if (quote.getDataEvento() != null && quoteService != null) {
@@ -417,10 +394,20 @@ public class EmailService {
     }
 
     private String buildAppleCalendarUrl(QuoteRequest quote) {
-        if (quote.getDataEvento() == null || quote.getId() == null) return "";
-        // URL HTTP/HTTPS standard perfettamente supportato in tutti i client mail (Gmail, Apple Mail, Outlook).
-        // Su dispositivi iOS (iPhone/iPad) e Mac (macOS), il sistema intercetta il tipo text/calendar ed apre direttamente l'App Calendario Apple.
-        return backendBaseUrl + "/api/quotes/" + quote.getId() + "/calendar.ics";
+        if (quote.getDataEvento() == null) return "";
+        try {
+            String icsContent = quoteService.generateIcsContent(quote);
+            if (icsContent != null && !icsContent.isBlank()) {
+                String b64 = java.util.Base64.getEncoder().encodeToString(icsContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                return "data:text/calendar;charset=utf-8;base64," + b64;
+            }
+        } catch (Exception e) {
+            System.err.println("[WARN EmailService] Impossibile generare Data URI per Apple Calendar: " + e.getMessage());
+        }
+        if (quote.getId() != null) {
+            return backendBaseUrl + "/api/quotes/" + quote.getId() + "/calendar.ics";
+        }
+        return "";
     }
 
     @Async
@@ -468,6 +455,11 @@ public class EmailService {
             String plainText;
             String htmlBody;
 
+            String logoVincoUri = URL_LOGO_VINCO;
+            String instaIconUri = URL_INSTAGRAM_ICON;
+            String phoneIconUri = URL_PHONE_ICON;
+            String waIconUri = URL_WHATSAPP_ICON;
+
             if (isEnglish) {
                 plainText = String.format("""
                     Dear %s %s,
@@ -510,7 +502,7 @@ public class EmailService {
                             <tr>
                               <td>
                                 <a href="https://www.vincoeventi.it" target="_blank" style="text-decoration: none; display: inline-block;">
-                                  <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                                  <img src="%s" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                                 </a>
                                 <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h1>
                                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #059669; font-weight: 600;">Exclusive Events & Musical Entertainment</p>
@@ -546,7 +538,7 @@ public class EmailService {
                               <tr>
                                 <td>
                                   <a href="https://www.instagram.com/vincoeventi/" target="_blank" style="text-decoration: none;">
-                                    <img src="cid:instagramIcon" alt="Instagram VINCO EVENTI" width="38" height="38" style="margin-bottom: 8px; display: inline-block; vertical-align: middle;" />
+                                    <img src="%s" alt="Instagram VINCO EVENTI" width="38" height="38" style="margin-bottom: 8px; display: inline-block; vertical-align: middle;" />
                                   </a>
                                   <h4 style="margin: 5px 0; color: #064e3b; font-size: 16px; font-weight: bold;">Follow VINCO EVENTI on Instagram!</h4>
                                   <p style="margin: 0 0 15px 0; font-size: 14px; color: #475569;">Don't miss our latest shows, live performances, news, and behind-the-scenes content!</p>
@@ -568,11 +560,11 @@ public class EmailService {
                               <tr>
                                 <td style="padding: 6px; text-align: center;">
                                   <a href="tel:+393492949669" style="background-color: #064e3b; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
-                                    <img src="cid:phoneIcon" alt="Phone" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
+                                    <img src="%s" alt="Phone" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
                                     Call +39 349 294 9669
                                   </a>
                                   <a href="https://wa.me/393492949669" target="_blank" style="background-color: #25D366; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
-                                    <img src="cid:whatsappIcon" alt="WhatsApp" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
+                                    <img src="%s" alt="WhatsApp" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
                                     WhatsApp Chat
                                   </a>
                                 </td>
@@ -601,13 +593,17 @@ public class EmailService {
                     </body>
                     </html>
                     """,
+                        logoVincoUri,
                         quote.getNome(), quote.getCognome(),
                         dataEventoFormatted,
                         quote.getTelefono(),
                         quote.getTipoEvento() != null ? quote.getTipoEvento() : "Not specified",
                         quote.getLocation() != null ? quote.getLocation() : "Not specified",
                         quote.getNumeroOspiti() != null ? quote.getNumeroOspiti() : "Not specified",
-                        quote.getBudget() != null ? quote.getBudget() : "Not specified"
+                        quote.getBudget() != null ? quote.getBudget() : "Not specified",
+                        instaIconUri,
+                        phoneIconUri,
+                        waIconUri
                 );
             } else {
                 plainText = String.format("""
@@ -658,7 +654,7 @@ public class EmailService {
                             <tr>
                               <td>
                                 <a href="https://www.vincoeventi.it" target="_blank" style="text-decoration: none; display: inline-block;">
-                                  <img src="cid:logoVinco" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                                  <img src="%s" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                                 </a>
                                 <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h1>
                                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #059669; font-weight: 600;">Organizzazione Eventi & Intrattenimento Musicale</p>
@@ -694,7 +690,7 @@ public class EmailService {
                               <tr>
                                 <td>
                                   <a href="https://www.instagram.com/vincoeventi/" target="_blank" style="text-decoration: none;">
-                                    <img src="cid:instagramIcon" alt="Instagram VINCO EVENTI" width="38" height="38" style="margin-bottom: 8px; display: inline-block; vertical-align: middle;" />
+                                    <img src="%s" alt="Instagram VINCO EVENTI" width="38" height="38" style="margin-bottom: 8px; display: inline-block; vertical-align: middle;" />
                                   </a>
                                   <h4 style="margin: 5px 0; color: #064e3b; font-size: 16px; font-weight: bold;">Segui VINCO EVENTI su Instagram!</h4>
                                   <p style="margin: 0 0 15px 0; font-size: 14px; color: #475569;">Non perderti tutte le novità, i video delle nostre esibizioni dal vivo e i momenti più spettacolari!</p>
@@ -716,11 +712,11 @@ public class EmailService {
                               <tr>
                                 <td style="padding: 6px; text-align: center;">
                                   <a href="tel:+393492949669" style="background-color: #064e3b; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
-                                    <img src="cid:phoneIcon" alt="Telefono" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
+                                    <img src="%s" alt="Telefono" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
                                     Chiama +39 349 294 9669
                                   </a>
                                   <a href="https://wa.me/393492949669" target="_blank" style="background-color: #25D366; color: #ffffff; padding: 12px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; margin: 4px;">
-                                    <img src="cid:whatsappIcon" alt="WhatsApp" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
+                                    <img src="%s" alt="WhatsApp" width="16" height="16" style="vertical-align: middle; margin-right: 6px;" />
                                     Scrivici su WhatsApp
                                   </a>
                                 </td>
@@ -747,6 +743,7 @@ public class EmailService {
                     </body>
                     </html>
                     """,
+                        logoVincoUri,
                         quote.getNome(), quote.getCognome(),
                         dataEventoFormatted,
                         quote.getTelefono(),
@@ -754,12 +751,14 @@ public class EmailService {
                         quote.getLocation() != null ? quote.getLocation() : "Non specificata",
                         quote.getNumeroOspiti() != null ? quote.getNumeroOspiti() : "Non specificato",
                         quote.getBudget() != null ? quote.getBudget() : "Non specificato",
+                        instaIconUri,
+                        phoneIconUri,
+                        waIconUri,
                         itLanguageNoticeHtml
                 );
             }
 
             helper.setText(plainText, htmlBody);
-            attachInlineResources(helper);
             mailSender.send(mimeMessage);
             System.out.println(">>> Email di conferma inviata con successo al cliente VINCO EVENTI: " + quote.getEmail());
         } catch (Exception ex) {

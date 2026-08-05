@@ -100,7 +100,7 @@ public class QuoteService {
         sb.append("VERSION:2.0\r\n");
         sb.append("PRODID:-//VINCO EVENTI//Gestione Preventivi//IT\r\n");
         sb.append("CALSCALE:GREGORIAN\r\n");
-        sb.append("METHOD:PUBLISH\r\n");
+        sb.append("METHOD:REQUEST\r\n");
         sb.append("BEGIN:VEVENT\r\n");
         sb.append("UID:quote-").append(quote.getId()).append("@vincoeventi.it\r\n");
         sb.append("DTSTAMP:").append(now).append("\r\n");

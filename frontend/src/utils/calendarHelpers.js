@@ -107,7 +107,7 @@ export const generateIcsContent = (quote) => {
     "VERSION:2.0",
     "PRODID:-//VINCO EVENTI//Gestione Preventivi//IT",
     "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
+    "METHOD:REQUEST",
     "BEGIN:VEVENT",
     `UID:${uid}`,
     `DTSTAMP:${nowUtc}`,
@@ -145,22 +145,11 @@ export const downloadIcsFile = (quote) => {
 
 /**
  * Salva l'evento nel Calendario Apple (macOS / iOS) ed altri calendari di sistema tramite file .ics.
- * Evita l'errore di protocollo webcal:// (che aprirebbe la modalità "Aggiungi calendario con iscrizione").
- * Genera e scarica/apre la scheda dell'evento singolo conforme RFC 5545.
+ * Usa METHOD:REQUEST per forzare l'apertura della scheda del singolo evento invece dell'iscrizione al calendario.
+ * Genera il file .ics lato client per garantire il funzionamento sia in locale che da remoto senza errori su localhost.
  */
 export const openAppleCalendar = (quote) => {
   if (!quote || !quote.dataEvento) return;
-
-  if (quote.id) {
-    // Utilizzando l'endpoint backend con Content-Disposition: inline,
-    // Chrome, Safari e Firefox su Mac e iOS aprono direttamente la scheda evento di Calendario Apple
-    // senza forzare il download manuale nella cartella dei download.
-    const baseUrl = API_BASE_URL || "http://localhost:8080";
-    const icsUrl = `${baseUrl}/api/quotes/${quote.id}/calendar.ics`;
-    window.location.href = icsUrl;
-  } else {
-    // Fallback locale per la generazione istantanea del file .ics via Blob
-    downloadIcsFile(quote);
-  }
+  downloadIcsFile(quote);
 };
 
