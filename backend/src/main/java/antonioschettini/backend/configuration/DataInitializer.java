@@ -117,11 +117,11 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedDefaultGalleryItems() {
-        // Rigenera se ci sono disallineamenti di dati o vecchi poster
+        // Rigenera sempre se i dati nel DB non contengono i poster con so_2 o sono disallineati
         boolean needReseed = galleryRepository.findAll().stream()
-                .anyMatch(g -> g.getTitleIta().contains("Console DJ Set") && "image".equals(g.getType()) && !g.getSrc().contains("srdtwafxbjz3w9hdkxax"));
+                .anyMatch(g -> g.getPosterUrl() == null || !g.getPosterUrl().contains("so_2"));
 
-        if (galleryRepository.count() < 31 || needReseed) {
+        if (galleryRepository.count() != 31 || needReseed) {
             galleryRepository.deleteAll();
 
             List<GalleryItem> items = List.of(
