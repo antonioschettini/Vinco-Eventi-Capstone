@@ -67,8 +67,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        List<String> allowedOrigins = Arrays.asList(allowedOriginsRaw.split(","));
-        config.setAllowedOrigins(allowedOrigins);
+        
+        // Consente tutti i domini di anteprima e produzione Vercel (*.vercel.app) e i domini di sviluppo locale
+        config.setAllowedOriginPatterns(List.of(
+            "https://*.vercel.app",
+            "https://vinco-eventi-capstone.vercel.app",
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "http://localhost:4173"
+        ));
+        
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         config.setAllowCredentials(true);
