@@ -16,6 +16,9 @@ public class ServiceMgmtService {
     @Autowired
     private ServiceRepository serviceRepository;
 
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
     public List<ServiceEntity> getAllServices() {
         return serviceRepository.findAllByOrderByDisplayOrderAsc();
     }
@@ -48,6 +51,21 @@ public class ServiceMgmtService {
     public ServiceEntity updateService(UUID id, ServiceDTO dto) {
         ServiceEntity service = getServiceById(id);
 
+        // Cancella le vecchie immagini da Cloudinary se vengono sostituite con URL diverse
+        String oldUrlIta = service.getImageUrlIta();
+        String oldUrlEng = service.getImageUrlEng();
+
+        if (dto.imageUrlIta() != null && !dto.imageUrlIta().isBlank()
+                && !dto.imageUrlIta().equals(oldUrlIta)
+                && oldUrlIta != null && oldUrlIta.contains("res.cloudinary.com")) {
+            cloudinaryService.deleteMedia(null, "image", oldUrlIta);
+        }
+        if (dto.imageUrlEng() != null && !dto.imageUrlEng().isBlank()
+                && !dto.imageUrlEng().equals(oldUrlEng)
+                && oldUrlEng != null && oldUrlEng.contains("res.cloudinary.com")) {
+            cloudinaryService.deleteMedia(null, "image", oldUrlEng);
+        }
+
         service.setTitleIta(dto.titleIta());
         service.setTitleEng(dto.titleEng());
         service.setSubtitleIta(dto.subtitleIta());
@@ -67,6 +85,19 @@ public class ServiceMgmtService {
 
     public void deleteService(UUID id) {
         ServiceEntity service = getServiceById(id);
+
+        // Cancellazione fisica degli asset Cloudinary prima di eliminare il record dal DB
+        String urlIta = service.getImageUrlIta();
+        String urlEng = service.getImageUrlEng();
+
+        if (urlIta != null && urlIta.contains("res.cloudinary.com")) {
+            cloudinaryService.deleteMedia(null, "image", urlIta);
+        }
+        // Cancella l'immagine ENG solo se diversa da ITA (evita doppia cancellazione stesso asset)
+        if (urlEng != null && urlEng.contains("res.cloudinary.com") && !urlEng.equals(urlIta)) {
+            cloudinaryService.deleteMedia(null, "image", urlEng);
+        }
+
         serviceRepository.delete(service);
     }
 }

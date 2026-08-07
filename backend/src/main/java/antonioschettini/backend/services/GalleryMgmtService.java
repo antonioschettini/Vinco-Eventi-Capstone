@@ -60,6 +60,13 @@ public class GalleryMgmtService {
     public GalleryItem updateGalleryItem(UUID id, GalleryDTO dto) {
         GalleryItem existing = getGalleryItemById(id);
 
+        // Se il file media è cambiato, cancella il vecchio asset da Cloudinary
+        if (dto.src() != null && !dto.src().isBlank()
+                && !dto.src().equals(existing.getSrc())
+                && existing.getSrc() != null && existing.getSrc().contains("res.cloudinary.com")) {
+            cloudinaryService.deleteMedia(existing.getPublicId(), existing.getType(), existing.getSrc());
+        }
+
         existing.setTitleIta(dto.titleIta());
         existing.setTitleEng(dto.titleEng());
         existing.setSubtitleIta(dto.subtitleIta());

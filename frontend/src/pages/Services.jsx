@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
@@ -44,69 +44,37 @@ function Services() {
     displayOrder: 1,
   });
 
-  const fetchDbServices = async () => {
+  const fetchDbServices = useCallback(async () => {
+    let isSubscribed = true;
     setLoading(true);
     try {
       const data = await apiFetch(`${API_BASE_URL}/api/services`);
-      if (Array.isArray(data)) {
+      if (isSubscribed && Array.isArray(data)) {
         const packagesOnly = data.filter((s) => s.category === "PACKAGE");
         setDbServices(packagesOnly);
       }
     } catch {
       console.log("Database non raggiungibile. Uso fallback locali per visualizzazione.");
     } finally {
-      setLoading(false);
+      if (isSubscribed) setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    let isSubscribed = true;
-    const loadServices = async () => {
-      setLoading(true);
-      try {
-        const data = await apiFetch(`${API_BASE_URL}/api/services`);
-        if (isSubscribed && Array.isArray(data)) {
-          const packagesOnly = data.filter((s) => s.category === "PACKAGE");
-          setDbServices(packagesOnly);
-        }
-      } catch {
-        console.log("Database non raggiungibile. Uso fallback locali per visualizzazione.");
-      } finally {
-        if (isSubscribed) setLoading(false);
-      }
-    };
-    loadServices();
-    return () => { isSubscribed = false; };
   }, []);
 
-  // Determina l'immagine da visualizzare con correzione difensiva
+  useEffect(() => {
+    fetchDbServices();
+  }, [fetchDbServices]);
+
+  // Determina l'immagine da visualizzare: usa l'URL del DB se presente, altrimenti fallback per badge noti
   const getServiceImage = (service) => {
     const isEng = lang === "en";
-    let dbUrl = isEng ? service.imageUrlEng : service.imageUrlIta;
+    const dbUrl = isEng ? service.imageUrlEng : service.imageUrlIta;
 
+    // Se il DB ha un URL valido (Cloudinary o esterno), usalo direttamente
     if (dbUrl && dbUrl.startsWith("http")) {
-      // Correzione automatica nel caso in cui il DB contenga i vecchi URL invertiti
-      if (!isEng && dbUrl.includes("fnrxkp5mpmdk8dcfz8mf.png")) {
-        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png";
-      }
-      if (isEng && dbUrl.includes("vvzgi7pa99ubd9np2fmy.png")) {
-        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png";
-      }
-      if (!isEng && dbUrl.includes("oppbybtrbqttfi2aprnz.png")) {
-        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738603/vinco_eventi_servizi/qev9reiqlzxtmpsiulsz.png";
-      }
-      if (isEng && dbUrl.includes("qev9reiqlzxtmpsiulsz.png")) {
-        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738606/vinco_eventi_servizi/oppbybtrbqttfi2aprnz.png";
-      }
-      if (!isEng && dbUrl.includes("ckjzq11sbrvaojf5iskt.png")) {
-        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738608/vinco_eventi_servizi/ii4efs143kbixn2n2wnb.png";
-      }
-      if (isEng && dbUrl.includes("ii4efs143kbixn2n2wnb.png")) {
-        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738611/vinco_eventi_servizi/ckjzq11sbrvaojf5iskt.png";
-      }
       return dbUrl;
     }
 
+    // Fallback statico per i 3 badge standard, quando l'immagine non è nel DB
     const badge = service.badge ? service.badge.toUpperCase() : "BASIC";
     switch (badge) {
       case "BASIC":
