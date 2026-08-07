@@ -54,10 +54,10 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedDefaultServices() {
-        boolean hasBrokenUrls = serviceRepository.findAll().stream()
-                .anyMatch(s -> s.getImageUrlIta() == null || s.getImageUrlIta().contains("basicIta.png"));
+        boolean hasMismatchedUrls = serviceRepository.findAll().stream()
+                .anyMatch(s -> s.getBadge().equalsIgnoreCase("BASIC") && s.getImageUrlIta().contains("ckjzq11sbrvaojf5iskt"));
 
-        if (serviceRepository.count() == 0 || hasBrokenUrls) {
+        if (serviceRepository.count() != 3 || hasMismatchedUrls) {
             serviceRepository.deleteAll();
             ServiceEntity basic = ServiceEntity.builder()
                     .titleIta("BASIC")
@@ -66,8 +66,8 @@ public class DataInitializer implements CommandLineRunner {
                     .subtitleEng("Essential package for entertainment and professional audio/lighting service")
                     .category("PACKAGE")
                     .badge("BASIC")
-                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738611/vinco_eventi_servizi/ckjzq11sbrvaojf5iskt.png")
-                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738608/vinco_eventi_servizi/ii4efs143kbixn2n2wnb.png")
+                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png")
+                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png")
                     .featuresIta("Service audio e luci;DJ (a scelta dal team VINCO EVENTI)")
                     .featuresEng("Audio and lighting service;DJ (selected from VINCO EVENTI team)")
                     .displayOrder(1)
@@ -94,8 +94,8 @@ public class DataInitializer implements CommandLineRunner {
                     .subtitleEng("The total entertainment experience with live band, special attractions and scenic lighting")
                     .category("PACKAGE")
                     .badge("FULL")
-                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png")
-                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png")
+                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738611/vinco_eventi_servizi/ckjzq11sbrvaojf5iskt.png")
+                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738608/vinco_eventi_servizi/ii4efs143kbixn2n2wnb.png")
                     .featuresIta("Service audio e luci;DJ (a scelta dal team VINCO EVENTI);Musica di sottofondo (Cerimonia, Aperitivo);Live Band [BROCHURE];Musicisti a scelta di accompagnamento al djset (violino, sax, percussioni ecc.);Photobooth, Videobooth 360°, Telefono degli Ospiti [BROCHURE];Illuminazioni, Fontane luminose sparkular, Fuochi d’artificio e Fumogeni Colorati [BROCHURE]")
                     .featuresEng("Audio and lighting service;DJ (selected from VINCO EVENTI team);Background music (Ceremony, Cocktail Hour);Live Band [BROCHURE];Musicians of choice to accompany DJ set (violin, sax, percussion, etc.);Photobooth, 360° Videobooth, Guest Audio Guestbook [BROCHURE];Lighting, Sparkular fountains, Fireworks & Colored smoke [BROCHURE]")
                     .brochureUrlIta("https://drive.google.com/file/d/1oXiV9ACF0xkTOiNtkyxHYVK0dVMDCvdw/view")
@@ -104,7 +104,7 @@ public class DataInitializer implements CommandLineRunner {
                     .build();
 
             serviceRepository.saveAll(List.of(basic, plus, full));
-            System.out.println(">>> Seed Servizi eseguito con successo con URL Cloudinary reali.");
+            System.out.println(">>> Seed Servizi eseguito con successo con URL Cloudinary corretti per BASIC, PLUS e FULL.");
         }
     }
 
