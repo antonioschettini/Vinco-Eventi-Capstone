@@ -4,7 +4,11 @@
  * di un'applicazione nativa iOS/Android ad ogni interazione chiave.
  */
 export const triggerHapticFeedback = (pattern = 12) => {
-  if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
+  if (
+    typeof window !== "undefined" &&
+    "navigator" in window &&
+    typeof navigator.vibrate === "function"
+  ) {
     try {
       navigator.vibrate(pattern);
     } catch {
