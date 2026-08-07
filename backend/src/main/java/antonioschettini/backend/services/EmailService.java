@@ -12,7 +12,18 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailService {
@@ -33,8 +44,11 @@ public class EmailService {
     @Value("${app.frontend-base-url:http://localhost:5173}")
     private String frontendBaseUrl;
 
-    @Value("${mail.from:onboarding@resend.dev}")
+    @Value("${mail.from:vincoeventi@gmail.com}")
     private String mailFrom;
+
+    @Value("${brevo.api-key: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}")
+    private String brevoApiKey;
 
 
     private static final String URL_LOGO_VINCO = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942217/vinco_email_assets/logo-vinco-tondo.png";
@@ -350,12 +364,13 @@ public class EmailService {
 
             helper.setText(plainTextBuilder.toString(), htmlBuilder.toString());
 
+            byte[] icsBytes = null;
             // Allegato .ics per Apple Mail / iOS / Outlook: salvataggio istantaneo in 1 tap senza chiamate al server
             if (quote.getDataEvento() != null && quoteService != null) {
                 try {
                     String icsContent = quoteService.generateIcsContent(quote);
                     if (icsContent != null && !icsContent.isBlank()) {
-                        byte[] icsBytes = icsContent.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                        icsBytes = icsContent.getBytes(java.nio.charset.StandardCharsets.UTF_8);
                         helper.addAttachment("evento-vinco.ics", new org.springframework.core.io.ByteArrayResource(icsBytes), "text/calendar; charset=UTF-8");
                     }
                 } catch (Exception icsEx) {
@@ -363,8 +378,25 @@ public class EmailService {
                 }
             }
 
-            mailSender.send(mimeMessage);
-            System.out.println(">>> Email di notifica preventivo inviata con successo all'admin VINCO EVENTI!");
+            // Tenta prima l'invio ultra-veloce via Brevo REST API su HTTPS (Porta 443 - Imune ai blocchi SMTP cloud)
+            boolean sentViaApi = sendViaBrevoApi(
+                "vincoeventi@gmail.com",
+                subject,
+                htmlBuilder.toString(),
+                quote.getEmail(),
+                quote.getNome() + " " + quote.getCognome(),
+                icsBytes != null ? "evento-vinco.ics" : null,
+                icsBytes
+            );
+
+            if (sentViaApi) {
+                return;
+            }
+
+            if (mailSender != null) {
+                mailSender.send(mimeMessage);
+                System.out.println(">>> Email di notifica preventivo inviata con successo all'admin VINCO EVENTI via SMTP!");
+            }
         } catch (Exception ex) {
             System.err.println("[ERROR EmailService] Impossibile inviare l'email di notifica all'admin: " + ex.getMessage());
         }
@@ -759,8 +791,26 @@ public class EmailService {
             }
 
             helper.setText(plainText, htmlBody);
-            mailSender.send(mimeMessage);
-            System.out.println(">>> Email di conferma inviata con successo al cliente VINCO EVENTI: " + quote.getEmail());
+
+            // Tenta prima l'invio via Brevo REST API su HTTPS (Porta 443)
+            boolean sentViaApi = sendViaBrevoApi(
+                quote.getEmail(),
+                subject,
+                htmlBody,
+                "vincoeventi@gmail.com",
+                "VINCO EVENTI",
+                null,
+                null
+            );
+
+            if (sentViaApi) {
+                return;
+            }
+
+            if (mailSender != null) {
+                mailSender.send(mimeMessage);
+                System.out.println(">>> Email di conferma inviata con successo al cliente VINCO EVENTI via SMTP: " + quote.getEmail());
+            }
         } catch (Exception ex) {
             System.err.println("[ERROR EmailService] Impossibile inviare l'email al cliente: " + ex.getMessage());
         }
@@ -769,10 +819,49 @@ public class EmailService {
     /**
      * Report di controllo mensile & Keep-Alive automatico per Brevo.
      * Esegue l'invio il 1° giorno di ogni mese alle ore 09:00 AM UTC.
-     * Mantiene la chiave SMTP Brevo attiva all'infinito (reset dei 90 giorni di inattività).
+     * Mantiene la chiave Brevo attiva all'infinito (reset dei 90 giorni di inattività).
      */
     @Scheduled(cron = "0 0 9 1 * ?")
     public void sendMonthlyKeepAliveEmail() {
+        String nowStr = java.time.ZonedDateTime.now(java.time.ZoneId.of("Europe/Rome"))
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+
+        String htmlBody = """
+            <!DOCTYPE html>
+            <html lang="it">
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; margin: 0; padding: 20px;">
+              <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 25px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <h2 style="color: #064e3b; margin-top: 0;">💚 VINCO EVENTI - System Heartbeat</h2>
+                <p style="font-size: 15px; color: #334155;">
+                  Questo è un messaggio automatico mensile inviato dal sistema per verificare il corretto funzionamento del servizio email e mantenere attiva la chiave Brevo all'infinito.
+                </p>
+                <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 14px; border-radius: 6px; margin: 20px 0; font-size: 14px;">
+                  <strong>✅ Stato Servizio:</strong> ATTIVO & OPERATIVO<br/>
+                  <strong>Data Esecuzione:</strong> %s
+                </div>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">
+                  Generato automaticamente dal backend VINCO EVENTI su Render.
+                </p>
+              </div>
+            </body>
+            </html>
+            """.formatted(nowStr);
+
+        boolean sentViaApi = sendViaBrevoApi(
+            "vincoeventi@gmail.com",
+            "🟢 VINCO EVENTI - Report Mensile & Keep-Alive Sistema",
+            htmlBody,
+            null,
+            null,
+            null,
+            null
+        );
+
+        if (sentViaApi) {
+            return;
+        }
+
         if (mailSender == null) {
             return;
         }
@@ -780,41 +869,62 @@ public class EmailService {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
             helper.setFrom(mailFrom, "VINCO EVENTI - System Health");
             helper.setTo("vincoeventi@gmail.com");
             helper.setSubject("🟢 VINCO EVENTI - Report Mensile & Keep-Alive Sistema");
-
-            String nowStr = java.time.ZonedDateTime.now(java.time.ZoneId.of("Europe/Rome"))
-                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
-
-            String htmlBody = """
-                <!DOCTYPE html>
-                <html lang="it">
-                <head><meta charset="UTF-8"></head>
-                <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; margin: 0; padding: 20px;">
-                  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 25px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                    <h2 style="color: #064e3b; margin-top: 0;">💚 VINCO EVENTI - System Heartbeat</h2>
-                    <p style="font-size: 15px; color: #334155;">
-                      Questo è un messaggio automatico mensile inviato dal sistema per verificare il corretto funzionamento del servizio email e mantenere attiva la chiave SMTP Brevo all'infinito.
-                    </p>
-                    <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 14px; border-radius: 6px; margin: 20px 0; font-size: 14px;">
-                      <strong>✅ Stato Servizio:</strong> ATTIVO & OPERATIVO<br/>
-                      <strong>Data Esecuzione:</strong> %s
-                    </div>
-                    <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">
-                      Generato automaticamente dal backend VINCO EVENTI su Render.
-                    </p>
-                  </div>
-                </body>
-                </html>
-                """.formatted(nowStr);
-
             helper.setText("VINCO EVENTI - System Heartbeat OK - " + nowStr, htmlBody);
             mailSender.send(mimeMessage);
-            System.out.println(">>> [INFO EmailService] Email mensile di Keep-Alive inviata con successo all'admin!");
+            System.out.println(">>> [INFO EmailService] Email mensile di Keep-Alive inviata con successo all'admin via SMTP!");
         } catch (Exception ex) {
-            System.err.println("[WARN EmailService] Impossibile inviare l'email mensile di Keep-Alive: " + ex.getMessage());
+            System.err.println("[WARN EmailService] Impossibile inviare l'email mensile di Keep-Alive via SMTP: " + ex.getMessage());
         }
+    }
+
+    private boolean sendViaBrevoApi(String to, String subject, String htmlContent, String replyToEmail, String replyToName, String attachmentName, byte[] attachmentBytes) {
+        if (brevoApiKey == null || brevoApiKey.isBlank()) {
+            return false;
+        }
+
+        try {
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(10))
+                    .build();
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("sender", Map.of("name", "VINCO EVENTI", "email", mailFrom != null && !mailFrom.isBlank() ? mailFrom : "vincoeventi@gmail.com"));
+            body.put("to", List.of(Map.of("email", to)));
+            body.put("subject", subject);
+            body.put("htmlContent", htmlContent);
+
+            if (replyToEmail != null && !replyToEmail.isBlank()) {
+                body.put("replyTo", Map.of("email", replyToEmail, "name", replyToName != null && !replyToName.isBlank() ? replyToName : "VINCO EVENTI"));
+            }
+
+            if (attachmentBytes != null && attachmentBytes.length > 0 && attachmentName != null && !attachmentName.isBlank()) {
+                String base64Content = Base64.getEncoder().encodeToString(attachmentBytes);
+                body.put("attachment", List.of(Map.of("name", attachmentName, "content", base64Content)));
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = mapper.writeValueAsString(body);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
+                    .header("Content-Type", "application/json")
+                    .header("api-key", brevoApiKey.trim())
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                System.out.println(">>> [SUCCESS EmailService] Email inviata con successo via Brevo HTTPS API (Porta 443) a: " + to);
+                return true;
+            } else {
+                System.err.println("[WARN EmailService] Errore risposta Brevo HTTPS API (" + response.statusCode() + "): " + response.body());
+            }
+        } catch (Exception e) {
+            System.err.println("[WARN EmailService] Eccezione invio Brevo HTTPS API: " + e.getMessage());
+        }
+        return false;
     }
 }
