@@ -32,6 +32,9 @@ public class EmailService {
     @Value("${app.frontend-base-url:http://localhost:5173}")
     private String frontendBaseUrl;
 
+    @Value("${mail.from:onboarding@resend.dev}")
+    private String mailFrom;
+
 
     private static final String URL_LOGO_VINCO = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942217/vinco_email_assets/logo-vinco-tondo.png";
     private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/y9rfpsut/image/upload/v1785942366/vinco_email_assets/google-official-v2.png";
@@ -52,7 +55,7 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-            helper.setFrom("vincoeventi@gmail.com", "VINCO EVENTI - Web App");
+            helper.setFrom(mailFrom, "VINCO EVENTI - Web App");
             helper.setTo("vincoeventi@gmail.com");
             if (quote.getEmail() != null && !quote.getEmail().isBlank()) {
                 helper.setReplyTo(quote.getEmail(), quote.getNome() + " " + quote.getCognome());
@@ -432,7 +435,8 @@ public class EmailService {
 
             boolean showItalianNotice = isEnglish || isForeignMessage;
 
-            helper.setFrom("vincoeventi@gmail.com", "VINCO EVENTI");
+            helper.setFrom(mailFrom, "VINCO EVENTI");
+            helper.setReplyTo("vincoeventi@gmail.com", "VINCO EVENTI");
             helper.setTo(quote.getEmail());
             
             String subject = isEnglish 
