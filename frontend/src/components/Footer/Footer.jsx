@@ -61,62 +61,74 @@ function Footer() {
 
             </div>
 
-            {/* Icone Social */}
+            {/* Icone Social con Deep Linking Nattivo App iOS/Android & Desktop */}
             <div className="social-icons-wrapper d-flex justify-content-center align-items-center gap-3 mb-4">
               {/* Spotify */}
-              <button
-                onClick={() => handleSocialClick("https://open.spotify.com/intl-it/artist/1QoaebxELudkw4ga0DH9YI?si=T6l1kxj9SwWHSoGXsbIvxA&dl_branch=1&nd=1")}
-                className="social-btn spotify"
+              <a
+                href="https://open.spotify.com/intl-it/artist/1QoaebxELudkw4ga0DH9YI?si=T6l1kxj9SwWHSoGXsbIvxA&dl_branch=1&nd=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-btn spotify text-decoration-none"
                 aria-label="Spotify"
                 title="Spotify"
               >
                 <i className="bi bi-spotify"></i>
-              </button>
+              </a>
 
               {/* Instagram */}
-              <button
-                onClick={() => handleSocialClick("https://www.instagram.com/vincoeventi/")}
-                className="social-btn instagram"
+              <a
+                href="https://www.instagram.com/vincoeventi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-btn instagram text-decoration-none"
                 aria-label="Instagram"
                 title="Instagram"
               >
                 <i className="bi bi-instagram"></i>
-              </button>
+              </a>
 
               {/* Matrimonio.com */}
-              <button
-                onClick={() => handleSocialClick("https://www.matrimonio.com/musica-matrimonio/vinco-eventi--e283893")}
-                className="social-btn matrimonio"
+              <a
+                href="https://www.matrimonio.com/musica-matrimonio/vinco-eventi--e283893"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-btn matrimonio text-decoration-none"
                 aria-label="Matrimonio.com"
                 title="Matrimonio.com"
               >
                 <i className="bi bi-heart-fill"></i>
-              </button>
+              </a>
 
               {/* TikTok */}
-              <button
-                onClick={() => handleSocialClick("https://www.tiktok.com/@vincoeventi?_r=1&_t=ZN-98OJ7oPdBVG")}
-                className="social-btn tiktok"
+              <a
+                href="https://www.tiktok.com/@vincoeventi?_r=1&_t=ZN-98OJ7oPdBVG"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-btn tiktok text-decoration-none"
                 aria-label="TikTok"
                 title="TikTok"
               >
                 <i className="bi bi-tiktok"></i>
-              </button>
+              </a>
 
               {/* WhatsApp */}
-              <button
-                onClick={() => handleSocialClick("https://wa.me/393492949669")}
-                className="social-btn whatsapp"
+              <a
+                href="https://wa.me/393492949669"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-btn whatsapp text-decoration-none"
                 aria-label="WhatsApp"
                 title="WhatsApp"
               >
                 <i className="bi bi-whatsapp"></i>
-              </button>
+              </a>
 
-              {/* Mixcloud (SVG personalizzato per fedeltà al brand) */}
-              <button
-                onClick={() => handleSocialClick("https://www.mixcloud.com/djcolaluca/")}
-                className="social-btn mixcloud"
+              {/* Mixcloud */}
+              <a
+                href="https://www.mixcloud.com/djcolaluca/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-btn mixcloud text-decoration-none"
                 aria-label="Mixcloud"
                 title="Mixcloud"
               >
@@ -130,7 +142,7 @@ function Footer() {
                 >
                   <path d="M589.6 240c0-111.4-86.4-201.7-193-201.7-87.7 0-161.7 62-185 146.4-18.7-27-48.4-44.4-82-44.4-53.5 0-97.4 43.9-97.4 97.4s43.9 97.4 97.4 97.4c29.1 0 55-13.1 72.8-33.8 23 85.9 98.4 149.2 188.7 149.2 106.6 0 193-90.3 193-201.7 0-3.3-.2-6.6-.5-9.8zm-449.2 41c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40zm184.6-26.6c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40zm92.3 80c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40zm92.3-80c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40z" />
                 </svg>
-              </button>
+              </a>
             </div>
 
             {/* Diritti Riservati */}
