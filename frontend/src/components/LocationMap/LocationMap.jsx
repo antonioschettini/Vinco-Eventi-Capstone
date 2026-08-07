@@ -1,4 +1,5 @@
-import { Container, Row, Col } from "react-bootstrap";
+import { useState } from "react";
+import { Container, Row, Col, Spinner } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
@@ -8,15 +9,49 @@ function LocationMap() {
   const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].about;
+  const [isLocating, setIsLocating] = useState(false);
 
   const mapAddress = "Via Ospedale Di Venere 132/A, Bari, BA 70131, Italy";
   const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(
     mapAddress
   )}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
 
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-    mapAddress
-  )}`;
+  const handleDirectionsClick = (e) => {
+    e.preventDefault();
+    if (isLocating) return;
+
+    const fallbackUrl = `https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(
+      mapAddress
+    )}`;
+
+    if (!("geolocation" in navigator)) {
+      window.open(fallbackUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    setIsLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setIsLocating(false);
+        const { latitude, longitude } = position.coords;
+        const preciseDirectionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${encodeURIComponent(
+          mapAddress
+        )}`;
+        window.open(preciseDirectionsUrl, "_blank", "noopener,noreferrer");
+      },
+      (error) => {
+        console.warn("Geolocation fallback triggered:", error);
+        setIsLocating(false);
+        window.open(fallbackUrl, "_blank", "noopener,noreferrer");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 6000,
+        maximumAge: 0,
+      }
+    );
+  };
 
   return (
     <section className="location-map-section py-5 position-relative">
@@ -132,13 +167,25 @@ function LocationMap() {
                 {/* Pulsante Indicazioni Stradali */}
                 <div className="mt-4 pt-3 border-top border-secondary border-opacity-10">
                   <a
-                    href={directionsUrl}
+                    href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(
+                      mapAddress
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={handleDirectionsClick}
                     className="btn-directions w-100"
                   >
-                    <i className="bi bi-box-arrow-up-right"></i>
-                    <span>{t.directionsBtn}</span>
+                    {isLocating ? (
+                      <>
+                        <Spinner animation="border" size="sm" className="me-2" />
+                        <span>{t.locatingBtn || "Localizzazione in corso..."}</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-box-arrow-up-right"></i>
+                        <span>{t.directionsBtn}</span>
+                      </>
+                    )}
                   </a>
                 </div>
               </div>

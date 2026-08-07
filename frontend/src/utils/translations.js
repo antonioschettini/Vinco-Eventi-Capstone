@@ -222,6 +222,7 @@ export const translations = {
       hoursLabel: "Disponibilità",
       hoursValue: "Riceviamo su appuntamento",
       directionsBtn: "Indicazioni Stradali",
+      locatingBtn: "Localizzazione in corso...",
       reviewsSectionTitle: "Riconoscimenti & Recensioni Verificate",
       reviewsSectionSub:
         "La voce dei nostri sposi e i premi ufficiali nazionali attribuiti a VINCO EVENTI.",
@@ -563,6 +564,7 @@ export const translations = {
       hoursLabel: "Availability",
       hoursValue: "Available by appointment",
       directionsBtn: "Get Driving Directions",
+      locatingBtn: "Locating...",
       reviewsSectionTitle: "Awards & Verified Customer Reviews",
       reviewsSectionSub:
         "The voice of our couples and official national awards earned by VINCO EVENTI.",
