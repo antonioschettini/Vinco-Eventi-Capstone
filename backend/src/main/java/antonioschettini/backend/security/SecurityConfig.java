@@ -68,8 +68,16 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         
-        // Consente tutti i domini di anteprima e produzione Vercel (*.vercel.app), il dominio personalizzato vincoeventi.com e localhost
-        config.setAllowedOriginPatterns(List.of(
+        List<String> origins = new java.util.ArrayList<>();
+        if (allowedOriginsRaw != null && !allowedOriginsRaw.isBlank()) {
+            for (String origin : allowedOriginsRaw.split(",")) {
+                if (!origin.trim().isEmpty()) {
+                    origins.add(origin.trim());
+                }
+            }
+        }
+        
+        List<String> defaults = List.of(
             "https://*.vercel.app",
             "https://vinco-eventi-capstone.vercel.app",
             "https://*.vincoeventi.com",
@@ -78,8 +86,14 @@ public class SecurityConfig {
             "http://localhost:5173",
             "http://localhost:3000",
             "http://localhost:4173"
-        ));
-        
+        );
+        for (String def : defaults) {
+            if (!origins.contains(def)) {
+                origins.add(def);
+            }
+        }
+
+        config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         config.setAllowCredentials(true);
