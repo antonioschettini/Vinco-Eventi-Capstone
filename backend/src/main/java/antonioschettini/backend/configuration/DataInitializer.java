@@ -44,17 +44,25 @@ public class DataInitializer implements CommandLineRunner {
         String adminEmail = "vincoeventi@gmail.com";
         if (userRepository.findByEmail(adminEmail).isEmpty()) {
             User admin = User.builder()
+                    .name("Admin")
+                    .surname("Vinco Eventi")
                     .email(adminEmail)
                     .password(passwordEncoder.encode(adminPassword))
                     .role(Role.ROLE_ADMIN)
+                    .phone("+393492949669")
                     .build();
+
             userRepository.save(admin);
-            System.out.println(">>> Seed Admin eseguito con successo per: " + adminEmail);
+            System.out.println(">>> Utente Admin principale creato con successo: " + adminEmail);
         }
     }
 
     private void seedDefaultServices() {
-        if (serviceRepository.count() == 0) {
+        boolean hasMismatchedUrls = serviceRepository.findAll().stream()
+                .anyMatch(s -> s.getBadge().equalsIgnoreCase("BASIC") && s.getImageUrlIta().contains("ckjzq11sbrvaojf5iskt"));
+
+        if (serviceRepository.count() != 3 || hasMismatchedUrls) {
+            serviceRepository.deleteAll();
             ServiceEntity basic = ServiceEntity.builder()
                     .titleIta("BASIC")
                     .titleEng("BASIC")
@@ -105,20 +113,25 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private String getPoster(String videoUrl) {
-        if (videoUrl == null || !videoUrl.contains("/video/upload/")) return videoUrl;
-        int idx = videoUrl.indexOf("/video/upload/");
-        String prefix = videoUrl.substring(0, idx + 14);
-        String rest = videoUrl.substring(idx + 14).replaceAll("\\.[^/.]+$", "");
-        return prefix + "f_jpg,q_auto,w_720,so_2/" + rest + ".jpg";
+        if (videoUrl == null || videoUrl.isBlank()) return null;
+        return videoUrl
+                .replace("/video/upload/", "/video/upload/f_jpg,q_auto,w_720,so_2/")
+                .replaceAll("\\.(mp4|mov|webm|avi|mkv)$", ".jpg");
     }
 
     private void seedDefaultGalleryItems() {
-        if (galleryRepository.count() == 0) {
+        // Forza il re-seed se il conteggio è diverso da 32 o se l'immagine Cielo Stellato ha l'URL sbagliato
+        boolean hasMisalignedItems = galleryRepository.findAll().stream()
+                .anyMatch(g -> g.getTitleIta().contains("Illuminazione Cielo Stellato") && !g.getSrc().contains("txbfapyv9ujglspk13eo"));
+
+        if (galleryRepository.count() != 32 || hasMisalignedItems) {
+            galleryRepository.deleteAll();
+
             List<GalleryItem> items = List.of(
-                    // 1: Video Enzo Singer
+                    // 1: Video Enzo Singer - International Voice Black / Set ELETTRICO
                     GalleryItem.builder()
-                            .titleIta("Set ELETTRICO - Promo on Fire!")
-                            .titleEng("ELECTRICAL Set - Promo on Fire!")
+                            .titleIta("Set ELETTRICO - International Voice Black")
+                            .titleEng("ELECTRICAL Set - International Voice Black")
                             .subtitleIta("La carica travolgente del nostro set elettrico live con Vincenzo Colaluca")
                             .subtitleEng("The overwhelming energy of our live electric set with Vincenzo Colaluca")
                             .type("video")
@@ -129,7 +142,8 @@ public class DataInitializer implements CommandLineRunner {
                             .startTime(null)
                             .displayOrder(1)
                             .build(),
-                    // 2: Video Fairy lights band
+
+                    // 2: Video Live Band Stage
                     GalleryItem.builder()
                             .titleIta("Crossroads Live Performance")
                             .titleEng("Crossroads Live Performance")
@@ -140,9 +154,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739102/vinco_eventi_galleria/wdjpouelk0wgy8b7ayxb.mov"))
                             .category("band")
                             .featured(true)
+                            .startTime(null)
                             .displayOrder(2)
                             .build(),
-                    // 3: Video Violin Duo Red Building
+
+                    // 3: Video Violin Duo Live
                     GalleryItem.builder()
                             .titleIta("Duo Violino & Performance Scenografica")
                             .titleEng("Violin Duo & Scenic Performance")
@@ -153,9 +169,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739094/vinco_eventi_galleria/vntlhm89bfzrdh2xgy2p.mov"))
                             .category("band")
                             .featured(true)
+                            .startTime(null)
                             .displayOrder(3)
                             .build(),
-                    // 4: Photo Enzo DJ white shirt console
+
+                    // 4: Photo Enzo DJ White Shirt
                     GalleryItem.builder()
                             .titleIta("Console DJ Set Enzo Colaluca")
                             .titleEng("Console DJ Set Enzo Colaluca")
@@ -168,7 +186,8 @@ public class DataInitializer implements CommandLineRunner {
                             .featured(true)
                             .displayOrder(4)
                             .build(),
-                    // 5: Video DJ Console Pioneer
+
+                    // 5: Video DJ Pioneer Console
                     GalleryItem.builder()
                             .titleIta("Exclusive Night Party Console")
                             .titleEng("Exclusive Night Party Console")
@@ -179,9 +198,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739072/vinco_eventi_galleria/r9e4uokfrbmpwadra7al.mov"))
                             .category("djset")
                             .featured(true)
+                            .startTime(null)
                             .displayOrder(5)
                             .build(),
-                    // 6: Video Female Vocalist Live
+
+                    // 6: Video Live Vocalist
                     GalleryItem.builder()
                             .titleIta("Esibizione Vocalist Live")
                             .titleEng("Live Vocalist Performance")
@@ -192,9 +213,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739059/vinco_eventi_galleria/ef6cr5xt3l4utt5ngzbz.mp4"))
                             .category("band")
                             .featured(true)
+                            .startTime(null)
                             .displayOrder(6)
                             .build(),
-                    // 7: Photo 3 Band members in garden
+
+                    // 7: Photo 3 Musicians with Double Bass in Garden
                     GalleryItem.builder()
                             .titleIta("I Nostri Musicisti dal Vivo")
                             .titleEng("Our Live Musicians")
@@ -207,7 +230,8 @@ public class DataInitializer implements CommandLineRunner {
                             .featured(true)
                             .displayOrder(7)
                             .build(),
-                    // 8: Video Sax Blue Lights
+
+                    // 8: Video Sax Solo
                     GalleryItem.builder()
                             .titleIta("Cocktail & Sax Show")
                             .titleEng("Cocktail & Sax Show")
@@ -218,9 +242,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739049/vinco_eventi_galleria/k6nrydw6lhpgaiztomgd.mov"))
                             .category("band")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(8)
                             .build(),
-                    // 9: Video Violin Stage Performance
+
+                    // 9: Video Electric Violin Solo
                     GalleryItem.builder()
                             .titleIta("Live Energy & Violino")
                             .titleEng("Live Energy & Violin")
@@ -231,9 +257,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739011/vinco_eventi_galleria/lq4emmoiddqhzpbgthq3.mov"))
                             .category("live")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(9)
                             .build(),
-                    // 10: Photo Starry Sky Tables
+
+                    // 10: Photo Starry Sky Lights Over Tables
                     GalleryItem.builder()
                             .titleIta("Illuminazione Cielo Stellato")
                             .titleEng("Starry Sky Lighting")
@@ -246,7 +274,8 @@ public class DataInitializer implements CommandLineRunner {
                             .featured(false)
                             .displayOrder(10)
                             .build(),
-                    // 11: Video DJ Sax Lights
+
+                    // 11: Video Wedding Party Sax
                     GalleryItem.builder()
                             .titleIta("Wedding Party & Sax Live")
                             .titleEng("Wedding Party & Live Sax")
@@ -257,9 +286,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739001/vinco_eventi_galleria/ufpb1xiseuvs1lsxonad.mp4"))
                             .category("wedding")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(11)
                             .build(),
-                    // 12: Video Starry Tunnel Arch
+
+                    // 12: Video Light Tunnel Dancefloor
                     GalleryItem.builder()
                             .titleIta("Scenografia Luci & Tunnel Stellato")
                             .titleEng("Lighting Design & Starry Tunnel")
@@ -270,9 +301,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738970/vinco_eventi_galleria/zhhw5yesgmrwsift9sow.mov"))
                             .category("lightshow")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(12)
                             .build(),
-                    // 13: Photo Bride Groom Kiss
+
+                    // 13: Photo Golden Arch Bride & Groom Kiss
                     GalleryItem.builder()
                             .titleIta("Il Primo Bacio degli Sposi")
                             .titleEng("The Bride & Groom First Kiss")
@@ -285,7 +318,8 @@ public class DataInitializer implements CommandLineRunner {
                             .featured(false)
                             .displayOrder(13)
                             .build(),
-                    // 14: Video Fireworks Aerial
+
+                    // 14: Video Fireworks Show Sposi
                     GalleryItem.builder()
                             .titleIta("Live Vibes & Scenografia Sposi")
                             .titleEng("Live Vibes & Wedding Scenery")
@@ -296,9 +330,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738959/vinco_eventi_galleria/afrx0hb5jnevhbudiieo.mp4"))
                             .category("live")
                             .featured(true)
+                            .startTime(null)
                             .displayOrder(14)
                             .build(),
-                    // 15: Video Violin Trio Cocktail
+
+                    // 15: Video Candlelit Dinner Live Acoustics
                     GalleryItem.builder()
                             .titleIta("Live Acoustics & Violini Aperitivo")
                             .titleEng("Live Acoustics & Cocktail Violins")
@@ -309,9 +345,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738945/vinco_eventi_galleria/etesqmzgylrapntrtrbf.mov"))
                             .category("band")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(15)
                             .build(),
-                    // 16: Video Woman Singer Outdoor
+
+                    // 16: Video Female Singer Guitar
                     GalleryItem.builder()
                             .titleIta("Atmosphere & Voice Live")
                             .titleEng("Atmosphere & Voice Live")
@@ -322,9 +360,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738935/vinco_eventi_galleria/vswvgslfquuykapxnr3d.mp4"))
                             .category("live")
                             .featured(true)
+                            .startTime(null)
                             .displayOrder(16)
                             .build(),
-                    // 17: Photo Toast Cake Cutting
+
+                    // 17: Photo Sparkular Fountains Cake Cutting
                     GalleryItem.builder()
                             .titleIta("Brindisi & Taglio Torta")
                             .titleEng("Toast & Cake Cutting")
@@ -337,7 +377,8 @@ public class DataInitializer implements CommandLineRunner {
                             .featured(false)
                             .displayOrder(17)
                             .build(),
-                    // 18: Video Party Guests Dancing
+
+                    // 18: Video Sparkular Smoke Effects Dancefloor
                     GalleryItem.builder()
                             .titleIta("Fumogeni & Party Night")
                             .titleEng("Smoke Effects & Party Night")
@@ -348,9 +389,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738913/vinco_eventi_galleria/tuu3jqx5c72wyf9ldhbg.mov"))
                             .category("effects")
                             .featured(true)
+                            .startTime(null)
                             .displayOrder(18)
                             .build(),
-                    // 19: Video Stage Performance Band
+
+                    // 19: Video Full Band Live Show
                     GalleryItem.builder()
                             .titleIta("Festeggiamenti & Live Show Band")
                             .titleEng("Celebrations & Live Show Band")
@@ -361,9 +404,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738895/vinco_eventi_galleria/owjxvhnylisvs0hiyxar.mp4"))
                             .category("band")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(19)
                             .build(),
-                    // 20: Photo Smoke Fireworks
+
+                    // 20: Photo Colored Smoke Fireworks Vintage Car
                     GalleryItem.builder()
                             .titleIta("Fumogeni Colorati Sposi")
                             .titleEng("Colored Smoke Effects")
@@ -376,7 +421,8 @@ public class DataInitializer implements CommandLineRunner {
                             .featured(false)
                             .displayOrder(20)
                             .build(),
-                    // 21: Video Glitter Singer
+
+                    // 21: Video Glitter Dress Singer
                     GalleryItem.builder()
                             .titleIta("Live Performance Cantante")
                             .titleEng("Live Singer Performance")
@@ -387,9 +433,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738827/vinco_eventi_galleria/slfbcr7zinspj5coflaa.mov"))
                             .category("live")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(21)
                             .build(),
-                    // 22: Video Stage Crowd
+
+                    // 22: Video Green Neon Sign Stage
                     GalleryItem.builder()
                             .titleIta("Live Show & Coinvolgimento")
                             .titleEng("Live Show & Engagement")
@@ -400,9 +448,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738801/vinco_eventi_galleria/so2xar04vohxdsc0lulo.mov"))
                             .category("live")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(22)
                             .build(),
-                    // 23: Photo Sax Dark Dress
+
+                    // 23: Photo Solo Sax Tuxedo
                     GalleryItem.builder()
                             .titleIta("Solo Sax & Eleganza")
                             .titleEng("Solo Sax & Elegance")
@@ -415,7 +465,8 @@ public class DataInitializer implements CommandLineRunner {
                             .featured(false)
                             .displayOrder(23)
                             .build(),
-                    // 24: Video Outdoor Dancing
+
+                    // 24: Video Outdoor Sunset Party
                     GalleryItem.builder()
                             .titleIta("Cocktail Party & Pista Aperta")
                             .titleEng("Cocktail Party & Open Dancefloor")
@@ -426,9 +477,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738787/vinco_eventi_galleria/uiqet8umjkjq3b4wej1c.mp4"))
                             .category("djset")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(24)
                             .build(),
-                    // 25: Video Guitar Singer Live
+
+                    // 25: Video Guitar & Singer Dark Suits
                     GalleryItem.builder()
                             .titleIta("Live Show Chitarra & Cantante")
                             .titleEng("Live Guitar & Singer Show")
@@ -439,9 +492,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738745/vinco_eventi_galleria/flg3kduqpo9yoq79fjom.mp4"))
                             .category("band")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(25)
                             .build(),
-                    // 26: Video Live Crowd
+
+                    // 26: Video Singer Dancing on Dancefloor
                     GalleryItem.builder()
                             .titleIta("Show dal Vivo in Pista")
                             .titleEng("Live Performance Show")
@@ -452,9 +507,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738686/vinco_eventi_galleria/oiuv1egd7bx5atkiwzbb.mov"))
                             .category("live")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(26)
                             .build(),
-                    // 27: Photo Guitarist Stage
+
+                    // 27: Photo Electric Guitarist Stage
                     GalleryItem.builder()
                             .titleIta("Chitarrista Live Band")
                             .titleEng("Live Band Guitarist")
@@ -467,7 +524,8 @@ public class DataInitializer implements CommandLineRunner {
                             .featured(false)
                             .displayOrder(27)
                             .build(),
-                    // 28: Video DJ Crowd Dancing
+
+                    // 28: Video Clubbing Night
                     GalleryItem.builder()
                             .titleIta("Party & Clubbing Night")
                             .titleEng("Party & Clubbing Night")
@@ -478,9 +536,11 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738661/vinco_eventi_galleria/uwi6mmwruee6037hbsuo.mp4"))
                             .category("djset")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(28)
                             .build(),
-                    // 29: Photo Enzo DJ Black Shirt
+
+                    // 29: Photo Enzo DJ Black Shirt Headphones
                     GalleryItem.builder()
                             .titleIta("Enzo Colaluca alla Console")
                             .titleEng("Enzo Colaluca at the Console")
@@ -493,7 +553,8 @@ public class DataInitializer implements CommandLineRunner {
                             .featured(false)
                             .displayOrder(29)
                             .build(),
-                    // 30: Video Violin Live Session
+
+                    // 30: Video Acoustic Duo Live Session
                     GalleryItem.builder()
                             .titleIta("Live Session & Duo Acustico")
                             .titleEng("Live Session & Acoustic Duo")
@@ -504,8 +565,10 @@ public class DataInitializer implements CommandLineRunner {
                             .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738637/vinco_eventi_galleria/jlqctoerysynttow2lpf.mov"))
                             .category("band")
                             .featured(false)
+                            .startTime(null)
                             .displayOrder(30)
                             .build(),
+
                     // 31: Photo Violin Duo Red Building
                     GalleryItem.builder()
                             .titleIta("Duo Violino Scenografico")
@@ -513,16 +576,31 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleIta("Esibizione in abito da sera per momenti unici")
                             .subtitleEng("Evening gown performance for unique moments")
                             .type("image")
-                            .src("https://res.cloudinary.com/ytjdxerb/image/upload/v1785739108/vinco_eventi_galleria/ftaaf6e3ry3wykbvdxdn.webp")
-                            .posterUrl("https://res.cloudinary.com/ytjdxerb/image/upload/v1785739108/vinco_eventi_galleria/ftaaf6e3ry3wykbvdxdn.webp")
+                            .src("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738683/vinco_eventi_galleria/ftaaf6e3ry3wykbvdxdn.webp")
+                            .posterUrl("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738683/vinco_eventi_galleria/ftaaf6e3ry3wykbvdxdn.webp")
                             .category("band")
                             .featured(false)
                             .displayOrder(31)
+                            .build(),
+
+                    // 32: Video International Voice & Live Show (#32)
+                    GalleryItem.builder()
+                            .titleIta("International Voice & Live Show")
+                            .titleEng("International Voice & Live Show")
+                            .subtitleIta("Spettacolo internazionale con la regia musicale di Enzo Colaluca")
+                            .subtitleEng("International show with music direction by Enzo Colaluca")
+                            .type("video")
+                            .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738600/vinco_eventi_galleria/ynbarymzdd1lu9cvycfu.mov")
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738600/vinco_eventi_galleria/ynbarymzdd1lu9cvycfu.mov"))
+                            .category("live")
+                            .featured(false)
+                            .startTime(null)
+                            .displayOrder(32)
                             .build()
             );
 
             galleryRepository.saveAll(items);
-            System.out.println(">>> Seed Galleria eseguito con successo con riallineamento 100% dei contenuti visivi a titoli e sottotitoli.");
+            System.out.println(">>> Seed Galleria eseguito con successo con tutti i 32 elementi 100% allineati.");
         }
     }
 }
