@@ -29,6 +29,10 @@ function LocationMap() {
       return;
     }
 
+    // Su Safari / iOS i window.open asincroni (dentro le callback di geolocalizzazione)
+    // vengono bloccati dal Popup Blocker. Apriamo la finestra in modo sincrono sul tap utente.
+    const targetWindow = window.open("", "_blank");
+
     setIsLocating(true);
 
     navigator.geolocation.getCurrentPosition(
@@ -38,16 +42,24 @@ function LocationMap() {
         const preciseDirectionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${encodeURIComponent(
           mapAddress
         )}`;
-        window.open(preciseDirectionsUrl, "_blank", "noopener,noreferrer");
+        if (targetWindow) {
+          targetWindow.location.href = preciseDirectionsUrl;
+        } else {
+          window.location.href = preciseDirectionsUrl;
+        }
       },
       (error) => {
         console.warn("Geolocation fallback triggered:", error);
         setIsLocating(false);
-        window.open(fallbackUrl, "_blank", "noopener,noreferrer");
+        if (targetWindow) {
+          targetWindow.location.href = fallbackUrl;
+        } else {
+          window.location.href = fallbackUrl;
+        }
       },
       {
         enableHighAccuracy: true,
-        timeout: 6000,
+        timeout: 5000,
         maximumAge: 0,
       }
     );
