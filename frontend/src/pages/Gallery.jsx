@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
-import heroBgImage from "../assets/home/foto sfondo banner enzo.jpeg";
+const heroBgImage = "https://res.cloudinary.com/ytjdxerb/image/upload/v1786087803/vinco_eventi_assets/nipwxdbvbrw5oeinqcqt.webp";
 import GallerySection from "../components/GallerySection/GallerySection";
 import useScrollReveal from "../utils/useScrollReveal";
 

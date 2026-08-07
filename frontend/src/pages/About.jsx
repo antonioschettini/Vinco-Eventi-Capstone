@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { translations } from "../utils/translations";
 import LocationMap from "../components/LocationMap/LocationMap";
 import MatrimonioWidgets from "../components/MatrimonioWidgets/MatrimonioWidgets";
-import heroBgImage from "../assets/home/foto enzo dj set.jpeg";
-import storyImage from "../assets/home/foto sfondo banner enzo.jpeg";
+const heroBgImage = "https://res.cloudinary.com/ytjdxerb/image/upload/v1786087804/vinco_eventi_assets/kjk5vdym2msfa3qxsaid.webp";
+const storyImage = "https://res.cloudinary.com/ytjdxerb/image/upload/v1786087803/vinco_eventi_assets/nipwxdbvbrw5oeinqcqt.webp";
 import useScrollReveal from "../utils/useScrollReveal";
 import "./About.css";
 

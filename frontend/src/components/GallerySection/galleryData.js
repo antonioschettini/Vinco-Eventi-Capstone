@@ -9,7 +9,7 @@ import fotoBandSera from "../../assets/home/foto band sera.jpg";
 import fotoBandPng from "../../assets/home/foto band.png";
 import fotoBrindisiTorta from "../../assets/home/foto brindisi torta.jpg";
 import fotoCantanteSera from "../../assets/home/foto cantante sera.webp";
-import fotoEnzoDjSet from "../../assets/home/foto enzo dj set.jpeg";
+const fotoEnzoDjSet = "https://res.cloudinary.com/ytjdxerb/image/upload/v1786087804/vinco_eventi_assets/kjk5vdym2msfa3qxsaid.webp";
 import fotoMusicaAperitivo from "../../assets/home/foto musica aperitivo.jpg";
 import fotoBandAperitivoWebp from "../../assets/home/fotoband aperitivo.webp";
 
