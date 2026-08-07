@@ -68,10 +68,13 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         
-        // Consente tutti i domini di anteprima e produzione Vercel (*.vercel.app) e i domini di sviluppo locale
+        // Consente tutti i domini di anteprima e produzione Vercel (*.vercel.app), il dominio personalizzato vincoeventi.com e localhost
         config.setAllowedOriginPatterns(List.of(
             "https://*.vercel.app",
             "https://vinco-eventi-capstone.vercel.app",
+            "https://*.vincoeventi.com",
+            "https://vincoeventi.com",
+            "https://www.vincoeventi.com",
             "http://localhost:5173",
             "http://localhost:3000",
             "http://localhost:4173"
