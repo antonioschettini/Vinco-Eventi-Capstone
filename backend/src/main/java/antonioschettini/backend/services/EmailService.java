@@ -12,8 +12,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -21,8 +19,6 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -890,29 +886,32 @@ public class EmailService {
                     .connectTimeout(Duration.ofSeconds(10))
                     .build();
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("sender", Map.of("name", "VINCO EVENTI", "email", mailFrom != null && !mailFrom.isBlank() ? mailFrom : "vincoeventi@gmail.com"));
-            body.put("to", List.of(Map.of("email", to)));
-            body.put("subject", subject);
-            body.put("htmlContent", htmlContent);
+            String senderEmail = mailFrom != null && !mailFrom.isBlank() ? mailFrom : "vincoeventi@gmail.com";
+            
+            StringBuilder jsonSb = new StringBuilder();
+            jsonSb.append("{");
+            jsonSb.append("\"sender\":{\"name\":\"VINCO EVENTI\",\"email\":\"").append(escapeJson(senderEmail)).append("\"},");
+            jsonSb.append("\"to\":[{\"email\":\"").append(escapeJson(to)).append("\"}],");
+            jsonSb.append("\"subject\":\"").append(escapeJson(subject)).append("\",");
+            jsonSb.append("\"htmlContent\":\"").append(escapeJson(htmlContent)).append("\"");
 
             if (replyToEmail != null && !replyToEmail.isBlank()) {
-                body.put("replyTo", Map.of("email", replyToEmail, "name", replyToName != null && !replyToName.isBlank() ? replyToName : "VINCO EVENTI"));
+                String rName = replyToName != null && !replyToName.isBlank() ? replyToName : "VINCO EVENTI";
+                jsonSb.append(",\"replyTo\":{\"email\":\"").append(escapeJson(replyToEmail)).append("\",\"name\":\"").append(escapeJson(rName)).append("\"}");
             }
 
             if (attachmentBytes != null && attachmentBytes.length > 0 && attachmentName != null && !attachmentName.isBlank()) {
                 String base64Content = Base64.getEncoder().encodeToString(attachmentBytes);
-                body.put("attachment", List.of(Map.of("name", attachmentName, "content", base64Content)));
+                jsonSb.append(",\"attachment\":[{\"name\":\"").append(escapeJson(attachmentName)).append("\",\"content\":\"").append(base64Content).append("\"}]");
             }
 
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonBody = mapper.writeValueAsString(body);
+            jsonSb.append("}");
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
                     .header("Content-Type", "application/json")
                     .header("api-key", brevoApiKey.trim())
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonSb.toString(), java.nio.charset.StandardCharsets.UTF_8))
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -926,5 +925,30 @@ public class EmailService {
             System.err.println("[WARN EmailService] Eccezione invio Brevo HTTPS API: " + e.getMessage());
         }
         return false;
+    }
+
+    private String escapeJson(String text) {
+        if (text == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            switch (ch) {
+                case '"': sb.append("\\\""); break;
+                case '\\': sb.append("\\\\"); break;
+                case '\b': sb.append("\\b"); break;
+                case '\f': sb.append("\\f"); break;
+                case '\n': sb.append("\\n"); break;
+                case '\r': sb.append("\\r"); break;
+                case '\t': sb.append("\\t"); break;
+                default:
+                    if (ch <= 0x1F) {
+                        sb.append(String.format("\\u%04x", (int) ch));
+                    } else {
+                        sb.append(ch);
+                    }
+                    break;
+            }
+        }
+        return sb.toString();
     }
 }
