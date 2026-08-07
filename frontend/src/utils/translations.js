@@ -18,6 +18,7 @@ export const translations = {
       phone: "+39 349 294 9669",
       email: "vincoeventi@gmail.com",
       rights: "© 2026 VINCO EVENTI. Tutti i diritti riservati.",
+      callNow: "Chiama Ora",
     },
     home: {
       title: "Biografia",
@@ -362,6 +363,7 @@ export const translations = {
       phone: "+39 349 294 9669",
       email: "vincoeventi@gmail.com",
       rights: "© 2026 VINCO EVENTI. All rights reserved.",
+      callNow: "Call Now",
     },
     home: {
       title: "Biography",

@@ -16,16 +16,20 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
   const currentMedia = items && items[currentIndex] ? items[currentIndex] : null;
 
   const [videoError, setVideoError] = useState(false);
-  const [prevMediaKey, setPrevMediaKey] = useState(null);
 
-  const currentMediaKey = `${show}-${currentIndex}`;
-  if (currentMediaKey !== prevMediaKey) {
-    setPrevMediaKey(currentMediaKey);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVideoError(false);
-  }
+  }, [show, currentIndex]);
 
   const isAudioPlayingRef = useRef(isAudioPlaying);
   const wasAudioPlayingRef = useRef(false);
+
+  // Touch Swipe Gesture Support per dispositivi Mobile
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
+  const touchStartY = useRef(null);
+  const touchEndY = useRef(null);
 
   useEffect(() => {
     isAudioPlayingRef.current = isAudioPlaying;
@@ -101,12 +105,6 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
 
   const modalMediaUrl = getOptimizedCloudinaryUrl(currentMedia.src, { type: "modal" });
   const posterUrl = currentMedia.posterUrl || getOptimizedCloudinaryUrl(currentMedia.src, { type: "poster" });
-
-  // Touch Swipe Gesture Support per dispositivi Mobile (Orizzontale per nav, Verticale verso il basso per chiudi)
-  const touchStartX = useRef(null);
-  const touchEndX = useRef(null);
-  const touchStartY = useRef(null);
-  const touchEndY = useRef(null);
 
   const minSwipeDistance = 45;
 

@@ -11,11 +11,6 @@ function Footer() {
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].footer;
 
-  // Gestione del click per i social
-  const handleSocialClick = (url) => {
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <footer
       className="footer-section py-5 mt-auto position-relative"

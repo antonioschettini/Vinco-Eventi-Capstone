@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   setIsPlaying,
   nextTrack,
+  prevTrack,
   setAutoplayBlocked,
 } from "../../redux/slices/audioSlice";
 import tracks from "../../data/tracksData";

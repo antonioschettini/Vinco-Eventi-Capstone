@@ -55,7 +55,7 @@ function AdminQuotes() {
   }, [token, dispatch]);
 
   useEffect(() => {
-    // fetchQuotes è già memoizzata con useCallback — nessuna doppia chiamata al mount
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchQuotes();
   }, [fetchQuotes]);
 
