@@ -45,11 +45,18 @@ public class JWTTools {
     }
 
     public String extractSubjectFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-        return claims.getSubject();
+        return extractClaimsFromToken(token).getSubject();
+    }
+
+    public Claims extractClaimsFromToken(String token) {
+        try {
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (Exception ex) {
+            throw new UnauthorizedException("Token non valido o scaduto! Per favore effettua nuovamente il login.");
+        }
     }
 }

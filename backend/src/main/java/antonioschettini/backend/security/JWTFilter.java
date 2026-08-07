@@ -1,8 +1,9 @@
 package antonioschettini.backend.security;
 
 import antonioschettini.backend.entities.User;
+import antonioschettini.backend.enums.Role;
 import antonioschettini.backend.exceptions.UnauthorizedException;
-import antonioschettini.backend.repositories.UserRepository;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,15 +17,13 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 public class JWTFilter extends OncePerRequestFilter {
 
     @Autowired
     private JWTTools jwtTools;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -39,11 +38,19 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String accessToken = authHeader.substring(7);
         try {
-            jwtTools.verifyToken(accessToken);
-            String email = jwtTools.extractSubjectFromToken(accessToken);
+            Claims claims = jwtTools.extractClaimsFromToken(accessToken);
+            String email = claims.getSubject();
+            String roleStr = claims.get("role", String.class);
+            String idStr = claims.get("id", String.class);
 
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new UnauthorizedException("Utente non trovato nel sistema."));
+            Role role = (roleStr != null) ? Role.valueOf(roleStr) : Role.ROLE_ADMIN;
+            UUID id = (idStr != null && !idStr.isBlank()) ? UUID.fromString(idStr) : UUID.randomUUID();
+
+            User user = User.builder()
+                    .id(id)
+                    .email(email)
+                    .role(role)
+                    .build();
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
