@@ -27,7 +27,16 @@
   --light-heading: #204a35;
 }
 
-/* Regole Base del Body e Sfondi Unificati */
+/* Regole Base del Body, Touch UX e Sfondi Unificati */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -38,6 +47,7 @@ body {
   display: flex;
   flex-direction: column;
   transition: background-color 0.3s ease, color 0.3s ease;
+  touch-action: manipulation;
 }
 
 [data-bs-theme="dark"] body {
