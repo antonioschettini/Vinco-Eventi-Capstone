@@ -79,12 +79,31 @@ function Services() {
     return () => { isSubscribed = false; };
   }, []);
 
-  // Determina l'immagine da visualizzare (Priorità: 1. URL Cloudinary/DB, 2. Cloudinary Fallback)
+  // Determina l'immagine da visualizzare con correzione difensiva
   const getServiceImage = (service) => {
     const isEng = lang === "en";
-    const dbUrl = isEng ? service.imageUrlEng : service.imageUrlIta;
+    let dbUrl = isEng ? service.imageUrlEng : service.imageUrlIta;
 
     if (dbUrl && dbUrl.startsWith("http")) {
+      // Correzione automatica nel caso in cui il DB contenga i vecchi URL invertiti
+      if (!isEng && dbUrl.includes("fnrxkp5mpmdk8dcfz8mf.png")) {
+        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png";
+      }
+      if (isEng && dbUrl.includes("vvzgi7pa99ubd9np2fmy.png")) {
+        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png";
+      }
+      if (!isEng && dbUrl.includes("oppbybtrbqttfi2aprnz.png")) {
+        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738603/vinco_eventi_servizi/qev9reiqlzxtmpsiulsz.png";
+      }
+      if (isEng && dbUrl.includes("qev9reiqlzxtmpsiulsz.png")) {
+        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738606/vinco_eventi_servizi/oppbybtrbqttfi2aprnz.png";
+      }
+      if (!isEng && dbUrl.includes("ckjzq11sbrvaojf5iskt.png")) {
+        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738608/vinco_eventi_servizi/ii4efs143kbixn2n2wnb.png";
+      }
+      if (isEng && dbUrl.includes("ii4efs143kbixn2n2wnb.png")) {
+        return "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738611/vinco_eventi_servizi/ckjzq11sbrvaojf5iskt.png";
+      }
       return dbUrl;
     }
 
@@ -104,8 +123,8 @@ function Services() {
           : "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738608/vinco_eventi_servizi/ii4efs143kbixn2n2wnb.png";
       default:
         return isEng
-          ? "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png"
-          : "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png";
+          ? "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png"
+          : "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png";
     }
   };
 

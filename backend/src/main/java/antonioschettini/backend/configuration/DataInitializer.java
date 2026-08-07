@@ -106,6 +106,24 @@ public class DataInitializer implements CommandLineRunner {
 
             serviceRepository.saveAll(List.of(basic, plus, full));
             System.out.println(">>> Seed Servizi eseguito con successo con URL Cloudinary corretti per BASIC, PLUS e FULL.");
+        } else {
+            List<ServiceEntity> existing = serviceRepository.findAll();
+            for (ServiceEntity s : existing) {
+                if ("BASIC".equalsIgnoreCase(s.getBadge())) {
+                    s.setImageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png");
+                    s.setImageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png");
+                    serviceRepository.save(s);
+                } else if ("PLUS".equalsIgnoreCase(s.getBadge())) {
+                    s.setImageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738603/vinco_eventi_servizi/qev9reiqlzxtmpsiulsz.png");
+                    s.setImageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738606/vinco_eventi_servizi/oppbybtrbqttfi2aprnz.png");
+                    serviceRepository.save(s);
+                } else if ("FULL".equalsIgnoreCase(s.getBadge())) {
+                    s.setImageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738608/vinco_eventi_servizi/ii4efs143kbixn2n2wnb.png");
+                    s.setImageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738611/vinco_eventi_servizi/ckjzq11sbrvaojf5iskt.png");
+                    serviceRepository.save(s);
+                }
+            }
+            System.out.println(">>> Allineamento Servizi completato su DB per i 3 pacchetti base.");
         }
     }
 

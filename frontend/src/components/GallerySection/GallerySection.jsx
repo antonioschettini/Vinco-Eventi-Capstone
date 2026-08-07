@@ -181,12 +181,14 @@ function GallerySection() {
     };
   });
 
-  // Unique category keys for filter options
+  // Unique category keys for filter options (solamente le categorie valide attive)
+  const validCategories = ["djset", "band", "wedding", "lightshow", "live", "effects"];
   const categoryKeys = Array.from(
-    new Set([
-      "djset", "band", "wedding", "lightshow", "live", "effects", "decor",
-      ...allItems.map((i) => i.category).filter(Boolean)
-    ])
+    new Set(
+      allItems
+        .map((i) => i.category)
+        .filter((c) => c && validCategories.includes(c))
+    )
   );
 
   const getCategoryCount = (catKey) => {
