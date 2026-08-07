@@ -44,12 +44,9 @@ public class DataInitializer implements CommandLineRunner {
         String adminEmail = "vincoeventi@gmail.com";
         if (userRepository.findByEmail(adminEmail).isEmpty()) {
             User admin = User.builder()
-                    .name("Admin")
-                    .surname("Vinco Eventi")
                     .email(adminEmail)
                     .password(passwordEncoder.encode(adminPassword))
                     .role(Role.ROLE_ADMIN)
-                    .phone("+393492949669")
                     .build();
 
             userRepository.save(admin);
@@ -58,11 +55,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedDefaultServices() {
-        boolean hasMismatchedUrls = serviceRepository.findAll().stream()
-                .anyMatch(s -> s.getBadge().equalsIgnoreCase("BASIC") && s.getImageUrlIta().contains("ckjzq11sbrvaojf5iskt"));
-
-        if (serviceRepository.count() != 3 || hasMismatchedUrls) {
-            serviceRepository.deleteAll();
+        if (serviceRepository.count() == 0) {
             ServiceEntity basic = ServiceEntity.builder()
                     .titleIta("BASIC")
                     .titleEng("BASIC")
