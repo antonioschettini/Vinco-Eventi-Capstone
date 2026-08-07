@@ -17,7 +17,7 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
 
   useEffect(() => {
     const target = videoRef.current;
-    if (!target || hasError || item.isFallback) return;
+    if (!target || hasError) return;
 
     target.play().catch(() => {});
 
@@ -42,11 +42,11 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
     return () => {
       if (target) observer.unobserve(target);
     };
-  }, [hasError, item.isFallback]);
+  }, [hasError]);
 
   const poster = posterUrl || (src && !src.startsWith("http") ? src : getOptimizedCloudinaryUrl(src, { type: "poster" }));
 
-  if (item.isFallback || hasError || !src) {
+  if (hasError || !src) {
     return (
       <img
         src={poster}
@@ -470,7 +470,7 @@ function GallerySection() {
                     className="gallery-carousel-item cursor-pointer position-relative"
                   >
                     <div className="carousel-media-wrapper">
-                      {item.type === "video" && !item.isFallback ? (
+                      {item.type === "video" ? (
                         isActive ? (
                           <video
                             src={item.startTime ? `${getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}#t=${item.startTime}` : getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}

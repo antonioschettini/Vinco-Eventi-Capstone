@@ -55,7 +55,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private void seedDefaultServices() {
         boolean hasBrokenUrls = serviceRepository.findAll().stream()
-                .anyMatch(s -> s.getImageUrlIta() == null || !s.getImageUrlIta().contains("/ytjdxerb/"));
+                .anyMatch(s -> s.getImageUrlIta() == null || s.getImageUrlIta().contains("basicIta.png"));
 
         if (serviceRepository.count() == 0 || hasBrokenUrls) {
             serviceRepository.deleteAll();
