@@ -394,16 +394,11 @@ public class EmailService {
     }
 
     private String buildAppleCalendarUrl(QuoteRequest quote) {
-        if (quote.getDataEvento() == null) return "";
-        try {
-            String icsContent = quoteService.generateIcsContent(quote);
-            if (icsContent != null && !icsContent.isBlank()) {
-                String b64 = java.util.Base64.getEncoder().encodeToString(icsContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                return "data:text/calendar;charset=utf-8;base64," + b64;
-            }
-        } catch (Exception e) {
-            System.err.println("[WARN EmailService] Impossibile generare Data URI per Apple Calendar: " + e.getMessage());
-        }
+        // Usa sempre l'URL diretto del backend: i data: URI base64 sono bloccati
+        // da tutti i mail client moderni (Gmail, Outlook, Apple Mail) per sicurezza.
+        // L'endpoint /calendar.ics è già pubblico (permitAll in SecurityConfig)
+        // e serve il file con Content-Disposition: inline per aprirsi direttamente
+        // nell'app Calendario di iOS/macOS senza la schermata di iscrizione.
         if (quote.getId() != null) {
             return backendBaseUrl + "/api/quotes/" + quote.getId() + "/calendar.ics";
         }

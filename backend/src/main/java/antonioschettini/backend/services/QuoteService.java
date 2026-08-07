@@ -82,7 +82,9 @@ public class QuoteService {
 
         String dtStart = quote.getDataEvento().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
         String dtEnd = quote.getDataEvento().plusDays(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String now = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));
+        // Usa ZonedDateTime UTC per un DTSTAMP genuinamente UTC (RFC 5545)
+        String now = java.time.ZonedDateTime.now(java.time.ZoneOffset.UTC)
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));
 
         StringBuilder desc = new StringBuilder();
         desc.append("Cliente: ").append(quote.getNome()).append(" ").append(quote.getCognome()).append("\\n");
@@ -100,7 +102,10 @@ public class QuoteService {
         sb.append("VERSION:2.0\r\n");
         sb.append("PRODID:-//VINCO EVENTI//Gestione Preventivi//IT\r\n");
         sb.append("CALSCALE:GREGORIAN\r\n");
-        sb.append("METHOD:REQUEST\r\n");
+        // METHOD:PUBLISH = evento di calendario semplice (non meeting invite).
+        // METHOD:REQUEST causerebbe problemi su Outlook (chiede di accettare come riunione)
+        // e su iOS potrebbe aprire il flusso di iscrizione invece della card evento singolo.
+        sb.append("METHOD:PUBLISH\r\n");
         sb.append("BEGIN:VEVENT\r\n");
         sb.append("UID:quote-").append(quote.getId()).append("@vincoeventi.it\r\n");
         sb.append("DTSTAMP:").append(now).append("\r\n");

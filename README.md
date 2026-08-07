@@ -53,7 +53,7 @@ L'applicativo unisce un **frontend raffinato ed elegante** in React a un **backe
 
 ## 📖 Documentazione API & Specifiche OpenAPI 3.0 (Swagger Docs 📘)
 
-Base URL: `http://localhost:8080` *(Sviluppo)* | `https://api.vincoeventi.it` *(Produzione)*  
+Base URL: `http://localhost:8080` *(Sviluppo)* | `https://api.vincoeventi.com` *(Produzione)*  
 Autenticazione: **Bearer JWT** su header `Authorization: Bearer <token>` per tutte le rotte `/api/admin/**`.
 
 ### 🔓 1. Autenticazione (`/api/auth`)
@@ -349,6 +349,15 @@ Vinco Eventi Capstone/
 - **Sviluppatore:** Antonio Schettini  
 - **Progetto:** Epicode Capstone Project  
 - **Cliente / Brand:** Vincenzo Colaluca — *Vinco Eventi* 🎷🎵  
+
+---
+
+## 🌍 Deploy in Produzione
+
+- **Frontend:** Vercel — [vinco-eventi-capstone.vercel.app](https://vinco-eventi-capstone.vercel.app)  
+- **Backend:** Railway / Render  
+- **Dominio Personalizzato:** `www.vincoeventi.com` *(collegamento da WordPress in fase di configurazione)*  
+- **CORS:** Configurato per `*.vercel.app`, `vincoeventi.com`, `www.vincoeventi.com`  
 
 ---
 *Pronto per il deploy online in produzione!* 🚀✨

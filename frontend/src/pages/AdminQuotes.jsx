@@ -55,27 +55,9 @@ function AdminQuotes() {
   }, [token, dispatch]);
 
   useEffect(() => {
-    let active = true;
-    const loadData = async () => {
-      try {
-        const data = await authApiFetch(`${API_BASE_URL}/api/admin/quotes`, {}, token, dispatch);
-        if (active) {
-          setAllQuotes(data || []);
-          setLoading(false);
-        }
-      } catch (err) {
-        if (active) {
-          setError(err.message);
-          setLoading(false);
-        }
-      }
-    };
-
-    loadData();
-    return () => {
-      active = false;
-    };
-  }, [token, dispatch]);
+    // fetchQuotes è già memoizzata con useCallback — nessuna doppia chiamata al mount
+    fetchQuotes();
+  }, [fetchQuotes]);
 
   // Gestione Tasto ESC per la chiusura dei modali Admin
   useEffect(() => {

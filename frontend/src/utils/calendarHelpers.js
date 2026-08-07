@@ -41,6 +41,18 @@ const escapeIcsText = (str) => {
 };
 
 /**
+ * Rileva se il dispositivo è iOS (iPhone / iPad).
+ * Gestisce anche iPadOS 13+ che si identifica come "MacIntel" con maxTouchPoints > 1.
+ */
+export const isIOSDevice = () => {
+  if (typeof window === "undefined" || !window.navigator) return false;
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+};
+
+/**
  * Genera l'URL diretto per la creazione evento su Google Calendar.
  */
 export const generateGoogleCalendarUrl = (quote) => {
@@ -86,6 +98,8 @@ export const generateOutlookCalendarUrl = (quote) => {
 
 /**
  * Genera la stringa iCalendar (.ics) conforme a RFC 5545.
+ * Usa METHOD:PUBLISH (evento semplice), non METHOD:REQUEST (che è per meeting invite
+ * e causa dialog "accetta riunione" su Outlook e problemi di iscrizione su iOS).
  */
 export const generateIcsContent = (quote) => {
   if (!quote || !quote.dataEvento) return "";
@@ -107,7 +121,7 @@ export const generateIcsContent = (quote) => {
     "VERSION:2.0",
     "PRODID:-//VINCO EVENTI//Gestione Preventivi//IT",
     "CALSCALE:GREGORIAN",
-    "METHOD:REQUEST",
+    "METHOD:PUBLISH",
     "BEGIN:VEVENT",
     `UID:${uid}`,
     `DTSTAMP:${nowUtc}`,
@@ -126,6 +140,7 @@ export const generateIcsContent = (quote) => {
 
 /**
  * Scarica direttamente il file .ics per Apple Calendar / iCal / Outlook Desktop.
+ * Usato solo su desktop dove il download blob funziona correttamente.
  */
 export const downloadIcsFile = (quote) => {
   const icsText = generateIcsContent(quote);
@@ -144,12 +159,27 @@ export const downloadIcsFile = (quote) => {
 };
 
 /**
- * Salva l'evento nel Calendario Apple (macOS / iOS) ed altri calendari di sistema tramite file .ics.
- * Usa METHOD:REQUEST per forzare l'apertura della scheda del singolo evento invece dell'iscrizione al calendario.
- * Genera il file .ics lato client per garantire il funzionamento sia in locale che da remoto senza errori su localhost.
+ * Salva l'evento nel Calendario Apple / di sistema:
+ *
+ * - iOS (iPhone/iPad): usa l'URL diretto del backend HTTPS (/calendar.ics).
+ *   I blob: URL su iOS vengono trattati come feed di iscrizione e mostrano
+ *   "Aggiungi calendario con iscrizione" invece di aprire il singolo evento.
+ *   L'endpoint backend è pubblico (permitAll), serve .ics con Content-Disposition: inline
+ *   e iOS lo apre direttamente nell'app Calendario come evento singolo.
+ *
+ * - Desktop (macOS, Windows): scarica il file .ics tramite blob, che viene
+ *   aperto automaticamente dall'app Calendario di sistema (Apple Calendar, iCal).
  */
 export const openAppleCalendar = (quote) => {
   if (!quote || !quote.dataEvento) return;
+
+  if (isIOSDevice() && quote.id) {
+    // iOS: redirect diretto all'endpoint backend — iOS apre l'app Calendario nativa
+    const icsUrl = `${API_BASE_URL}/api/quotes/${quote.id}/calendar.ics`;
+    window.location.href = icsUrl;
+    return;
+  }
+
+  // Desktop: download del .ics che si apre con l'app Calendario di sistema
   downloadIcsFile(quote);
 };
-
