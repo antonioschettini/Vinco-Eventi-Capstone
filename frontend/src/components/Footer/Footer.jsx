@@ -1,7 +1,7 @@
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
-import footerBgImage from "../../assets/home/bannerFooter.png";
+const footerBgImage = "https://res.cloudinary.com/ytjdxerb/image/upload/v1786087542/vinco_eventi_assets/grx32y3fmenjhcwk1god.webp";
 import "./Footer.css";
 
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
