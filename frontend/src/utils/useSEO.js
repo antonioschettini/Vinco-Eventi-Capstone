@@ -5,20 +5,20 @@ import { useSelector } from "react-redux";
 const metaConfig = {
   it: {
     "/": {
-      title: "VINCO EVENTI | DJ Set, Service Audio Luci & Allestimenti Eventi Bari Puglia",
-      description: "VINCO EVENTI: Wedding Music Designer, DJ set per matrimoni e feste private a Bari e in Puglia. Service audio e luci professionale, fontane fredde Sparkular ed allestimenti per eventi esclusivi."
+      title: "VINCO EVENTI | DJ Set, Service Audio Luci & Spettacoli Musicali Bari Puglia",
+      description: "VINCO EVENTI: Wedding Music Designer & DJ Set d'eccellenza in Puglia. Service Audio-Luci scenografico, fontane fredde Sparkular ed allestimenti musicali per matrimoni ed eventi esclusivi a Bari."
     },
     "/servizi": {
-      title: "Servizi DJ Set & Effetti Speciali Bari Puglia | VINCO EVENTI",
-      description: "Scopri i pacchetti DJ set, service audio e luci architetturale, fontane luminose fredde Sparkular ed effetti speciali per il tuo matrimonio o festa privata in Puglia."
+      title: "Service Audio Luci, DJ Set & Effetti Speciali Puglia | VINCO EVENTI",
+      description: "Scopri i pacchetti DJ set, service audio e illuminazione scenografica, fontane luminose fredde Sparkular ed allestimenti spettacoli per matrimoni e feste in Puglia."
     },
     "/galleria": {
-      title: "Galleria Foto e Video Eventi Musicali Puglia | VINCO EVENTI",
-      description: "Esplora i momenti più emozionanti dei nostri DJ set, matrimoni, concerti e feste private a Bari e in Puglia nella nostra galleria in alta definizione."
+      title: "Galleria Spettacoli Musicali & Service Eventi Puglia | VINCO EVENTI",
+      description: "Esplora le foto ed i video dei nostri DJ set, service audio-luci scenografico e spettacoli per matrimoni ed eventi esclusivi in Puglia."
     },
     "/chi-siamo": {
-      title: "Chi Siamo - Organizzazione Musicale Bari Puglia | VINCO EVENTI",
-      description: "Scopri la storia e l'esperienza di Vincenzo Colaluca e VINCO EVENTI nell'organizzazione musicale sartoriale ed allestimenti scenografici in Puglia e in tutta Italia."
+      title: "Chi Siamo - Direzione Musicale & Service Spettacoli | VINCO EVENTI",
+      description: "Scopri l'esperienza di Vincenzo Colaluca e VINCO EVENTI nella regia musicale sartoriale, service audio e luci scenografico in Puglia e in tutta Italia."
     },
     "/admin-enzo": {
       title: "Accesso Area Riservata | VINCO EVENTI",
@@ -31,20 +31,20 @@ const metaConfig = {
   },
   en: {
     "/": {
-      title: "VINCO EVENTI | DJ Sets, Audio Light Service & Event Setups Bari Puglia",
-      description: "VINCO EVENTI: Wedding Music Designer and exclusive DJ sets for weddings and private parties in Bari and Puglia. Professional audio/lighting service, Sparkular cold fountains & event setups."
+      title: "VINCO EVENTI | DJ Sets, Audio Light Service & Musical Production Bari Puglia",
+      description: "VINCO EVENTI: Wedding Music Designer & exclusive DJ sets in Puglia. Scenic Audio-Lighting service, Sparkular cold spark fountains & musical event setups in Bari."
     },
     "/servizi": {
-      title: "DJ Set & Special Effects Services Bari Puglia | VINCO EVENTI",
-      description: "Explore our DJ set packages, architectural lighting service, Sparkular cold spark fountains, and special effects for your luxury wedding or private event in Puglia."
+      title: "Audio Lighting Service, DJ Sets & Special Effects | VINCO EVENTI",
+      description: "Explore our DJ set packages, architectural lighting service, Sparkular cold spark fountains, and musical stage production for luxury weddings & events in Puglia."
     },
     "/galleria": {
-      title: "Photo & Video Event Gallery Puglia | VINCO EVENTI",
-      description: "Explore exciting highlights from our live DJ sets, weddings, concerts, and private parties in Bari and Puglia through our high-definition media gallery."
+      title: "Musical Show & Lighting Service Gallery | VINCO EVENTI",
+      description: "Explore photos and videos from our live DJ sets, weddings, concerts, and scenic audio-lighting event setups in Bari and Puglia."
     },
     "/chi-siamo": {
-      title: "About Us - Musical Organization Bari Puglia | VINCO EVENTI",
-      description: "Discover the history and experience of Vincenzo Colaluca and VINCO EVENTI in custom musical direction and scenic setups across Puglia and Italy."
+      title: "About Us - Musical Direction & Event Production | VINCO EVENTI",
+      description: "Discover Vincenzo Colaluca and VINCO EVENTI's experience in bespoke musical direction and stage audio-lighting setup across Puglia and Italy."
     },
     "/admin-enzo": {
       title: "Admin Reserved Login | VINCO EVENTI",
@@ -86,6 +86,16 @@ export function useSEO() {
       let ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) {
         ogDesc.setAttribute("content", pageMeta.description);
+      }
+
+      // Aggiorna Twitter Title & Description
+      let twTitle = document.querySelector('meta[name="twitter:title"]');
+      if (twTitle) {
+        twTitle.setAttribute("content", pageMeta.title);
+      }
+      let twDesc = document.querySelector('meta[name="twitter:description"]');
+      if (twDesc) {
+        twDesc.setAttribute("content", pageMeta.description);
       }
 
       // Aggiorna Canonical Link
