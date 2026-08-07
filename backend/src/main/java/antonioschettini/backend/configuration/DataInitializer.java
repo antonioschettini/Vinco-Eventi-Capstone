@@ -67,8 +67,8 @@ public class DataInitializer implements CommandLineRunner {
                     .subtitleEng("Essential package for entertainment and professional audio/lighting service")
                     .category("PACKAGE")
                     .badge("BASIC")
-                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png")
-                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png")
+                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png")
+                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png")
                     .featuresIta("Service audio e luci;DJ (a scelta dal team VINCO EVENTI)")
                     .featuresEng("Audio and lighting service;DJ (selected from VINCO EVENTI team)")
                     .displayOrder(1)
@@ -81,8 +81,8 @@ public class DataInitializer implements CommandLineRunner {
                     .subtitleEng("Complete solution with background music and live solo instruments")
                     .category("PACKAGE")
                     .badge("PLUS")
-                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738606/vinco_eventi_servizi/oppbybtrbqttfi2aprnz.png")
-                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738603/vinco_eventi_servizi/qev9reiqlzxtmpsiulsz.png")
+                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738603/vinco_eventi_servizi/qev9reiqlzxtmpsiulsz.png")
+                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738606/vinco_eventi_servizi/oppbybtrbqttfi2aprnz.png")
                     .featuresIta("Service audio e luci;DJ (a scelta dal team VINCO EVENTI);Musica di sottofondo (Cerimonia, Aperitivo);Musicista a scelta di accompagnamento al djset (violino, sax, percussioni ecc.)")
                     .featuresEng("Audio and lighting service;DJ (selected from VINCO EVENTI team);Background music (Ceremony, Cocktail Hour);Musician of choice to accompany DJ set (violin, sax, percussion, etc.)")
                     .displayOrder(2)
@@ -95,8 +95,8 @@ public class DataInitializer implements CommandLineRunner {
                     .subtitleEng("The total entertainment experience with live band, special attractions and scenic lighting")
                     .category("PACKAGE")
                     .badge("FULL")
-                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738611/vinco_eventi_servizi/ckjzq11sbrvaojf5iskt.png")
-                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738608/vinco_eventi_servizi/ii4efs143kbixn2n2wnb.png")
+                    .imageUrlIta("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738608/vinco_eventi_servizi/ii4efs143kbixn2n2wnb.png")
+                    .imageUrlEng("https://res.cloudinary.com/ytjdxerb/image/upload/v1785738611/vinco_eventi_servizi/ckjzq11sbrvaojf5iskt.png")
                     .featuresIta("Service audio e luci;DJ (a scelta dal team VINCO EVENTI);Musica di sottofondo (Cerimonia, Aperitivo);Live Band [BROCHURE];Musicisti a scelta di accompagnamento al djset (violino, sax, percussioni ecc.);Photobooth, Videobooth 360°, Telefono degli Ospiti [BROCHURE];Illuminazioni, Fontane luminose sparkular, Fuochi d’artificio e Fumogeni Colorati [BROCHURE]")
                     .featuresEng("Audio and lighting service;DJ (selected from VINCO EVENTI team);Background music (Ceremony, Cocktail Hour);Live Band [BROCHURE];Musicians of choice to accompany DJ set (violin, sax, percussion, etc.);Photobooth, 360° Videobooth, Guest Audio Guestbook [BROCHURE];Lighting, Sparkular fountains, Fireworks & Colored smoke [BROCHURE]")
                     .brochureUrlIta("https://drive.google.com/file/d/1oXiV9ACF0xkTOiNtkyxHYVK0dVMDCvdw/view")
@@ -570,171 +570,12 @@ public class DataInitializer implements CommandLineRunner {
         if (galleryRepository.count() == 0) {
             galleryRepository.saveAll(defaultItems);
             System.out.println(">>> Seed Galleria eseguito con successo con tutti i 32 elementi 100% allineati.");
-        } else {
-            List<GalleryItem> existing = galleryRepository.findAll();
-            for (GalleryItem newItem : defaultItems) {
-                existing.stream()
-                        .filter(e -> e.getDisplayOrder() != null && e.getDisplayOrder().equals(newItem.getDisplayOrder()))
-                        .findFirst()
-                        .ifPresent(e -> {
-                            e.setTitleIta(newItem.getTitleIta());
-                            e.setTitleEng(newItem.getTitleEng());
-                            e.setSubtitleIta(newItem.getSubtitleIta());
-                            e.setSubtitleEng(newItem.getSubtitleEng());
-                            e.setType(newItem.getType());
-                            e.setSrc(newItem.getSrc());
-                            e.setPosterUrl(newItem.getPosterUrl());
-                            e.setCategory(newItem.getCategory());
-                            e.setFeatured(newItem.getFeatured());
-                            galleryRepository.save(e);
-                        });
-            }
-            System.out.println(">>> Allineamento Galleria completato a DB per i 32 elementi.");
         }
     }
 
     private void seedDefaultQuoteRequests() {
-        if (quoteRequestRepository.count() == 0) {
-            List<antonioschettini.backend.entities.QuoteRequest> defaultQuotes = List.of(
-                    antonioschettini.backend.entities.QuoteRequest.builder()
-                            .nome("Antonio")
-                            .cognome("Schettini")
-                            .email("antonio.schettini93@gmail.com")
-                            .telefono("+39 347 1234567")
-                            .dataEvento(java.time.LocalDate.of(2026, 12, 9))
-                            .tipoEvento("Matrimonio")
-                            .location("Villa Rosa, Castel Gandolfo (RM)")
-                            .numeroOspiti("120")
-                            .orarioGiornata("Intera giornata")
-                            .tipoCerimonia("Simbolica in location")
-                            .messaggio("Preventivo per pacchetto FULL con Live Band, DJ set serale e fontane Sparkular per il taglio torta.")
-                            .budget("2500-3500 €")
-                            .lingua("it")
-                            .stato(antonioschettini.backend.enums.QuoteStatus.PROCESSED)
-                            .build(),
-
-                    antonioschettini.backend.entities.QuoteRequest.builder()
-                            .nome("Anto")
-                            .cognome("Skeit")
-                            .email("antonio.schettini93@gmail.com")
-                            .telefono("+39 347 1234567")
-                            .dataEvento(java.time.LocalDate.of(2026, 8, 15))
-                            .tipoEvento("Matrimonio")
-                            .location("Tenuta San Silvestro, Tivoli (RM)")
-                            .numeroOspiti("100")
-                            .orarioGiornata("Cena")
-                            .tipoCerimonia("Civile")
-                            .messaggio("Richiesta preventivo intrattenimento musicale per matrimonio Ferragosto.")
-                            .budget("2000-3000 €")
-                            .lingua("it")
-                            .stato(antonioschettini.backend.enums.QuoteStatus.PROCESSED)
-                            .build(),
-
-                    antonioschettini.backend.entities.QuoteRequest.builder()
-                            .nome("Giorgio")
-                            .cognome("Mastrota")
-                            .email("enzokola@hotmail.com")
-                            .telefono("+39 338 1122334")
-                            .dataEvento(java.time.LocalDate.of(2028, 9, 12))
-                            .tipoEvento("Matrimonio")
-                            .location("Masseria Coccaro, Monopoli (BA)")
-                            .numeroOspiti("150")
-                            .orarioGiornata("Intera giornata")
-                            .tipoCerimonia("Religiosa")
-                            .messaggio("Richiesta preventivo speciale per matrimonio con band acustica ed allestimento luci cielo stellato.")
-                            .budget("3000-4000 €")
-                            .lingua("it")
-                            .stato(antonioschettini.backend.enums.QuoteStatus.PROCESSED)
-                            .build(),
-
-                    antonioschettini.backend.entities.QuoteRequest.builder()
-                            .nome("Mario")
-                            .cognome("Rossi")
-                            .email("antonio.schettini93@gmail.com")
-                            .telefono("+39 333 9876543")
-                            .dataEvento(java.time.LocalDate.of(2027, 1, 9))
-                            .tipoEvento("Evento privato")
-                            .location("Milano")
-                            .numeroOspiti("80")
-                            .orarioGiornata("Sera")
-                            .tipoCerimonia("N/A")
-                            .messaggio("DJ set e regia luci per festa privata esclusiva.")
-                            .budget("1500 €")
-                            .lingua("it")
-                            .stato(antonioschettini.backend.enums.QuoteStatus.READ)
-                            .build(),
-
-                    antonioschettini.backend.entities.QuoteRequest.builder()
-                            .nome("Alessia")
-                            .cognome("Cotini")
-                            .email("antonio.schettini93@gmail.com")
-                            .telefono("+39 349 8877665")
-                            .dataEvento(java.time.LocalDate.of(2026, 12, 25))
-                            .tipoEvento("Matrimonio")
-                            .location("Castello di Limatola (BN)")
-                            .numeroOspiti("130")
-                            .orarioGiornata("Pranzo e Cena")
-                            .tipoCerimonia("Simbolica")
-                            .messaggio("Intrattenimento musicale natalizio per matrimonio invernale con sax solista e band live.")
-                            .budget("2500 €")
-                            .lingua("it")
-                            .stato(antonioschettini.backend.enums.QuoteStatus.READ)
-                            .build(),
-
-                    antonioschettini.backend.entities.QuoteRequest.builder()
-                            .nome("Francesco")
-                            .cognome("Cutrone")
-                            .email("antonio.schettini93@gmail.com")
-                            .telefono("+39 335 4433221")
-                            .dataEvento(java.time.LocalDate.of(2026, 8, 6))
-                            .tipoEvento("Matrimonio")
-                            .location("Napoli")
-                            .numeroOspiti("110")
-                            .orarioGiornata("Cena")
-                            .tipoCerimonia("Civile")
-                            .messaggio("Musica per aperitivo in giardino e DJ set per la serata.")
-                            .budget("2000 €")
-                            .lingua("it")
-                            .stato(antonioschettini.backend.enums.QuoteStatus.READ)
-                            .build(),
-
-                    antonioschettini.backend.entities.QuoteRequest.builder()
-                            .nome("Lord K")
-                            .cognome("Cola")
-                            .email("antonio.schettini93@gmail.com")
-                            .telefono("+39 340 9988776")
-                            .dataEvento(java.time.LocalDate.of(2026, 8, 9))
-                            .tipoEvento("Altro: Graduation Party")
-                            .location("Roma")
-                            .numeroOspiti("60")
-                            .orarioGiornata("Sera")
-                            .tipoCerimonia("N/A")
-                            .messaggio("Party di laurea con DJ set ed effetti scenografici fumogeni.")
-                            .budget("1000-1200 €")
-                            .lingua("it")
-                            .stato(antonioschettini.backend.enums.QuoteStatus.READ)
-                            .build(),
-
-                    antonioschettini.backend.entities.QuoteRequest.builder()
-                            .nome("Mario")
-                            .cognome("Verdi")
-                            .email("antonio.schettini93@gmail.com")
-                            .telefono("+39 347 1122445")
-                            .dataEvento(java.time.LocalDate.of(2026, 8, 29))
-                            .tipoEvento("Evento Aziendale")
-                            .location("Palazzo Congressi, Roma")
-                            .numeroOspiti("200")
-                            .orarioGiornata("Sera")
-                            .tipoCerimonia("N/A")
-                            .messaggio("Gala dinner aziendale con sottofondo musicale acustico e djset finale.")
-                            .budget("3000 €")
-                            .lingua("it")
-                            .stato(antonioschettini.backend.enums.QuoteStatus.PENDING)
-                            .build()
-            );
-
-            quoteRequestRepository.saveAll(defaultQuotes);
-            System.out.println(">>> Seed Preventivi reali di prova completato con successo (" + defaultQuotes.size() + " preventivi inseriti).");
-        }
+        // Nessun seeding automatico di preventivi fasulli/demo.
+        // I preventivi arrivano esclusivamente dal form utente sul sito o dalla migrazione iniziale.
+        // Se l'Admin cancella tutti i preventivi da DB, la tabella rimane a 0 in modo 100% scalabile.
     }
 }

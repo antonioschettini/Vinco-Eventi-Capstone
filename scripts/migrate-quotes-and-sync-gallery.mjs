@@ -13,7 +13,7 @@ const { Client } = pg;
 
 const BACKEND_URL = process.env.LIVE_BACKEND_URL || "http://localhost:8080";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "vincoeventi@gmail.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "RipBigVincoEventi!";
 
 // Configurazione PostgreSQL Locale
 const localPgConfig = {
@@ -24,7 +24,7 @@ const localPgConfig = {
   password: "1234",
 };
 
-// 32 Elementi della Galleria 100% Verificati ed Allineati
+// 32 Elementi della Galleria 100% Verificati ed Allineati Visualmente
 const ALIGNED_GALLERY_ITEMS = [
   {
     displayOrder: 1,
@@ -35,7 +35,7 @@ const ALIGNED_GALLERY_ITEMS = [
     type: "video",
     src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785861122/vinco_eventi_galleria/rftirtcmqxgjsqsyu6fv.mp4",
     posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785861122/vinco_eventi_galleria/rftirtcmqxgjsqsyu6fv.jpg",
-    category: "djset",
+    category: "live",
     featured: true
   },
   {
@@ -45,8 +45,8 @@ const ALIGNED_GALLERY_ITEMS = [
     subtitleIta: "Spettacolo musicale d'impatto e ritmo coinvolgente sotto le luci",
     subtitleEng: "High impact musical performance with engaging rhythm under the lights",
     type: "video",
-    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785739102/vinco_eventi_galleria/wdjpouelk0wgy8b7ayxb.mov",
-    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785739102/vinco_eventi_galleria/wdjpouelk0wgy8b7ayxb.jpg",
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738686/vinco_eventi_galleria/oiuv1egd7bx5atkiwzbb.mov",
+    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738686/vinco_eventi_galleria/oiuv1egd7bx5atkiwzbb.jpg",
     category: "band",
     featured: true
   },
@@ -57,8 +57,8 @@ const ALIGNED_GALLERY_ITEMS = [
     subtitleIta: "Eleganza e sonorità uniche per momenti indimenticabili",
     subtitleEng: "Elegance and unique sounds for unforgettable moments",
     type: "video",
-    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785739094/vinco_eventi_galleria/vntlhm89bfzrdh2xgy2p.mov",
-    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785739094/vinco_eventi_galleria/vntlhm89bfzrdh2xgy2p.jpg",
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738913/vinco_eventi_galleria/tuu3jqx5c72wyf9ldhbg.mov",
+    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738913/vinco_eventi_galleria/tuu3jqx5c72wyf9ldhbg.jpg",
     category: "band",
     featured: true
   },
@@ -95,7 +95,7 @@ const ALIGNED_GALLERY_ITEMS = [
     type: "video",
     src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785739059/vinco_eventi_galleria/ef6cr5xt3l4utt5ngzbz.mp4",
     posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785739059/vinco_eventi_galleria/ef6cr5xt3l4utt5ngzbz.jpg",
-    category: "band",
+    category: "live",
     featured: true
   },
   {
@@ -119,7 +119,7 @@ const ALIGNED_GALLERY_ITEMS = [
     type: "video",
     src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785739049/vinco_eventi_galleria/k6nrydw6lhpgaiztomgd.mov",
     posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785739049/vinco_eventi_galleria/k6nrydw6lhpgaiztomgd.jpg",
-    category: "band",
+    category: "live",
     featured: false
   },
   {
@@ -184,22 +184,22 @@ const ALIGNED_GALLERY_ITEMS = [
   },
   {
     displayOrder: 14,
-    titleIta: "Live Vibes & Scenografia Sposi",
-    titleEng: "Live Vibes & Wedding Scenery",
-    subtitleIta: "La magia dell'evento con spettacoli pirotecnici",
-    subtitleEng: "The magic of the event with pyrotechnic displays",
+    titleIta: "Spettacolo Pirotecnico & Scenografia Sposi",
+    titleEng: "Pyrotechnic Show & Wedding Scenery",
+    subtitleIta: "La magia dell'evento con spettacoli pirotecnici sul lago",
+    subtitleEng: "The magic of the event with fireworks by the lake",
     type: "video",
     src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738959/vinco_eventi_galleria/afrx0hb5jnevhbudiieo.mp4",
     posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738959/vinco_eventi_galleria/afrx0hb5jnevhbudiieo.jpg",
-    category: "live",
+    category: "effects",
     featured: true
   },
   {
     displayOrder: 15,
-    titleIta: "Live Acoustics & Violini Aperitivo",
-    titleEng: "Live Acoustics & Cocktail Violins",
-    subtitleIta: "Musica dal vivo elegante durante il cocktail in giardino",
-    subtitleEng: "Elegant live music during cocktail hour in the garden",
+    titleIta: "Candlelight String Quartet Live",
+    titleEng: "Candlelight String Quartet Live",
+    subtitleIta: "Quartetto d'archi ed atmosfera romantica a lume di candela",
+    subtitleEng: "String quartet and romantic candlelight atmosphere",
     type: "video",
     src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738945/vinco_eventi_galleria/etesqmzgylrapntrtrbf.mov",
     posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738945/vinco_eventi_galleria/etesqmzgylrapntrtrbf.jpg",
@@ -234,24 +234,24 @@ const ALIGNED_GALLERY_ITEMS = [
     displayOrder: 18,
     titleIta: "Fumogeni & Party Night",
     titleEng: "Smoke Effects & Party Night",
-    subtitleIta: "Effetti speciali e pista di ballo per gli invitati",
-    subtitleEng: "Special effects and dancefloor for guests",
+    subtitleIta: "Effetti speciali fumogeni e luce stroboscopica per il party",
+    subtitleEng: "Special smoke effects and strobe lighting for the party",
     type: "video",
-    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738913/vinco_eventi_galleria/tuu3jqx5c72wyf9ldhbg.mov",
-    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738913/vinco_eventi_galleria/tuu3jqx5c72wyf9ldhbg.jpg",
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785739102/vinco_eventi_galleria/wdjpouelk0wgy8b7ayxb.mov",
+    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785739102/vinco_eventi_galleria/wdjpouelk0wgy8b7ayxb.jpg",
     category: "effects",
     featured: true
   },
   {
     displayOrder: 19,
-    titleIta: "Festeggiamenti & Live Show Band",
-    titleEng: "Celebrations & Live Show Band",
-    subtitleIta: "Spettacolo e divertimento per tutti gli invitati",
-    subtitleEng: "Show and fun for all guests",
+    titleIta: "Party & Clubbing Night",
+    titleEng: "Party & Clubbing Night",
+    subtitleIta: "Pista piena e divertimento assicurato",
+    subtitleEng: "Full dancefloor and guaranteed fun",
     type: "video",
     src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738895/vinco_eventi_galleria/owjxvhnylisvs0hiyxar.mp4",
     posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738895/vinco_eventi_galleria/owjxvhnylisvs0hiyxar.jpg",
-    category: "band",
+    category: "djset",
     featured: false
   },
   {
@@ -268,14 +268,14 @@ const ALIGNED_GALLERY_ITEMS = [
   },
   {
     displayOrder: 21,
-    titleIta: "Live Performance Cantante",
-    titleEng: "Live Singer Performance",
-    subtitleIta: "Voce in abito glitter sul palco live",
-    subtitleEng: "Live voice in glitter dress on stage",
+    titleIta: "Brass & Street Band Entertainment",
+    titleEng: "Brass & Street Band Entertainment",
+    subtitleIta: "Coinvolgimento itinerante travolgente con megafono e fiati",
+    subtitleEng: "Overwhelming roaming entertainment with brass and megaphone",
     type: "video",
     src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738827/vinco_eventi_galleria/slfbcr7zinspj5coflaa.mov",
     posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738827/vinco_eventi_galleria/slfbcr7zinspj5coflaa.jpg",
-    category: "live",
+    category: "band",
     featured: false
   },
   {
@@ -304,14 +304,14 @@ const ALIGNED_GALLERY_ITEMS = [
   },
   {
     displayOrder: 24,
-    titleIta: "Cocktail Party & Pista Aperta",
-    titleEng: "Cocktail Party & Open Dancefloor",
-    subtitleIta: "Musica e divertimento all'aperto per gli ospiti",
-    subtitleEng: "Music and outdoor fun for guests",
+    titleIta: "Scenografia Teste Mobili & Light Show",
+    titleEng: "Moving Heads & Light Show Scenery",
+    subtitleIta: "Regia luci professionale con teste mobili e fasci luminosi",
+    subtitleEng: "Professional light direction with moving heads and beams",
     type: "video",
     src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738787/vinco_eventi_galleria/uiqet8umjkjq3b4wej1c.mp4",
     posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738787/vinco_eventi_galleria/uiqet8umjkjq3b4wej1c.jpg",
-    category: "djset",
+    category: "lightshow",
     featured: false
   },
   {
@@ -330,11 +330,11 @@ const ALIGNED_GALLERY_ITEMS = [
     displayOrder: 26,
     titleIta: "Show dal Vivo in Pista",
     titleEng: "Live Performance Show",
-    subtitleIta: "Coinvolgimento e spettacolo per tutti gli invitati",
+    subtitleIta: "Coinvolgimento e spettacolo per tutti gli ospiti",
     subtitleEng: "Engagement and show for all guests",
     type: "video",
-    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738686/vinco_eventi_galleria/oiuv1egd7bx5atkiwzbb.mov",
-    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738686/vinco_eventi_galleria/oiuv1egd7bx5atkiwzbb.jpg",
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738600/vinco_eventi_galleria/ynbarymzdd1lu9cvycfu.mov",
+    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738600/vinco_eventi_galleria/ynbarymzdd1lu9cvycfu.jpg",
     category: "live",
     featured: false
   },
@@ -352,8 +352,8 @@ const ALIGNED_GALLERY_ITEMS = [
   },
   {
     displayOrder: 28,
-    titleIta: "Party & Clubbing Night",
-    titleEng: "Party & Clubbing Night",
+    titleIta: "Pista Aperta & Party Night",
+    titleEng: "Open Dancefloor & Party Night",
     subtitleIta: "Pista piena e divertimento assicurato",
     subtitleEng: "Full dancefloor and guaranteed fun",
     type: "video",
@@ -376,8 +376,8 @@ const ALIGNED_GALLERY_ITEMS = [
   },
   {
     displayOrder: 30,
-    titleIta: "Live Session & Duo Acustico",
-    titleEng: "Live Session & Acoustic Duo",
+    titleIta: "Live Session & Band Acustica Aperitivo",
+    titleEng: "Live Session & Acoustic Band Cocktail",
     subtitleIta: "Musica e passione al servizio del tuo evento",
     subtitleEng: "Music and passion at the service of your event",
     type: "video",
@@ -388,8 +388,8 @@ const ALIGNED_GALLERY_ITEMS = [
   },
   {
     displayOrder: 31,
-    titleIta: "Brass & Street Band Entertainment",
-    titleEng: "Brass & Street Band Entertainment",
+    titleIta: "Brass & Street Band in Action",
+    titleEng: "Brass & Street Band in Action",
     subtitleIta: "Coinvolgimento itinerante travolgente con megafono e fiati",
     subtitleEng: "Overwhelming roaming entertainment with brass and megaphone",
     type: "image",
@@ -405,8 +405,8 @@ const ALIGNED_GALLERY_ITEMS = [
     subtitleIta: "Spettacolo internazionale con la regia musicale di Enzo Colaluca",
     subtitleEng: "International show with music direction by Enzo Colaluca",
     type: "video",
-    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738600/vinco_eventi_galleria/ynbarymzdd1lu9cvycfu.mov",
-    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738600/vinco_eventi_galleria/ynbarymzdd1lu9cvycfu.jpg",
+    src: "https://res.cloudinary.com/ytjdxerb/video/upload/v1785738801/vinco_eventi_galleria/so2xar04vohxdsc0lulo.mov",
+    posterUrl: "https://res.cloudinary.com/ytjdxerb/video/upload/f_jpg,q_auto,w_720,so_2/v1785738801/vinco_eventi_galleria/so2xar04vohxdsc0lulo.jpg",
     category: "live",
     featured: false
   }
@@ -432,10 +432,7 @@ async function fetchLocalQuotes() {
   try {
     await client.connect();
     const res = await client.query("SELECT * FROM quote_requests ORDER BY data_richiesta ASC");
-    console.log(`  -> Trovati ${res.rows.length} preventivi nel DB locale:`);
-    res.rows.forEach((r, idx) => {
-      console.log(`     ${idx + 1}. ${r.nome} ${r.cognome} | ${r.email} | Evento: ${r.tipo_evento} (${r.data_evento}) | Stato: ${r.stato}`);
-    });
+    console.log(`  -> Trovati ${res.rows.length} preventivi nel DB locale.`);
     await client.end();
     return res.rows;
   } catch (err) {
@@ -449,10 +446,8 @@ async function main() {
   console.log("  🚀 VINCO EVENTI - MIGRAZIONE PREVENTIVI & SYNCHRO GALLERIA");
   console.log("=".repeat(65) + "\n");
 
-  // 1. Estrazione preventivi locali
   const localQuotes = await fetchLocalQuotes();
 
-  // 2. Se BACKEND_URL è raggiungibile, esegui migrazione ed allineamento
   console.log(`\nConnessione al backend target (${BACKEND_URL})...`);
   try {
     const token = await getAuthToken(BACKEND_URL);
@@ -497,7 +492,6 @@ async function main() {
       console.log(`\n  🎉 Preventivi migrati con successo: ${migrated}/${localQuotes.length}`);
     }
 
-    // 3. Allineamento Galleria via REST API
     console.log("\n🎬 Sincronizzazione ed allineamento della Galleria...");
     const galleryRes = await fetch(`${BACKEND_URL}/api/gallery`);
     if (galleryRes.ok) {
