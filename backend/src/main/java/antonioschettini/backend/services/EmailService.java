@@ -9,6 +9,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -762,6 +763,58 @@ public class EmailService {
             System.out.println(">>> Email di conferma inviata con successo al cliente VINCO EVENTI: " + quote.getEmail());
         } catch (Exception ex) {
             System.err.println("[ERROR EmailService] Impossibile inviare l'email al cliente: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Report di controllo mensile & Keep-Alive automatico per Brevo.
+     * Esegue l'invio il 1° giorno di ogni mese alle ore 09:00 AM UTC.
+     * Mantiene la chiave SMTP Brevo attiva all'infinito (reset dei 90 giorni di inattività).
+     */
+    @Scheduled(cron = "0 0 9 1 * ?")
+    public void sendMonthlyKeepAliveEmail() {
+        if (mailSender == null) {
+            return;
+        }
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(mailFrom, "VINCO EVENTI - System Health");
+            helper.setTo("vincoeventi@gmail.com");
+            helper.setSubject("🟢 VINCO EVENTI - Report Mensile & Keep-Alive Sistema");
+
+            String nowStr = java.time.ZonedDateTime.now(java.time.ZoneId.of("Europe/Rome"))
+                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+
+            String htmlBody = """
+                <!DOCTYPE html>
+                <html lang="it">
+                <head><meta charset="UTF-8"></head>
+                <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f1f5f9; margin: 0; padding: 20px;">
+                  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 25px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                    <h2 style="color: #064e3b; margin-top: 0;">💚 VINCO EVENTI - System Heartbeat</h2>
+                    <p style="font-size: 15px; color: #334155;">
+                      Questo è un messaggio automatico mensile inviato dal sistema per verificare il corretto funzionamento del servizio email e mantenere attiva la chiave SMTP Brevo all'infinito.
+                    </p>
+                    <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 14px; border-radius: 6px; margin: 20px 0; font-size: 14px;">
+                      <strong>✅ Stato Servizio:</strong> ATTIVO & OPERATIVO<br/>
+                      <strong>Data Esecuzione:</strong> %s
+                    </div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">
+                      Generato automaticamente dal backend VINCO EVENTI su Render.
+                    </p>
+                  </div>
+                </body>
+                </html>
+                """.formatted(nowStr);
+
+            helper.setText("VINCO EVENTI - System Heartbeat OK - " + nowStr, htmlBody);
+            mailSender.send(mimeMessage);
+            System.out.println(">>> [INFO EmailService] Email mensile di Keep-Alive inviata con successo all'admin!");
+        } catch (Exception ex) {
+            System.err.println("[WARN EmailService] Impossibile inviare l'email mensile di Keep-Alive: " + ex.getMessage());
         }
     }
 }
