@@ -70,6 +70,39 @@ function InstagramMockup() {
     setIsBookmarked((prev) => !prev);
   };
 
+  // Touch swipe state per l'esperienza da smartphone
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
+
+  const minSwipeDistance = 40;
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = e.touches[0].clientX;
+    setIsPaused(true);
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    setIsPaused(false);
+    if (!touchStartX.current || !touchEndX.current) return;
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      setCurrentIndex((prev) => (prev + 1) % slideImages.length);
+    } else if (isRightSwipe) {
+      setCurrentIndex((prev) => (prev === 0 ? slideImages.length - 1 : prev - 1));
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   return (
     <div className="instagram-mockup-wrapper">
       {/* Smartphone Chassis */}
@@ -113,12 +146,15 @@ function InstagramMockup() {
             </button>
           </div>
 
-          {/* Central Image Carousel (Square 1:1 Aspect Ratio) */}
+          {/* Central Image Carousel (Square 1:1 Aspect Ratio + Touch Swipe Support) */}
           <div
             className="ig-carousel-container"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
             onDoubleClick={handleDoubleTap}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {/* Animated Double-Tap Heart */}
             {showHeartAnim && (

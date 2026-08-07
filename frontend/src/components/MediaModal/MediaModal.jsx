@@ -101,45 +101,84 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
   const modalMediaUrl = getOptimizedCloudinaryUrl(currentMedia.src, { type: "modal" });
   const posterUrl = currentMedia.posterUrl || getOptimizedCloudinaryUrl(currentMedia.src, { type: "poster" });
 
+  // Touch Swipe Gesture Support per dispositivi Mobile / Smartphone
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
+  const minSwipeDistance = 40;
+
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches.length === 1) {
+      touchStartX.current = e.touches[0].clientX;
+      touchEndX.current = e.touches[0].clientX;
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches && e.touches.length === 1) {
+      touchEndX.current = e.touches[0].clientX;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current || !items || items.length <= 1) return;
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      onNavigate((currentIndex + 1) % items.length);
+    } else if (isRightSwipe) {
+      onNavigate((currentIndex - 1 + items.length) % items.length);
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   return (
     <Modal
-        show={show}
-        onHide={onHide}
-        centered
-        size="xl"
-        dialogClassName="media-modal-dialog"
-        contentClassName="media-modal-content border-0 rounded-4 overflow-hidden"
-        backdropClassName="media-modal-backdrop"
-      >
-        <div className="media-modal-header d-flex justify-content-between align-items-center p-3 p-md-4">
-          <div className="media-modal-info">
-            <span className="badge rounded-pill media-badge-type me-2 px-3 py-2">
-              {currentMedia.type === "video" ? t.videoBadge : t.photoBadge}
+      show={show}
+      onHide={onHide}
+      centered
+      size="xl"
+      dialogClassName="media-modal-dialog"
+      contentClassName="media-modal-content border-0 rounded-4 overflow-hidden"
+      backdropClassName="media-modal-backdrop"
+    >
+      <div className="media-modal-header d-flex justify-content-between align-items-center p-3 p-md-4">
+        <div className="media-modal-info">
+          <span className="badge rounded-pill media-badge-type me-2 px-3 py-2">
+            {currentMedia.type === "video" ? t.videoBadge : t.photoBadge}
+          </span>
+          {currentMedia.category && (
+            <span className="badge rounded-pill media-badge-category me-2 px-3 py-2">
+              <i className="bi bi-tag-fill me-1"></i>
+              {getCategoryLabel(currentMedia.category, lang)}
             </span>
-            {currentMedia.category && (
-              <span className="badge rounded-pill media-badge-category me-2 px-3 py-2">
-                <i className="bi bi-tag-fill me-1"></i>
-                {getCategoryLabel(currentMedia.category, lang)}
-              </span>
-            )}
-            <span className="media-modal-counter fs-6">
-              {t.mediaCounter} {currentIndex + 1} {t.of} {items.length}
-            </span>
-            {currentMedia.title && (
-              <h5 className="h5 font-heading media-modal-title mb-0 mt-1">
-                {currentMedia.title}
-              </h5>
-            )}
-          </div>
-          <button
-            type="button"
-            className="btn-close media-modal-close-btn p-2"
-            onClick={onHide}
-            aria-label={t.modalClose}
-          ></button>
+          )}
+          <span className="media-modal-counter fs-6">
+            {t.mediaCounter} {currentIndex + 1} {t.of} {items.length}
+          </span>
+          {currentMedia.title && (
+            <h5 className="h5 font-heading media-modal-title mb-0 mt-1">
+              {currentMedia.title}
+            </h5>
+          )}
         </div>
+        <button
+          type="button"
+          className="btn-close media-modal-close-btn p-2"
+          onClick={onHide}
+          aria-label={t.modalClose}
+        ></button>
+      </div>
 
-        <div className="media-modal-body position-relative d-flex justify-content-center align-items-center p-2 p-md-4">
+      <div
+        className="media-modal-body position-relative d-flex justify-content-center align-items-center p-2 p-md-4"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
           {/* Navigation Arrow Left */}
           {items.length > 1 && (
             <button
