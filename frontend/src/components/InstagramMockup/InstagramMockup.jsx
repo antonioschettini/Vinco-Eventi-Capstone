@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { translations } from "../../utils/translations";
 import "./InstagramMockup.css";
 
+import { triggerHapticFeedback } from "../../utils/vibration";
+
 // Assets imports from src/assets/home/
 import imgSposi from "../../assets/home/foto bacio sposi.webp";
 import imgAperitivo from "../../assets/home/foto band aperitivo.webp";
@@ -41,6 +43,7 @@ function InstagramMockup() {
   }, [isPaused]);
 
   const handleLikeToggle = () => {
+    triggerHapticFeedback(15);
     setIsLiked((prev) => {
       setLikeCount((count) => (prev ? count - 1 : count + 1));
       return !prev;
@@ -48,6 +51,7 @@ function InstagramMockup() {
   };
 
   const handleDoubleTap = () => {
+    triggerHapticFeedback([10, 30, 20]);
     if (!isLiked) {
       setIsLiked(true);
       setLikeCount((count) => count + 1);

@@ -7,6 +7,7 @@ import TrackModal from "./components/AudioPlayer/TrackModal";
 import MobileBottomPlayer from "./components/AudioPlayer/MobileBottomPlayer";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import EmailChoiceModal from "./components/EmailModal/EmailChoiceModal";
+import MobileFloatingBar from "./components/MobileFloatingBar/MobileFloatingBar";
 import ProtectedRoute from "./components/Admin/ProtectedRoute";
 import ErrorBanner from "./components/ErrorBanner/ErrorBanner";
 import { clearGlobalError } from "./redux/slices/uiSlice";
@@ -39,6 +40,7 @@ function Layout() {
       <MobileBottomPlayer />
       <ScrollToTop />
       <EmailChoiceModal />
+      <MobileFloatingBar />
       
       {/* Banner per errori/notifiche globali in alto */}
       {globalError && (

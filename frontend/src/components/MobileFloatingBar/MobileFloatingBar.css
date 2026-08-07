@@ -1,0 +1,68 @@
+/* Styling per la Barra di Azioni Rapide Flottante su Mobile (<768px) */
+.mobile-floating-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1040;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: slideUpFloat 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
+}
+
+[data-bs-theme="dark"] .mobile-floating-bar {
+  background-color: rgba(12, 18, 14, 0.88);
+  border-top-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.45);
+}
+
+[data-bs-theme="light"] .mobile-floating-bar {
+  background-color: rgba(255, 255, 255, 0.90);
+  border-top-color: rgba(32, 74, 53, 0.15) !important;
+  box-shadow: 0 -8px 24px rgba(32, 74, 53, 0.12);
+}
+
+.btn-floating-bar {
+  font-size: 0.85rem;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.btn-floating-bar:active {
+  transform: scale(0.96);
+}
+
+.btn-whatsapp-floating {
+  background-color: #25d366;
+  border: 1px solid #20ba5a;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+}
+
+.btn-whatsapp-floating:hover,
+.btn-whatsapp-floating:focus {
+  background-color: #20ba5a;
+  color: #ffffff;
+}
+
+.btn-phone-floating {
+  background: linear-gradient(135deg, var(--primary-forest) 0%, var(--emerald-accent) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(32, 74, 53, 0.35);
+}
+
+.btn-phone-floating:hover,
+.btn-phone-floating:focus {
+  background: var(--primary-forest);
+  color: #ffffff;
+}
+
+@keyframes slideUpFloat {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

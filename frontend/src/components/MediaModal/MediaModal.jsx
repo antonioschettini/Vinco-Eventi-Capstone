@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setIsPlaying } from "../../redux/slices/audioSlice";
 import { translations, getCategoryLabel } from "../../utils/translations";
 import { getOptimizedCloudinaryUrl } from "../../utils/cloudinary";
+import { triggerHapticFeedback } from "../../utils/vibration";
 import "./MediaModal.css";
 
 function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
@@ -101,38 +102,53 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
   const modalMediaUrl = getOptimizedCloudinaryUrl(currentMedia.src, { type: "modal" });
   const posterUrl = currentMedia.posterUrl || getOptimizedCloudinaryUrl(currentMedia.src, { type: "poster" });
 
-  // Touch Swipe Gesture Support per dispositivi Mobile / Smartphone
+  // Touch Swipe Gesture Support per dispositivi Mobile (Orizzontale per nav, Verticale verso il basso per chiudi)
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
-  const minSwipeDistance = 40;
+  const touchStartY = useRef(null);
+  const touchEndY = useRef(null);
+
+  const minSwipeDistance = 45;
 
   const handleTouchStart = (e) => {
     if (e.touches && e.touches.length === 1) {
       touchStartX.current = e.touches[0].clientX;
       touchEndX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+      touchEndY.current = e.touches[0].clientY;
     }
   };
 
   const handleTouchMove = (e) => {
     if (e.touches && e.touches.length === 1) {
       touchEndX.current = e.touches[0].clientX;
+      touchEndY.current = e.touches[0].clientY;
     }
   };
 
   const handleTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current || !items || items.length <= 1) return;
-    const distance = touchStartX.current - touchEndX.current;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+    if (!touchStartX.current || !touchEndX.current || !touchStartY.current || !touchEndY.current) return;
+    const diffX = touchStartX.current - touchEndX.current;
+    const diffY = touchStartY.current - touchEndY.current;
 
-    if (isLeftSwipe) {
-      onNavigate((currentIndex + 1) % items.length);
-    } else if (isRightSwipe) {
-      onNavigate((currentIndex - 1 + items.length) % items.length);
+    // Se il movimento è prevalentemente verticale verso il basso (swipe down) -> Chiudi modale
+    if (Math.abs(diffY) > Math.abs(diffX) && diffY < -65) {
+      triggerHapticFeedback(15);
+      onHide();
+    } else if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > minSwipeDistance && items && items.length > 1) {
+      // Movimento prevalentemente orizzontale -> Navigazione foto/video
+      triggerHapticFeedback(12);
+      if (diffX > 0) {
+        onNavigate((currentIndex + 1) % items.length);
+      } else {
+        onNavigate((currentIndex - 1 + items.length) % items.length);
+      }
     }
 
     touchStartX.current = null;
     touchEndX.current = null;
+    touchStartY.current = null;
+    touchEndY.current = null;
   };
 
   return (
