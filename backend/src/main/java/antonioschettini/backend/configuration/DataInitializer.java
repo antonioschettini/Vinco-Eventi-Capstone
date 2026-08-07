@@ -54,11 +54,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedDefaultServices() {
-        boolean hasMismatchedUrls = serviceRepository.findAll().stream()
-                .anyMatch(s -> s.getBadge().equalsIgnoreCase("BASIC") && s.getImageUrlIta().contains("ckjzq11sbrvaojf5iskt"));
-
-        if (serviceRepository.count() != 3 || hasMismatchedUrls) {
-            serviceRepository.deleteAll();
+        if (serviceRepository.count() == 0) {
             ServiceEntity basic = ServiceEntity.builder()
                     .titleIta("BASIC")
                     .titleEng("BASIC")
@@ -117,13 +113,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedDefaultGalleryItems() {
-        // Rigenera sempre se i dati nel DB non contengono i poster con so_2 o sono disallineati
-        boolean needReseed = galleryRepository.findAll().stream()
-                .anyMatch(g -> g.getPosterUrl() == null || !g.getPosterUrl().contains("so_2"));
-
-        if (galleryRepository.count() != 31 || needReseed) {
-            galleryRepository.deleteAll();
-
+        if (galleryRepository.count() == 0) {
             List<GalleryItem> items = List.of(
                     // 1: Video Enzo Singer
                     GalleryItem.builder()
