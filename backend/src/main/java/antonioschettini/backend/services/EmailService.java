@@ -305,7 +305,7 @@ public class EmailService {
 
             htmlBuilder.append("""
                       <div style="text-align: center; margin: 28px 0 15px 0;">
-                        <a href="%s/admin/preventivi" target="_blank" style="background: linear-gradient(135deg, #10b981 0%%, #059669 100%%); color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); margin-bottom: 14px;">
+                        <a href="%s/admin-enzo/preventivi" target="_blank" style="background: linear-gradient(135deg, #10b981 0%%, #059669 100%%); color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); margin-bottom: 14px;">
                           <img src="%s" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" alt="Dashboard" />
                           <span>Apri Dashboard Preventivi</span>
                         </a>
