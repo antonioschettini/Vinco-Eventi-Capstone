@@ -676,19 +676,19 @@ function GallerySection() {
                 {/* Admin action buttons overlay on card (Top-Right) */}
                 {isAuthenticated && (
                   <div
-                    className="position-absolute top-0 end-0 p-2 z-3 d-flex gap-1"
+                    className="admin-action-btns position-absolute top-0 end-0 p-2 z-4 d-flex gap-1"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
                       onClick={(e) => handleOpenEditModal(e, item)}
-                      className="btn btn-warning btn-sm py-1 px-2 fw-bold shadow"
+                      className="btn btn-warning btn-sm py-1 px-2 fw-bold shadow-sm rounded-2"
                       title={t.editMedia}
                     >
                       <i className="bi bi-pencil-fill"></i>
                     </button>
                     <button
                       onClick={(e) => handleDeleteItem(e, item.id)}
-                      className="btn btn-danger btn-sm py-1 px-2 shadow"
+                      className="btn btn-danger btn-sm py-1 px-2 shadow-sm rounded-2"
                       title={t.deleteMedia}
                     >
                       <i className="bi bi-trash-fill"></i>
@@ -725,7 +725,11 @@ function GallerySection() {
                   )}
 
                   {/* Badges Top-Left (Foto/Video + Categoria) */}
-                  <div className="card-badges-container position-absolute top-0 start-0 m-2 z-3 d-flex flex-wrap gap-1 align-items-center pe-5">
+                  <div
+                    className={`card-badges-container position-absolute top-0 start-0 m-2 z-2 d-flex flex-wrap gap-1 align-items-center ${
+                      isAuthenticated ? "has-admin-btns" : ""
+                    }`}
+                  >
                     <span className="media-type-tag badge rounded-pill">
                       {item.type === "video" ? (
                         <>
