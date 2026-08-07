@@ -85,32 +85,15 @@
   transform: translateY(0) scale(0.96);
 }
 
-/* Responsiveness: Per schermi piccoli (< 820px) regoliamo la posizione per evitare sovrapposizioni con MobileBottomPlayer (48px) */
+/* Responsiveness: Per schermi piccoli (< 820px) regoliamo la posizione a 114px per galleggiare sopra la barra di contatto rapido (52px) e il player audio (0px) */
 @media (max-width: 819.98px) {
   .scroll-to-top-btn {
-    bottom: 64px;
-    right: 16px;
-    padding: 8px 14px;
-    font-size: 0.72rem;
-    transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease;
-  }
-
-  body.has-floating-bar .scroll-to-top-btn {
-    bottom: 124px;
-  }
-}
-
-@media (max-width: 480px) {
-  .scroll-to-top-btn {
-    bottom: 62px;
+    bottom: 114px;
     right: 14px;
     padding: 8px 12px;
+    font-size: 0.72rem;
   }
 
-  body.has-floating-bar .scroll-to-top-btn {
-    bottom: 124px;
-  }
-  
   .scroll-top-text {
     font-size: 0.7rem;
   }
