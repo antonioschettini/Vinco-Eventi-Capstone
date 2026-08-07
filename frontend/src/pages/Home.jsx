@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
 import bioBgImage from "../assets/home/foto per sfondo bio.webp";
@@ -14,8 +16,21 @@ import useScrollReveal from "../utils/useScrollReveal";
 
 function Home() {
   useScrollReveal();
+  const location = useLocation();
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].home;
+
+  useEffect(() => {
+    if (location.state?.scrollToForm) {
+      const timer = setTimeout(() => {
+        const formElement = document.querySelector(".contact-form-wrapper");
+        if (formElement) {
+          formElement.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [location]);
 
   const cardImages = {
     cerimonia: cerimoniaImg,

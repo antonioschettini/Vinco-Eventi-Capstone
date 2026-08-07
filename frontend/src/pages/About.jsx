@@ -16,13 +16,7 @@ function About() {
   const navigate = useNavigate();
 
   const handleCtaClick = () => {
-    navigate("/");
-    setTimeout(() => {
-      const contactSection = document.querySelector(".contact-instagram-section");
-      if (contactSection) {
-        contactSection.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
+    navigate("/", { state: { scrollToForm: true } });
   };
 
   return (

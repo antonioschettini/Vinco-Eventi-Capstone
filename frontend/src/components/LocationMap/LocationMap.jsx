@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Container, Row, Col, Spinner } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
@@ -9,61 +8,15 @@ function LocationMap() {
   const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].about;
-  const [isLocating, setIsLocating] = useState(false);
 
   const mapAddress = "Via Ospedale Di Venere 132/A, Bari, BA 70131, Italy";
   const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(
     mapAddress
   )}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
 
-  const handleDirectionsClick = (e) => {
-    e.preventDefault();
-    if (isLocating) return;
-
-    const fallbackUrl = `https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(
-      mapAddress
-    )}`;
-
-    if (!("geolocation" in navigator)) {
-      window.open(fallbackUrl, "_blank", "noopener,noreferrer");
-      return;
-    }
-
-    // Su Safari / iOS i window.open asincroni (dentro le callback di geolocalizzazione)
-    // vengono bloccati dal Popup Blocker. Apriamo la finestra in modo sincrono sul tap utente.
-    const targetWindow = window.open("", "_blank");
-
-    setIsLocating(true);
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setIsLocating(false);
-        const { latitude, longitude } = position.coords;
-        const preciseDirectionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${encodeURIComponent(
-          mapAddress
-        )}`;
-        if (targetWindow) {
-          targetWindow.location.href = preciseDirectionsUrl;
-        } else {
-          window.location.href = preciseDirectionsUrl;
-        }
-      },
-      (error) => {
-        console.warn("Geolocation fallback triggered:", error);
-        setIsLocating(false);
-        if (targetWindow) {
-          targetWindow.location.href = fallbackUrl;
-        } else {
-          window.location.href = fallbackUrl;
-        }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0,
-      }
-    );
-  };
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+    mapAddress
+  )}`;
 
   return (
     <section className="location-map-section py-5 position-relative">
@@ -176,28 +129,16 @@ function LocationMap() {
                   </div>
                 </div>
 
-                {/* Pulsante Indicazioni Stradali */}
+                {/* Pulsante Indicazioni Stradali Diretto (Universal Link) */}
                 <div className="mt-4 pt-3 border-top border-secondary border-opacity-10">
                   <a
-                    href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(
-                      mapAddress
-                    )}`}
+                    href={directionsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={handleDirectionsClick}
-                    className="btn-directions w-100"
+                    className="btn-directions w-100 d-flex align-items-center justify-content-center gap-2"
                   >
-                    {isLocating ? (
-                      <>
-                        <Spinner animation="border" size="sm" className="me-2" />
-                        <span>{t.locatingBtn || "Localizzazione in corso..."}</span>
-                      </>
-                    ) : (
-                      <>
-                        <i className="bi bi-box-arrow-up-right"></i>
-                        <span>{t.directionsBtn}</span>
-                      </>
-                    )}
+                    <i className="bi bi-box-arrow-up-right"></i>
+                    <span>{t.directionsBtn}</span>
                   </a>
                 </div>
               </div>
