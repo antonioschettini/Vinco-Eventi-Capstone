@@ -3,13 +3,13 @@ import fetch from "node-fetch";
 
 const BASE = "http://localhost:8080";
 const EMAIL = "vincoeventi@gmail.com";
-const PWD = "RipBigVincoEventi!";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // 1. Login
 const loginRes = await fetch(`${BASE}/api/auth/login`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email: EMAIL, password: PWD }),
+  body: JSON.stringify({ email: EMAIL, password: ADMIN_PASSWORD }),
 });
 const loginData = await loginRes.json();
 const token = loginData.token || loginData.accessToken || loginData.jwt;

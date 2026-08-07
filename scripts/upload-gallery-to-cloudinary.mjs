@@ -21,7 +21,7 @@ const SERVIZI_DIR = path.join(FRONTEND_SRC, "assets/serviziOfferti");
 
 const BACKEND_URL = "http://localhost:8080";
 const ADMIN_EMAIL = "vincoeventi@gmail.com";
-const ADMIN_PASSWORD = "RipBigVincoEventi!";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Mappa esatta dei 31 media in ordine di displayOrder / galleria
 const GALLERY_FILE_MAP = [

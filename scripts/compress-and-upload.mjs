@@ -23,7 +23,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_SRC = path.resolve(__dirname, "../frontend/src");
 const BACKEND_URL = "http://localhost:8080";
 const ADMIN_EMAIL = "vincoeventi@gmail.com";
-const ADMIN_PASSWORD = "RipBigVincoEventi!";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Usa ffmpeg bundled da npm
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);

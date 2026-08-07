@@ -13,3 +13,10 @@ promemoria*
 .tasks/
 tasks.md
 task_list.json
+
+# Environment and sensitive configuration files
+*.env
+*.env.*
+env.properties
+backend/env.properties
+
