@@ -157,7 +157,7 @@ function Navbar() {
 
       {/* 1. Fascia Superiore (Top Banner) */}
       <div className="top-banner d-flex justify-content-between align-items-center px-3 px-md-4 py-2 border-bottom border-secondary border-opacity-10">
-        {/* Lato Sinistro: Lingua & Tema */}
+        {/* Lato Sinistro: Lingua */}
         <div className="top-left d-flex align-items-center gap-2 gap-md-3">
           {/* Switch Lingua con Bandiere */}
           <div className="language-selector d-flex align-items-center gap-2">
@@ -179,19 +179,6 @@ function Navbar() {
               <UKFlag />
             </button>
           </div>
-
-          {/* Switch Light/Dark Mode */}
-          <button
-            onClick={() => dispatch(toggleTheme())}
-            className="theme-toggle-btn d-flex align-items-center justify-content-center"
-            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          >
-            {theme === "dark" ? (
-              <i className="bi bi-sun-fill fs-5 text-warning"></i>
-            ) : (
-              <i className="bi bi-moon-stars-fill fs-5 text-secondary"></i>
-            )}
-          </button>
         </div>
 
         {/* CENTRO: CONTROLLI COMPATTI MINI PLAYER (Visibili solo da 820px in su) */}
@@ -276,9 +263,24 @@ function Navbar() {
           </div>
         </div>
 
-        {/* Lato Destro: Area Privata con Modale/Popover Login (visibile solo su rotte /admin o se autenticato) */}
-        {showAdminButton ? (
-          <div className="top-right position-relative" ref={popoverRef}>
+        {/* Lato Destro: Switch Light/Dark Mode & Area Privata Admin */}
+        <div className="top-right d-flex align-items-center gap-2 position-relative" ref={popoverRef}>
+          {/* Switch Light/Dark Mode (Posizionato a Destra) */}
+          <button
+            onClick={() => dispatch(toggleTheme())}
+            className="theme-toggle-btn d-flex align-items-center justify-content-center p-1"
+            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            aria-label="Cambia tema chiaro/scuro"
+          >
+            {theme === "dark" ? (
+              <i className="bi bi-sun-fill fs-5 text-warning"></i>
+            ) : (
+              <i className="bi bi-moon-stars-fill fs-5 text-secondary"></i>
+            )}
+          </button>
+
+          {/* Area Privata Admin (visibile solo su rotte /admin o se autenticato) */}
+          {showAdminButton && (
             <button
               onClick={() => setShowLogin(!showLogin)}
               className={`admin-login-btn-toggle d-flex align-items-center gap-2 ${
@@ -302,6 +304,7 @@ function Navbar() {
                 {isAuthenticated ? t.adminPanel : t.adminLogin}
               </span>
             </button>
+          )}
 
             {/* Modale Login / Admin Menu Dropdown Popover */}
             {showLogin && (
@@ -399,9 +402,6 @@ function Navbar() {
               </div>
             )}
           </div>
-        ) : (
-          <div className="top-right" style={{ minWidth: "120px" }}></div>
-        )}
       </div>
 
       {/* 2. Fascia Centrale - Logo con Animazione Ritmo Musicale */}
