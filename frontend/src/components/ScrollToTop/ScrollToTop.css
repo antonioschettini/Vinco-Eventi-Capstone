@@ -85,13 +85,14 @@
   transform: translateY(0) scale(0.96);
 }
 
-/* Responsiveness: Per schermi piccoli (< 820px) regoliamo la posizione a 114px per galleggiare sopra la barra di contatto rapido (52px) e il player audio (0px) */
+/* Responsiveness: Per schermi piccoli (< 820px) posizioniamo il pulsante a destra in basso (bottom: 60px, right: 14px), perfettamente simmetrico rispetto al widget Speed Dial a sinistra (bottom: 60px, left: 16px) e sopra il player audio (0px) */
 @media (max-width: 819.98px) {
   .scroll-to-top-btn {
-    bottom: 114px;
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     right: 14px;
     padding: 8px 12px;
     font-size: 0.72rem;
+    z-index: 1040;
   }
 
   .scroll-top-text {

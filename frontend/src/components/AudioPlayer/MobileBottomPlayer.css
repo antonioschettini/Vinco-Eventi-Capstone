@@ -84,8 +84,8 @@
   font-weight: 500;
   letter-spacing: 0.02em;
   padding-right: 28px;
-  /* Animazione più lenta (15s) per simulare la lettura naturale ed il ritorno morbido */
-  animation: mobileMarqueeScrollXs 15s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+  /* Animazione dinamica (10s) senza pause eccessive a fine percorso */
+  animation: mobileMarqueeScrollXs 10s cubic-bezier(0.35, 0, 0.25, 1) infinite;
 }
 
 .mobile-bottom-player:hover .track-marquee-text {
@@ -95,14 +95,14 @@
 /* Animazione per schermi molto piccoli (< 576px) */
 @keyframes mobileMarqueeScrollXs {
   0%,
-  20% {
+  12% {
     transform: translateX(0);
   }
-  65%,
-  85% {
+  70%,
+  78% {
     transform: translateX(min(0px, calc(-100% + 160px)));
   }
-  96%,
+  94%,
   100% {
     transform: translateX(0);
   }
@@ -119,21 +119,21 @@
   }
 
   .mobile-bottom-player .track-marquee-text {
-    animation: mobileMarqueeScrollSm 15s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+    animation: mobileMarqueeScrollSm 10s cubic-bezier(0.35, 0, 0.25, 1) infinite;
   }
 }
 
 /* Animazione per schermi medi (sm, 576px - 819px) */
 @keyframes mobileMarqueeScrollSm {
   0%,
-  20% {
+  12% {
     transform: translateX(0);
   }
-  65%,
-  85% {
+  70%,
+  78% {
     transform: translateX(min(0px, calc(-100% + 400px)));
   }
-  96%,
+  94%,
   100% {
     transform: translateX(0);
   }

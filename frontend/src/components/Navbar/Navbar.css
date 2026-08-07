@@ -495,8 +495,8 @@
   font-weight: 500;
   letter-spacing: 0.02em;
   padding-right: 28px;
-  /* Animazione più lenta (15s) per simulare la lettura naturale ed il ritorno morbido */
-  animation: marqueeScrollCycle 15s cubic-bezier(0.35, 0, 0.25, 1) infinite;
+  /* Animazione fluida (10s) con breve pausa iniziale ed una brevissima pausa finale per una lettura dinamica e continua */
+  animation: marqueeScrollCycle 10s cubic-bezier(0.35, 0, 0.25, 1) infinite;
 }
 
 .top-player-track-info:hover .track-marquee-text {
@@ -504,18 +504,18 @@
 }
 
 @keyframes marqueeScrollCycle {
-  /* 0% - 20% (0s - 3s): Pausa iniziale per lettura inizio titolo */
+  /* 0% - 12%: Breve pausa iniziale di lettura */
   0%,
-  20% {
+  12% {
     transform: translateX(0);
   }
-  /* 65% - 85% (9.75s - 12.75s): Scorrimento lento verso sinistra e pausa finale di lettura */
-  65%,
-  85% {
+  /* 70% - 78%: Scorrimento fluido ed una brevissima pausa al termine (0.8s) per non congelare il testo */
+  70%,
+  78% {
     transform: translateX(min(0px, calc(-100% + 220px)));
   }
-  /* 96% - 100% (14.4s - 15s): Ritorno lento ed elegante alla posizione di partenza */
-  96%,
+  /* 94% - 100%: Ritorno morbido ed elegante al punto di partenza */
+  94%,
   100% {
     transform: translateX(0);
   }
