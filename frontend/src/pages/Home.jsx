@@ -1,11 +1,11 @@
 import { useSelector } from "react-redux";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
-import bioBgImage from "../assets/home/foto per sfondo bio.jpeg";
+import bioBgImage from "../assets/home/foto per sfondo bio.webp";
 
-import cerimoniaImg from "../assets/home/14. fumogeni color.jpg";
-import aperitivoImg from "../assets/home/foto intrattenimento aperitivo.jpeg";
-import pranzoCenaImg from "../assets/home/foto band sera.jpg";
+import cerimoniaImg from "../assets/home/14. fumogeni color.webp";
+import aperitivoImg from "../assets/home/foto intrattenimento aperitivo.webp";
+import pranzoCenaImg from "../assets/home/foto band sera.webp";
 import afterPartyImg from "../assets/home/dancefloor.webp";
 
 import InstagramMockup from "../components/InstagramMockup/InstagramMockup";

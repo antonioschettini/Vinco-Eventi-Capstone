@@ -4,11 +4,11 @@ import { translations } from "../../utils/translations";
 import "./InstagramMockup.css";
 
 // Assets imports from src/assets/home/
-import imgSposi from "../../assets/home/foto bacio sposi.jpg";
-import imgAperitivo from "../../assets/home/foto band aperitivo.jpg";
+import imgSposi from "../../assets/home/foto bacio sposi.webp";
+import imgAperitivo from "../../assets/home/foto band aperitivo.webp";
 import imgDancefloor from "../../assets/home/dancefloor.webp";
-import imgFumogeni from "../../assets/home/14. fumogeni color.jpg";
-import imgCielo from "../../assets/home/cielo stellato.jpg";
+import imgFumogeni from "../../assets/home/14. fumogeni color.webp";
+import imgCielo from "../../assets/home/cielo stellato.webp";
 
 
 const slideImages = [
