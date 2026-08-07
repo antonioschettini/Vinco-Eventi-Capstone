@@ -120,13 +120,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedDefaultGalleryItems() {
-        // Forza il re-seed se il conteggio è diverso da 32 o se l'immagine Cielo Stellato ha l'URL sbagliato
-        boolean hasMisalignedItems = galleryRepository.findAll().stream()
-                .anyMatch(g -> g.getTitleIta().contains("Illuminazione Cielo Stellato") && !g.getSrc().contains("txbfapyv9ujglspk13eo"));
-
-        if (galleryRepository.count() != 32 || hasMisalignedItems) {
-            galleryRepository.deleteAll();
-
+        if (galleryRepository.count() == 0) {
             List<GalleryItem> items = List.of(
                     // 1: Video Enzo Singer - International Voice Black / Set ELETTRICO
                     GalleryItem.builder()
