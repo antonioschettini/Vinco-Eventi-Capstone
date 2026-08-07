@@ -98,10 +98,9 @@ export function useSEO() {
         twDesc.setAttribute("content", pageMeta.description);
       }
 
-      // Aggiorna Canonical Link
       let canonicalTag = document.querySelector('link[rel="canonical"]');
       if (canonicalTag) {
-        canonicalTag.setAttribute("href", `https://www.vincoeventi.it${location.pathname}`);
+        canonicalTag.setAttribute("href", `https://www.vincoeventi.com${location.pathname}`);
       }
     }
   }, [location.pathname, lang]);

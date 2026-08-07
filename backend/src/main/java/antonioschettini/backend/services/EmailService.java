@@ -43,7 +43,7 @@ public class EmailService {
     @Value("${mail.from:vincoeventi@gmail.com}")
     private String mailFrom;
 
-    @Value("${brevo.api-key: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}")
+    @Value("${brevo.api-key:}")
     private String brevoApiKey;
 
 
@@ -529,8 +529,8 @@ public class EmailService {
                           <table style="width: 100%%; text-align: center;">
                             <tr>
                               <td>
-                                <a href="https://www.vincoeventi.it" target="_blank" style="text-decoration: none; display: inline-block;">
-                                  <img src="%s" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                                <a href="%s" target="_blank" style="text-decoration: none; display: inline-block;">
+                                  <img src="%s" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                                 </a>
                                 <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h1>
                                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #059669; font-weight: 600;">Exclusive Events & Musical Entertainment</p>
@@ -621,6 +621,7 @@ public class EmailService {
                     </body>
                     </html>
                     """,
+                        frontendBaseUrl,
                         logoVincoUri,
                         quote.getNome(), quote.getCognome(),
                         dataEventoFormatted,
@@ -681,8 +682,8 @@ public class EmailService {
                           <table style="width: 100%%; text-align: center;">
                             <tr>
                               <td>
-                                <a href="https://www.vincoeventi.it" target="_blank" style="text-decoration: none; display: inline-block;">
-                                  <img src="%s" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                                <a href="%s" target="_blank" style="text-decoration: none; display: inline-block;">
+                                  <img src="%s" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                                 </a>
                                 <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h1>
                                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #059669; font-weight: 600;">Organizzazione Eventi & Intrattenimento Musicale</p>
@@ -771,6 +772,7 @@ public class EmailService {
                     </body>
                     </html>
                     """,
+                        frontendBaseUrl,
                         logoVincoUri,
                         quote.getNome(), quote.getCognome(),
                         dataEventoFormatted,

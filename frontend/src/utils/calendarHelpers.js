@@ -106,7 +106,7 @@ export const generateIcsContent = (quote) => {
   const startYmd = formatToYmd(quote.dataEvento);
   const endYmd = getNextDayYmd(quote.dataEvento);
   const nowUtc = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-  const uid = quote.id ? `quote-${quote.id}@vincoeventi.it` : `quote-${Date.now()}@vincoeventi.it`;
+  const uid = quote.id ? `quote-${quote.id}@vincoeventi.com` : `quote-${Date.now()}@vincoeventi.com`;
 
   const descriptionStr =
     `Cliente: ${quote.nome} ${quote.cognome}\\n` +

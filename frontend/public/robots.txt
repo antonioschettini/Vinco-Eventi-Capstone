@@ -2,5 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/*
+Disallow: /admin-enzo
+Disallow: /admin-enzo/*
 
-Sitemap: https://www.vincoeventi.it/sitemap.xml
+Sitemap: https://www.vincoeventi.com/sitemap.xml

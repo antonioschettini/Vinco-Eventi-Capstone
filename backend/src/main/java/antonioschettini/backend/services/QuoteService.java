@@ -107,7 +107,7 @@ public class QuoteService {
         // e su iOS potrebbe aprire il flusso di iscrizione invece della card evento singolo.
         sb.append("METHOD:PUBLISH\r\n");
         sb.append("BEGIN:VEVENT\r\n");
-        sb.append("UID:quote-").append(quote.getId()).append("@vincoeventi.it\r\n");
+        sb.append("UID:quote-").append(quote.getId()).append("@vincoeventi.com\r\n");
         sb.append("DTSTAMP:").append(now).append("\r\n");
         sb.append("DTSTART;VALUE=DATE:").append(dtStart).append("\r\n");
         sb.append("DTEND;VALUE=DATE:").append(dtEnd).append("\r\n");
