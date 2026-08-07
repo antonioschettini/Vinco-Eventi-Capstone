@@ -7,7 +7,7 @@ function ProtectedRoute({ children }) {
 
   if (!isAuthenticated || user?.role !== "ROLE_ADMIN") {
     const redirectPath = encodeURIComponent(location.pathname + location.search);
-    return <Navigate to={`/admin?redirect=${redirectPath}`} state={{ from: location }} replace />;
+    return <Navigate to={`/admin-enzo?redirect=${redirectPath}`} state={{ from: location }} replace />;
   }
 
   return children;

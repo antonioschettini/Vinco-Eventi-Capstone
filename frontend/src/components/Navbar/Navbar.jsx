@@ -75,7 +75,7 @@ function Navbar() {
   );
   const t = translations[lang].nav;
 
-  const isAdminRoute = location.pathname.startsWith("/admin");
+  const isAdminRoute = location.pathname.startsWith("/admin-enzo");
   const showAdminButton = isAuthenticated || isAdminRoute;
 
   // Redux audio state
@@ -136,7 +136,7 @@ function Navbar() {
       setEmail("");
       setPassword("");
       setShowLogin(false);
-      navigate("/admin/preventivi");
+      navigate("/admin-enzo/preventivi");
     } catch {
       const msg = "Impossibile connettersi al server di autenticazione.";
       setLoginError(msg);
@@ -331,7 +331,7 @@ function Navbar() {
                       </div>
                     </div>
                     <Link
-                      to="/admin/preventivi"
+                      to="/admin-enzo/preventivi"
                       className="btn btn-outline-success btn-sm w-100 mb-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
                       onClick={() => setShowLogin(false)}
                     >
@@ -503,7 +503,7 @@ function Navbar() {
               {isAuthenticated && (
                 <li className="nav-item">
                   <NavLink
-                    to="/admin/preventivi"
+                    to="/admin-enzo/preventivi"
                     className={({ isActive }) => `nav-link custom-nav-link ${isActive ? "active" : ""}`}
                     onClick={() => setExpanded(false)}
                   >

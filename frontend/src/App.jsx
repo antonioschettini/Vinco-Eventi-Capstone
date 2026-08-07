@@ -76,9 +76,9 @@ function App() {
           <Route path="servizi" element={<Services />} />
           <Route path="galleria" element={<Gallery />} />
           <Route path="chi-siamo" element={<About />} />
-          <Route path="admin" element={<AdminLogin />} />
+          <Route path="admin-enzo" element={<AdminLogin />} />
           <Route
-            path="admin/preventivi"
+            path="admin-enzo/preventivi"
             element={
               <ProtectedRoute>
                 <AdminQuotes />

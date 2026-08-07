@@ -20,11 +20,11 @@ const metaConfig = {
       title: "Chi Siamo - Organizzazione Musicale Bari Puglia | VINCO EVENTI",
       description: "Scopri la storia e l'esperienza di Vincenzo Colaluca e VINCO EVENTI nell'organizzazione musicale sartoriale ed allestimenti scenografici in Puglia e in tutta Italia."
     },
-    "/admin": {
+    "/admin-enzo": {
       title: "Accesso Area Riservata | VINCO EVENTI",
       description: "Area di autenticazione riservata agli amministratori di VINCO EVENTI."
     },
-    "/admin/preventivi": {
+    "/admin-enzo/preventivi": {
       title: "Gestione Preventivi Admin | VINCO EVENTI",
       description: "Pannello di controllo per la gestione ed il tracciamento delle richieste di preventivo ricevute."
     }
@@ -46,11 +46,11 @@ const metaConfig = {
       title: "About Us - Musical Organization Bari Puglia | VINCO EVENTI",
       description: "Discover the history and experience of Vincenzo Colaluca and VINCO EVENTI in custom musical direction and scenic setups across Puglia and Italy."
     },
-    "/admin": {
+    "/admin-enzo": {
       title: "Admin Reserved Login | VINCO EVENTI",
       description: "Authentication login area reserved for VINCO EVENTI administrators."
     },
-    "/admin/preventivi": {
+    "/admin-enzo/preventivi": {
       title: "Admin Quote Management | VINCO EVENTI",
       description: "Control panel for managing and tracking received quote requests."
     }

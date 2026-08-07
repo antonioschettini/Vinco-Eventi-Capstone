@@ -23,8 +23,8 @@ function AdminLogin() {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [cooldown, setCooldown] = useState(0);
 
-  const rawRedirect = searchParams.get("redirect") || location.state?.from?.pathname || "/admin/preventivi";
-  const redirectTarget = rawRedirect.startsWith("/") ? rawRedirect : "/admin/preventivi";
+  const rawRedirect = searchParams.get("redirect") || location.state?.from?.pathname || "/admin-enzo/preventivi";
+  const redirectTarget = rawRedirect.startsWith("/") ? rawRedirect : "/admin-enzo/preventivi";
 
   // Reindirizza automaticamente se già autenticato come Admin
   useEffect(() => {

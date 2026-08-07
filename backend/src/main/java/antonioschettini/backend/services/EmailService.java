@@ -148,7 +148,7 @@ public class EmailService {
 
             plainTextBuilder.append(String.format("""
                 
-                Dashboard Admin Direct Link: %s/admin/preventivi
+                Dashboard Admin Direct Link: %s/admin-enzo/preventivi
                 --------------------------------------------
                 Data Invio Richiesta: %s
                 Email automatica dal sistema VINCO EVENTI.
@@ -178,7 +178,7 @@ public class EmailService {
                       <table style="width: 100%%; text-align: center;">
                         <tr>
                           <td>
-                            <a href="%s/admin/preventivi" target="_blank" style="text-decoration: none; display: inline-block;">
+                            <a href="%s/admin-enzo/preventivi" target="_blank" style="text-decoration: none; display: inline-block;">
                               <img src="%s" alt="VINCO EVENTI Logo" width="68" height="68" style="display: block; margin: 0 auto 10px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                             </a>
                             <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h2>
