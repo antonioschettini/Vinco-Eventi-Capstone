@@ -108,14 +108,21 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
+    private String getPoster(String videoUrl) {
+        if (videoUrl == null || !videoUrl.contains("/video/upload/")) return videoUrl;
+        int idx = videoUrl.indexOf("/video/upload/");
+        String prefix = videoUrl.substring(0, idx + 14);
+        String rest = videoUrl.substring(idx + 14).replaceAll("\\.[^/.]+$", "");
+        return prefix + "f_jpg,q_auto,w_720,so_0/" + rest + ".jpg";
+    }
+
     private void seedDefaultGalleryItems() {
-        boolean hasBrokenUrls = galleryRepository.findAll().stream()
-                .anyMatch(g -> g.getSrc() == null || !g.getSrc().contains("/ytjdxerb/"));
+        boolean hasDuplicatePosters = galleryRepository.findAll().stream()
+                .filter(g -> "video".equals(g.getType()))
+                .anyMatch(g -> g.getPosterUrl() == null || !g.getPosterUrl().contains("f_jpg,q_auto,w_720,so_0"));
 
-        if (galleryRepository.count() < 31 || hasBrokenUrls) {
+        if (galleryRepository.count() < 31 || hasDuplicatePosters) {
             galleryRepository.deleteAll();
-
-            String defaultPoster = "https://res.cloudinary.com/ytjdxerb/image/upload/v1785739092/vinco_eventi_galleria/srdtwafxbjz3w9hdkxax.jpg";
 
             List<GalleryItem> items = List.of(
                     // 1
@@ -126,7 +133,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("The overwhelming energy of our live electric set (start minute 1:00)")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785861122/vinco_eventi_galleria/rftirtcmqxgjsqsyu6fv.mp4")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785861122/vinco_eventi_galleria/rftirtcmqxgjsqsyu6fv.mp4"))
                             .category("djset")
                             .featured(true)
                             .startTime(60.0)
@@ -140,7 +147,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("High impact musical performance with engaging rhythm")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739102/vinco_eventi_galleria/wdjpouelk0wgy8b7ayxb.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739102/vinco_eventi_galleria/wdjpouelk0wgy8b7ayxb.mov"))
                             .category("band")
                             .featured(true)
                             .displayOrder(2)
@@ -153,7 +160,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Energy and passion for unique events")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739094/vinco_eventi_galleria/vntlhm89bfzrdh2xgy2p.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739094/vinco_eventi_galleria/vntlhm89bfzrdh2xgy2p.mov"))
                             .category("djset")
                             .featured(true)
                             .displayOrder(3)
@@ -179,7 +186,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Packed dancefloor and intense energy for an unforgettable night")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739072/vinco_eventi_galleria/r9e4uokfrbmpwadra7al.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739072/vinco_eventi_galleria/r9e4uokfrbmpwadra7al.mov"))
                             .category("djset")
                             .featured(true)
                             .displayOrder(5)
@@ -192,7 +199,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Live show and music performance")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739059/vinco_eventi_galleria/ef6cr5xt3l4utt5ngzbz.mp4")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739059/vinco_eventi_galleria/ef6cr5xt3l4utt5ngzbz.mp4"))
                             .category("band")
                             .featured(true)
                             .displayOrder(6)
@@ -218,7 +225,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Lighting design and sound system")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739049/vinco_eventi_galleria/k6nrydw6lhpgaiztomgd.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739049/vinco_eventi_galleria/k6nrydw6lhpgaiztomgd.mov"))
                             .category("lightshow")
                             .featured(false)
                             .displayOrder(8)
@@ -231,7 +238,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Entertainment and musical direction on stage")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739011/vinco_eventi_galleria/lq4emmoiddqhzpbgthq3.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739011/vinco_eventi_galleria/lq4emmoiddqhzpbgthq3.mov"))
                             .category("live")
                             .featured(false)
                             .displayOrder(9)
@@ -257,7 +264,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("The best and most exciting moments of the party")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739001/vinco_eventi_galleria/ufpb1xiseuvs1lsxonad.mp4")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785739001/vinco_eventi_galleria/ufpb1xiseuvs1lsxonad.mp4"))
                             .category("wedding")
                             .featured(false)
                             .displayOrder(11)
@@ -270,7 +277,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Full dancefloor and guaranteed fun")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738970/vinco_eventi_galleria/zhhw5yesgmrwsift9sow.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738970/vinco_eventi_galleria/zhhw5yesgmrwsift9sow.mov"))
                             .category("djset")
                             .featured(false)
                             .displayOrder(12)
@@ -296,7 +303,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("The magic of the event up close")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738959/vinco_eventi_galleria/afrx0hb5jnevhbudiieo.mp4")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738959/vinco_eventi_galleria/afrx0hb5jnevhbudiieo.mp4"))
                             .category("live")
                             .featured(true)
                             .displayOrder(14)
@@ -309,7 +316,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Elegant live music during cocktail hour")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738945/vinco_eventi_galleria/etesqmzgylrapntrtrbf.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738945/vinco_eventi_galleria/etesqmzgylrapntrtrbf.mov"))
                             .category("band")
                             .featured(false)
                             .displayOrder(15)
@@ -322,7 +329,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Lighting and effects service for an elegant atmosphere")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738935/vinco_eventi_galleria/vswvgslfquuykapxnr3d.mp4")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738935/vinco_eventi_galleria/vswvgslfquuykapxnr3d.mp4"))
                             .category("lightshow")
                             .featured(true)
                             .displayOrder(16)
@@ -348,7 +355,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Special effects for grand entrances and key moments")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738913/vinco_eventi_galleria/tuu3jqx5c72wyf9ldhbg.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738913/vinco_eventi_galleria/tuu3jqx5c72wyf9ldhbg.mov"))
                             .category("effects")
                             .featured(true)
                             .displayOrder(18)
@@ -361,7 +368,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Rhythm and wild fun for the guests")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738895/vinco_eventi_galleria/owjxvhnylisvs0hiyxar.mp4")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738895/vinco_eventi_galleria/owjxvhnylisvs0hiyxar.mp4"))
                             .category("djset")
                             .featured(false)
                             .displayOrder(19)
@@ -387,7 +394,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Customized music selection")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738827/vinco_eventi_galleria/slfbcr7zinspj5coflaa.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738827/vinco_eventi_galleria/slfbcr7zinspj5coflaa.mov"))
                             .category("djset")
                             .featured(false)
                             .displayOrder(21)
@@ -400,7 +407,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Performance and energy directed by VINCO EVENTI")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738801/vinco_eventi_galleria/so2xar04vohxdsc0lulo.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738801/vinco_eventi_galleria/so2xar04vohxdsc0lulo.mov"))
                             .category("djset")
                             .featured(false)
                             .displayOrder(22)
@@ -426,7 +433,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Sound system and music selection of excellence")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738787/vinco_eventi_galleria/uiqet8umjkjq3b4wej1c.mp4")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738787/vinco_eventi_galleria/uiqet8umjkjq3b4wej1c.mp4"))
                             .category("djset")
                             .featured(false)
                             .displayOrder(24)
@@ -439,7 +446,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Grand finale with full band")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738745/vinco_eventi_galleria/flg3kduqpo9yoq79fjom.mp4")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738745/vinco_eventi_galleria/flg3kduqpo9yoq79fjom.mp4"))
                             .category("band")
                             .featured(false)
                             .displayOrder(25)
@@ -452,7 +459,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Engagement and show for all guests")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738686/vinco_eventi_galleria/oiuv1egd7bx5atkiwzbb.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738686/vinco_eventi_galleria/oiuv1egd7bx5atkiwzbb.mov"))
                             .category("live")
                             .featured(false)
                             .displayOrder(26)
@@ -478,7 +485,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("A taste of our live entertainment")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738661/vinco_eventi_galleria/uwi6mmwruee6037hbsuo.mp4")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738661/vinco_eventi_galleria/uwi6mmwruee6037hbsuo.mp4"))
                             .category("band")
                             .featured(false)
                             .displayOrder(28)
@@ -504,7 +511,7 @@ public class DataInitializer implements CommandLineRunner {
                             .subtitleEng("Music and passion at the service of your event")
                             .type("video")
                             .src("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738637/vinco_eventi_galleria/jlqctoerysynttow2lpf.mov")
-                            .posterUrl(defaultPoster)
+                            .posterUrl(getPoster("https://res.cloudinary.com/ytjdxerb/video/upload/v1785738637/vinco_eventi_galleria/jlqctoerysynttow2lpf.mov"))
                             .category("band")
                             .featured(false)
                             .displayOrder(30)
@@ -525,7 +532,7 @@ public class DataInitializer implements CommandLineRunner {
             );
 
             galleryRepository.saveAll(items);
-            System.out.println(">>> Seed Galleria eseguito con successo per tutti i 31 media con URL Cloudinary reali 200 OK.");
+            System.out.println(">>> Seed Galleria eseguito con successo con poster unici generati dinamicamente per ogni video.");
         }
     }
 }
