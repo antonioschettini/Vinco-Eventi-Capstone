@@ -882,7 +882,7 @@ export default function AdminAccounting() {
                           </span>
                         </div>
                         <div className="small text-muted mb-1">
-                          Lordo: <strong className="text-dark">€ {mLordo.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong>
+                          Lordo: <strong className="text-body fw-bold">€ {mLordo.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong>
                         </div>
                         <div className="small text-muted mb-3">
                           Netto: <strong className="text-primary">€ {mNetto.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong>
@@ -934,7 +934,7 @@ export default function AdminAccounting() {
                               </span>
                             )}
 
-                            <h6 className="fw-bold mb-0 text-dark">{ev.titolo}</h6>
+                            <h6 className="fw-bold mb-0 text-body">{ev.titolo}</h6>
                             <small className="text-muted d-block">
                               {ev.clienteNome} {ev.clienteCognome} {ev.location && `• ${ev.location}`}
                             </small>
@@ -952,7 +952,7 @@ export default function AdminAccounting() {
 
                         <div className="d-flex flex-wrap justify-content-between align-items-center pt-2 border-top gap-2">
                           <div className="d-flex align-items-center gap-3">
-                            <small className="text-muted">Lordo: <strong className="text-dark">€{ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
+                            <small className="text-body-secondary">Lordo: <strong className="text-body fw-bold">€{parseItalianNumber(ev.importoLordo).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></small>
                             <small className="text-muted">Netto: <strong className="text-primary">€{ev.totaleNetto?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
                           </div>
                           <button className="btn btn-sm btn-outline-success rounded-pill px-3 py-0 font-monospace" style={{ fontSize: "0.75rem" }}>
@@ -972,7 +972,7 @@ export default function AdminAccounting() {
       {/* VISTA REGISTRO CONTABILE */}
       {viewMode === "table" && (
         <div className="excel-table-card">
-          <div className="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+          <div className="p-3 border-bottom d-flex justify-content-between align-items-center bg-body-tertiary">
             <h6 className="fw-bold text-secondary mb-0">
               <i className="bi bi-journal-text me-2"></i>
               {selectedMonth === 0 ? `Elenco Completo Anno ${currentYear}` : `Elenco Eventi ${MONTH_NAMES[selectedMonth - 1]} ${currentYear}`}
@@ -1035,7 +1035,7 @@ export default function AdminAccounting() {
                         )}
                       </td>
                       <td>
-                        <span className="badge bg-light text-dark me-1">{ev.tipoEvento || "Evento"}</span>
+                        <span className="badge bg-body-secondary text-body me-1">{ev.tipoEvento || "Evento"}</span>
                         <small className="text-muted">{ev.location}</small>
                       </td>
                       <td className="text-center">
@@ -1047,7 +1047,7 @@ export default function AdminAccounting() {
                           <span className="text-muted small">-</span>
                         )}
                       </td>
-                      <td className="text-end fw-bold text-dark font-monospace">
+                      <td className="text-end fw-bold text-body font-monospace">
                         € {parseItalianNumber(ev.importoLordo).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td className="text-end text-danger fw-semibold font-monospace">
@@ -1115,7 +1115,7 @@ export default function AdminAccounting() {
                           </span>
                         )}
 
-                        <h6 className="fw-bold mb-0 text-dark">{ev.titolo}</h6>
+                        <h6 className="fw-bold mb-0 text-body">{ev.titolo}</h6>
                         {ev.clienteNome && (
                           <small className="text-muted d-block">
                             {ev.clienteNome} {ev.clienteCognome} {ev.location && `• ${ev.location}`}
@@ -1150,7 +1150,7 @@ export default function AdminAccounting() {
 
                     <div className="d-flex justify-content-between align-items-center pt-2 border-top mt-2">
                       <div>
-                        <small className="text-muted d-block">Lordo: <strong className="text-dark">€{parseItalianNumber(ev.importoLordo).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></small>
+                        <small className="text-body-secondary d-block">Lordo: <strong className="text-body fw-bold">€{parseItalianNumber(ev.importoLordo).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></small>
                         <small className="text-danger d-block">Spese: -€{parseItalianNumber(ev.totaleSpese).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>
                         <small className="text-success fw-bold d-block">Netto: €{parseItalianNumber(ev.totaleNetto).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>
                       </div>
@@ -1219,7 +1219,7 @@ export default function AdminAccounting() {
                   {/* BOX PARTECIPAZIONE DJ SET ADMIN (ENZO) */}
                   <div className="dj-switch-box mb-4">
                     <div className="form-check form-switch d-flex align-items-center justify-content-between p-0 mb-0">
-                      <label className="form-check-label fw-bold text-dark me-3 cursor-pointer d-flex align-items-center gap-2" htmlFor="hasDjSetSwitch">
+                      <label className="form-check-label fw-bold text-body me-3 cursor-pointer d-flex align-items-center gap-2" htmlFor="hasDjSetSwitch">
                         <i className="bi bi-disc-fill text-warning fs-4"></i>
                         <div>
                           <div className="fs-6">Presenza DJ Set Admin (Enzo Colaluca)</div>
@@ -1468,7 +1468,7 @@ export default function AdminAccounting() {
                         <div className="d-flex align-items-center gap-3">
                           <i className="bi bi-file-earmark-pdf-fill text-danger display-6"></i>
                           <div>
-                            <div className="fw-bold text-dark">{editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}</div>
+                            <div className="fw-bold text-body">{editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}</div>
                             <small className="text-success fw-bold"><i className="bi bi-check-circle-fill me-1"></i> Contratto Persistente Caricato</small>
                           </div>
                         </div>
@@ -1493,7 +1493,7 @@ export default function AdminAccounting() {
                     ) : (
                       <div className="pdf-upload-dropzone">
                         <i className="bi bi-cloud-arrow-up-fill text-success display-6 mb-2 d-block"></i>
-                        <div className="fw-bold text-dark mb-1">Upload Contratto PDF</div>
+                        <div className="fw-bold text-body mb-1">Upload Contratto PDF</div>
                         <small className="text-muted d-block mb-3">Seleziona il contratto siglato in formato .pdf</small>
                         <input
                           type="file"
@@ -1629,7 +1629,7 @@ export default function AdminAccounting() {
                               </span>
                             )}
                           </div>
-                          <h5 className="fw-bold text-dark mb-1">{ev.titolo}</h5>
+                          <h5 className="fw-bold text-body mb-1">{ev.titolo}</h5>
                           {(ev.clienteNome || ev.clienteCognome) && (
                             <p className="mb-1 text-muted small fw-semibold">
                               <i className="bi bi-person me-1"></i>
@@ -1700,11 +1700,11 @@ export default function AdminAccounting() {
                       )}
 
                       {/* Riepilogo Finanziario & Azioni */}
-                      <div className="d-flex flex-wrap justify-content-between align-items-center pt-2 border-top gap-2 bg-light p-2 rounded">
+                      <div className="d-flex flex-wrap justify-content-between align-items-center pt-2 border-top gap-2 bg-body-tertiary p-2 rounded border">
                         <div className="d-flex flex-wrap align-items-center gap-3">
-                          <small className="text-muted">Lordo: <strong className="text-dark">€{ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
-                          <small className="text-muted">Spese: <strong className="text-danger">-€{ev.totaleSpese?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
-                          <small className="text-muted">Netto: <strong className="text-success">€{ev.totaleNetto?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
+                          <small className="text-body-secondary">Lordo: <strong className="text-body font-monospace fw-bold">€{parseItalianNumber(ev.importoLordo).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></small>
+                          <small className="text-body-secondary">Spese: <strong className="text-danger font-monospace fw-semibold">-€{parseItalianNumber(ev.totaleSpese).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></small>
+                          <small className="text-body-secondary">Netto: <strong className="text-success font-monospace fw-bold">€{parseItalianNumber(ev.totaleNetto).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></small>
                         </div>
                         <div className="btn-group btn-group-sm">
                           <button

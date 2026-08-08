@@ -25,6 +25,12 @@ const getEventTypeBadgeClass = (tipo) => {
   return "event-badge-altro";
 };
 
+// Helper per garantire la corretta formattazione dei messaggi con 'Info aggiuntive:' a capo
+const formatQuoteMessage = (msg) => {
+  if (!msg) return "";
+  return msg.replace(/([^\n])\s*(Info aggiuntive:)/gi, "$1\n\n$2");
+};
+
 function AdminQuotes() {
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
@@ -685,7 +691,7 @@ function AdminQuotes() {
 
                         {q.messaggio && (
                           <div className="small text-muted bg-body-tertiary p-2 rounded border line-clamp-2">
-                            "{q.messaggio}"
+                            "{formatQuoteMessage(q.messaggio)}"
                           </div>
                         )}
                       </div>
@@ -809,7 +815,7 @@ function AdminQuotes() {
                 <div className="row g-3">
                   <div className="col-12 col-md-6">
                     <span className="text-muted small fw-semibold d-block mb-1">Nome e Cognome:</span>
-                    <p className="fs-5 fw-bold mb-0 text-dark">{selectedQuote.nome} {selectedQuote.cognome}</p>
+                    <p className="fs-5 fw-bold mb-0 text-body">{selectedQuote.nome} {selectedQuote.cognome}</p>
                   </div>
                   <div className="col-12 col-md-6">
                     <span className="text-muted small fw-semibold d-block mb-1">Stato Attuale:</span>
@@ -911,8 +917,8 @@ function AdminQuotes() {
                   <div className="col-12 mt-3">
                     <span className="text-muted small fw-semibold d-block mb-1">Messaggio / Idea di Festa:</span>
                     <div className="p-3 rounded bg-body-tertiary border message-box-dark">
-                      <p className="mb-0" style={{ whiteSpace: "pre-wrap" }}>
-                        {selectedQuote.messaggio || "Nessun messaggio inserito."}
+                      <p className="mb-0 text-body" style={{ whiteSpace: "pre-wrap" }}>
+                        {selectedQuote.messaggio ? formatQuoteMessage(selectedQuote.messaggio) : "Nessun messaggio inserito."}
                       </p>
                     </div>
                   </div>

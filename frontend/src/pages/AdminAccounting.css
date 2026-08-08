@@ -561,3 +561,45 @@
   z-index: 10 !important;
   background: var(--bs-body-bg);
 }
+
+/* ==========================================================================
+   DARK MODE OVERRIDES (data-bs-theme="dark")
+   ========================================================================== */
+[data-bs-theme="dark"] .excel-table-card,
+[data-bs-theme="dark"] .calendar-container,
+[data-bs-theme="dark"] .month-overview-card,
+[data-bs-theme="dark"] .financial-kpi-card {
+  background-color: #181d24;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="dark"] .excel-table th {
+  background-color: #0f1319;
+  color: #94a3b8;
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="dark"] .excel-table td {
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-bs-theme="dark"] .calendar-day-cell {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .calendar-day-cell:hover {
+  background: rgba(25, 135, 84, 0.15);
+}
+
+[data-bs-theme="dark"] .modal-content {
+  background-color: #181d24;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-bs-theme="dark"] .modal-footer {
+  background-color: #0f1319 !important;
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
