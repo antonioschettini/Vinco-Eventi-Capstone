@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
+import { authApiFetch } from "../utils/apiClient";
 import { logout } from "../redux/slices/authSlice";
 import { setGlobalError } from "../redux/slices/uiSlice";
 import "./AdminAccounting.css";
@@ -32,7 +34,10 @@ export default function AdminAccounting() {
     numeroEventi: 0
   });
 
-  const [taxPercent, setTaxPercent] = useState(20); // Aliquota stimata predefinita %
+  // Modalità calcolo tasse: "percent" (%) oppure "manual" (€ fisso)
+  const [taxMode, setTaxMode] = useState("percent");
+  const [taxPercent, setTaxPercent] = useState(20);
+  const [taxManualAmount, setTaxManualAmount] = useState(0);
 
   // Stato per la modale di editing/creazione evento
   const [showModal, setShowModal] = useState(false);
@@ -57,44 +62,41 @@ export default function AdminAccounting() {
   const [speseList, setSpeseList] = useState([]);
   const [uploadingPdf, setUploadingPdf] = useState(false);
 
-  useEffect(() => {
-    fetchEventsAndReport();
-  }, [currentYear, selectedMonth, token]);
-
-  const fetchEventsAndReport = async () => {
+  const fetchEventsAndReport = useCallback(async () => {
+    if (!token) return;
     setLoading(true);
     try {
-      let urlEvents = `/api/admin/agenda?year=${currentYear}`;
-      let urlReport = `/api/admin/agenda/report?year=${currentYear}`;
+      let urlEvents = `${API_BASE_URL}/api/admin/agenda?year=${currentYear}`;
+      let urlReport = `${API_BASE_URL}/api/admin/agenda/report?year=${currentYear}`;
       if (selectedMonth !== 0) {
         urlEvents += `&month=${selectedMonth}`;
         urlReport += `&month=${selectedMonth}`;
       }
 
-      const [resEvents, resReport] = await Promise.all([
-        fetch(urlEvents, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch(urlReport, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+      const [eventsData, reportData] = await Promise.all([
+        authApiFetch(urlEvents, {}, token, dispatch),
+        authApiFetch(urlReport, {}, token, dispatch)
       ]);
 
-      if (!resEvents.ok || !resReport.ok) {
-        throw new Error("Errore durante il caricamento dei dati dell'agenda contabile");
-      }
-
-      const eventsData = await resEvents.json();
-      const reportData = await resReport.json();
-
-      setEvents(eventsData);
-      setReport(reportData);
+      setEvents(eventsData || []);
+      setReport(reportData || {
+        totaleLordo: 0,
+        totaleSpese: 0,
+        totaleNetto: 0,
+        stimaTasse: 0,
+        nettoPostTasse: 0,
+        numeroEventi: 0
+      });
     } catch (err) {
-      dispatch(setGlobalError({ message: err.message, type: "danger" }));
+      dispatch(setGlobalError({ message: err.message || "Impossibile caricare i dati dell'agenda", type: "danger" }));
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentYear, selectedMonth, token, dispatch]);
+
+  useEffect(() => {
+    fetchEventsAndReport();
+  }, [fetchEventsAndReport]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -103,7 +105,8 @@ export default function AdminAccounting() {
 
   // Apertura modale per NUOVO evento
   const handleOpenNewModal = (defaultDate = "") => {
-    const formattedDate = defaultDate || `${currentYear}-${String(selectedMonth || 1).padStart(2, "0")}-01`;
+    const today = new Date();
+    const formattedDate = defaultDate || `${currentYear}-${String(selectedMonth || (today.getMonth() + 1)).padStart(2, "0")}-01`;
     setEditingEvent(null);
     setFormData({
       titolo: "",
@@ -201,26 +204,24 @@ export default function AdminAccounting() {
       };
 
       const isEdit = Boolean(editingEvent?.id);
-      const url = isEdit ? `/api/admin/agenda/${editingEvent.id}` : "/api/admin/agenda";
+      const url = isEdit ? `${API_BASE_URL}/api/admin/agenda/${editingEvent.id}` : `${API_BASE_URL}/api/admin/agenda`;
       const method = isEdit ? "PUT" : "POST";
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+      await authApiFetch(
+        url,
+        {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        throw new Error("Impossibile salvare l'evento contabile");
-      }
+        token,
+        dispatch
+      );
 
       setShowModal(false);
       fetchEventsAndReport();
     } catch (err) {
-      dispatch(setGlobalError({ message: err.message, type: "danger" }));
+      dispatch(setGlobalError({ message: err.message || "Impossibile salvare l'evento contabile", type: "danger" }));
     }
   };
 
@@ -228,16 +229,17 @@ export default function AdminAccounting() {
   const handleDeleteEvent = async (eventId) => {
     if (!window.confirm("Sei sicuro di voler eliminare questo evento dall'Agenda Contabile?")) return;
     try {
-      const res = await fetch(`/api/admin/agenda/${eventId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error("Impossibile eliminare l'evento");
+      await authApiFetch(
+        `${API_BASE_URL}/api/admin/agenda/${eventId}`,
+        { method: "DELETE" },
+        token,
+        dispatch
+      );
 
       setShowModal(false);
       fetchEventsAndReport();
     } catch (err) {
-      dispatch(setGlobalError({ message: err.message, type: "danger" }));
+      dispatch(setGlobalError({ message: err.message || "Impossibile eliminare l'evento", type: "danger" }));
     }
   };
 
@@ -255,19 +257,20 @@ export default function AdminAccounting() {
       const bodyData = new FormData();
       bodyData.append("file", file);
 
-      const res = await fetch(`/api/admin/agenda/${editingEvent.id}/contratto`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: bodyData
-      });
+      const updatedEvent = await authApiFetch(
+        `${API_BASE_URL}/api/admin/agenda/${editingEvent.id}/contratto`,
+        {
+          method: "POST",
+          body: bodyData
+        },
+        token,
+        dispatch
+      );
 
-      if (!res.ok) throw new Error("Errore durante l'upload del contratto PDF");
-
-      const updatedEvent = await res.json();
       setEditingEvent(updatedEvent);
       fetchEventsAndReport();
     } catch (err) {
-      dispatch(setGlobalError({ message: err.message, type: "danger" }));
+      dispatch(setGlobalError({ message: err.message || "Errore durante l'upload del contratto PDF", type: "danger" }));
     } finally {
       setUploadingPdf(false);
     }
@@ -277,18 +280,17 @@ export default function AdminAccounting() {
   const handleDeleteContract = async () => {
     if (!window.confirm("Vuoi rimuovere il contratto PDF allegato?")) return;
     try {
-      const res = await fetch(`/api/admin/agenda/${editingEvent.id}/contratto`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const updatedEvent = await authApiFetch(
+        `${API_BASE_URL}/api/admin/agenda/${editingEvent.id}/contratto`,
+        { method: "DELETE" },
+        token,
+        dispatch
+      );
 
-      if (!res.ok) throw new Error("Impossibile eliminare il contratto PDF");
-
-      const updatedEvent = await res.json();
       setEditingEvent(updatedEvent);
       fetchEventsAndReport();
     } catch (err) {
-      dispatch(setGlobalError({ message: err.message, type: "danger" }));
+      dispatch(setGlobalError({ message: err.message || "Impossibile eliminare il contratto PDF", type: "danger" }));
     }
   };
 
@@ -298,9 +300,9 @@ export default function AdminAccounting() {
     const firstDayOfMonth = new Date(currentYear, monthIndex, 1);
     const lastDayOfMonth = new Date(currentYear, monthIndex + 1, 0);
 
-    // Giorno della settimana del 1° del mese (0 = Domenica, convertiamo in 0 = Lunedi)
+    // Giorno della settimana del 1° del mese (0 = Domenica -> convertito in 0 = Lunedì)
     let startDayOfWeek = firstDayOfMonth.getDay() - 1;
-    if (startDayOfWeek === -1) startDayOfWeek = 6; // Domenica -> index 6
+    if (startDayOfWeek === -1) startDayOfWeek = 6;
 
     const daysInMonth = lastDayOfMonth.getDate();
     const cells = [];
@@ -341,7 +343,7 @@ export default function AdminAccounting() {
                 }}
                 title={`${ev.titolo} - Lordo: €${ev.importoLordo}`}
               >
-                <div>{ev.titolo}</div>
+                <div className="text-truncate">{ev.titolo}</div>
                 <span className="event-chip-amount">€ {ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
               </div>
             ))}
@@ -353,11 +355,18 @@ export default function AdminAccounting() {
     return cells;
   };
 
-  // Calcoli finanziari aggiornati con aliquota tasse %
+  // Calcoli finanziari flessibili (Percentuale % oppure Importo Fissato €)
   const lordoTot = report?.totaleLordo || 0;
   const speseTot = report?.totaleSpese || 0;
   const nettoOp = lordoTot - speseTot;
-  const tasseCalcolate = (nettoOp * taxPercent) / 100;
+
+  let tasseCalcolate = 0;
+  if (taxMode === "percent") {
+    tasseCalcolate = (nettoOp * (parseFloat(taxPercent) || 0)) / 100;
+  } else {
+    tasseCalcolate = parseFloat(taxManualAmount) || 0;
+  }
+
   const nettoPostTasse = nettoOp - tasseCalcolate;
 
   return (
@@ -498,19 +507,60 @@ export default function AdminAccounting() {
             <div className="w-100">
               <div className="d-flex justify-content-between align-items-center mb-1">
                 <span className="text-secondary small fw-bold text-uppercase">Netto Post-Tasse</span>
-                <span className="badge bg-warning text-dark small">
-                  Tasse ~
-                  <input
-                    type="number"
-                    className="border-0 bg-transparent text-dark fw-bold text-end"
-                    style={{ width: "35px" }}
-                    value={taxPercent}
-                    onChange={(e) => setTaxPercent(parseFloat(e.target.value) || 0)}
-                  />
-                  %
-                </span>
+                
+                {/* Switcher Modalità Tasse: Percentuale % vs Cifra Esatta € */}
+                <div className="btn-group btn-group-xs">
+                  <button
+                    type="button"
+                    className={`btn btn-xs px-2 py-0 fw-bold ${taxMode === "percent" ? "btn-warning text-dark" : "btn-outline-secondary"}`}
+                    onClick={() => setTaxMode("percent")}
+                    title="Imposta % Tasse"
+                  >
+                    %
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-xs px-2 py-0 fw-bold ${taxMode === "manual" ? "btn-warning text-dark" : "btn-outline-secondary"}`}
+                    onClick={() => setTaxMode("manual")}
+                    title="Imposta € Importo Fissato Tasse"
+                  >
+                    €
+                  </button>
+                </div>
               </div>
-              <span className="h4 fw-bold mb-0 text-success">€ {nettoPostTasse.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
+
+              <div className="d-flex align-items-center gap-1 mb-1">
+                {taxMode === "percent" ? (
+                  <div className="d-flex align-items-center gap-1 bg-warning bg-opacity-10 text-dark px-2 py-1 rounded">
+                    <span className="small fw-bold">Tasse:</span>
+                    <input
+                      type="number"
+                      step="0.5"
+                      className="border-0 bg-transparent fw-bold text-dark text-end font-monospace"
+                      style={{ width: "45px" }}
+                      value={taxPercent}
+                      onChange={(e) => setTaxPercent(e.target.value)}
+                    />
+                    <span className="small fw-bold">%</span>
+                  </div>
+                ) : (
+                  <div className="d-flex align-items-center gap-1 bg-warning bg-opacity-10 text-dark px-2 py-1 rounded">
+                    <span className="small fw-bold">€ Tasse:</span>
+                    <input
+                      type="number"
+                      step="10"
+                      className="border-0 bg-transparent fw-bold text-dark text-end font-monospace"
+                      style={{ width: "70px" }}
+                      value={taxManualAmount}
+                      onChange={(e) => setTaxManualAmount(e.target.value)}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <span className="h4 fw-bold mb-0 text-success d-block">
+                € {nettoPostTasse.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+              </span>
             </div>
           </div>
         </div>
@@ -529,7 +579,12 @@ export default function AdminAccounting() {
             </span>
           </div>
 
-          {selectedMonth === 0 ? (
+          {loading ? (
+            <div className="text-center py-5 text-success">
+              <div className="spinner-border spinner-border-sm me-2" role="status"></div>
+              <span>Caricamento eventi in corso...</span>
+            </div>
+          ) : selectedMonth === 0 ? (
             <div className="alert alert-info border-0 rounded-4 p-4 text-center my-3">
               <i className="bi bi-info-circle-fill display-6 mb-2 d-block"></i>
               Seleziona un mese specifico dalle pillole in alto per visualizzare la griglia del calendario giorno per giorno.
@@ -565,7 +620,13 @@ export default function AdminAccounting() {
                 </tr>
               </thead>
               <tbody>
-                {events.length === 0 ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan="8" className="text-center py-4 text-muted">
+                      Caricamento in corso...
+                    </td>
+                  </tr>
+                ) : events.length === 0 ? (
                   <tr>
                     <td colSpan="8" className="text-center py-5 text-muted">
                       Nessun evento registrato per il periodo selezionato.
@@ -653,7 +714,7 @@ export default function AdminAccounting() {
                         type="text"
                         className="form-control rounded-3"
                         required
-                        placeholder="es. Matrimonio Marco e Giulia"
+                        placeholder="es. Matrimonio Rossi"
                         value={formData.titolo}
                         onChange={(e) => setFormData({ ...formData, titolo: e.target.value })}
                       />
@@ -673,7 +734,7 @@ export default function AdminAccounting() {
                       <input
                         type="text"
                         className="form-control rounded-3"
-                        placeholder="es. Matrimonio, Compleanno"
+                        placeholder="es. Matrimonio, Evento Aziendale"
                         value={formData.tipoEvento}
                         onChange={(e) => setFormData({ ...formData, tipoEvento: e.target.value })}
                       />
@@ -684,6 +745,7 @@ export default function AdminAccounting() {
                       <input
                         type="text"
                         className="form-control rounded-3"
+                        placeholder="es. Nome"
                         value={formData.clienteNome}
                         onChange={(e) => setFormData({ ...formData, clienteNome: e.target.value })}
                       />
@@ -693,6 +755,7 @@ export default function AdminAccounting() {
                       <input
                         type="text"
                         className="form-control rounded-3"
+                        placeholder="es. Cognome"
                         value={formData.clienteCognome}
                         onChange={(e) => setFormData({ ...formData, clienteCognome: e.target.value })}
                       />
@@ -702,6 +765,7 @@ export default function AdminAccounting() {
                       <input
                         type="text"
                         className="form-control rounded-3"
+                        placeholder="es. +39 333..."
                         value={formData.clienteTelefono}
                         onChange={(e) => setFormData({ ...formData, clienteTelefono: e.target.value })}
                       />
@@ -712,7 +776,7 @@ export default function AdminAccounting() {
                       <input
                         type="text"
                         className="form-control rounded-3"
-                        placeholder="es. Villa Rosa, Napoli"
+                        placeholder="es. Villa / Location"
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                       />
@@ -722,6 +786,7 @@ export default function AdminAccounting() {
                       <input
                         type="email"
                         className="form-control rounded-3"
+                        placeholder="es. cliente@email.it"
                         value={formData.clienteEmail}
                         onChange={(e) => setFormData({ ...formData, clienteEmail: e.target.value })}
                       />
@@ -803,7 +868,7 @@ export default function AdminAccounting() {
                                   <input
                                     type="text"
                                     className="form-control form-control-sm border-0"
-                                    placeholder="es. Dario Violinista, DJ Team..."
+                                    placeholder="es. Musicista, DJ, Service audio..."
                                     value={item.descrizione}
                                     onChange={(e) => handleUpdateSpesaRow(item.id, "descrizione", e.target.value)}
                                   />
