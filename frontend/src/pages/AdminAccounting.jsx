@@ -14,6 +14,15 @@ const MONTH_NAMES = [
 
 const WEEKDAY_NAMES = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
 
+// Helper per parsificare numeri in formato italiano con virgola o punto
+const parseItalianNumber = (val) => {
+  if (val === null || val === undefined || val === "") return 0;
+  if (typeof val === "number") return isNaN(val) ? 0 : val;
+  const normalized = val.toString().replace(",", ".");
+  const num = parseFloat(normalized);
+  return isNaN(num) ? 0 : num;
+};
+
 export default function AdminAccounting() {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
@@ -45,10 +54,22 @@ export default function AdminAccounting() {
     numeroEventi: 0
   });
 
-  // Modalità calcolo tasse: "percent" (%) oppure "manual" (€ fisso)
-  const [taxMode, setTaxMode] = useState("percent");
-  const [taxPercent, setTaxPercent] = useState(20);
-  const [taxManualAmount, setTaxManualAmount] = useState(0);
+  // Persistenza configurazione tasse in localStorage
+  const [taxMode, setTaxMode] = useState(() => {
+    return localStorage.getItem("vinco_admin_tax_mode") || "percent";
+  });
+  const [taxPercent, setTaxPercent] = useState(() => {
+    return localStorage.getItem("vinco_admin_tax_percent") || "20";
+  });
+  const [taxManualAmount, setTaxManualAmount] = useState(() => {
+    return localStorage.getItem("vinco_admin_tax_manual") || "0";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vinco_admin_tax_mode", taxMode);
+    localStorage.setItem("vinco_admin_tax_percent", taxPercent.toString());
+    localStorage.setItem("vinco_admin_tax_manual", taxManualAmount.toString());
+  }, [taxMode, taxPercent, taxManualAmount]);
 
   // Stato per la modale di editing/creazione evento
   const [showModal, setShowModal] = useState(false);
@@ -62,7 +83,7 @@ export default function AdminAccounting() {
     dataEvento: "",
     location: "",
     tipoEvento: "Matrimonio",
-    importoLordo: 0,
+    importoLordo: "",
     totaleSpese: 0,
     tasseStimate: 0,
     note: "",
@@ -151,7 +172,7 @@ export default function AdminAccounting() {
       dataEvento: formattedDate,
       location: "",
       tipoEvento: "Matrimonio",
-      importoLordo: 0,
+      importoLordo: "",
       totaleSpese: 0,
       tasseStimate: 0,
       note: "",
@@ -173,7 +194,7 @@ export default function AdminAccounting() {
       dataEvento: ev.dataEvento || "",
       location: ev.location || "",
       tipoEvento: ev.tipoEvento || "Matrimonio",
-      importoLordo: ev.importoLordo || 0,
+      importoLordo: ev.importoLordo || "",
       totaleSpese: ev.totaleSpese || 0,
       tasseStimate: ev.tasseStimate || 0,
       note: ev.note || "",
@@ -194,7 +215,7 @@ export default function AdminAccounting() {
   const handleAddSpesaRow = () => {
     setSpeseList([
       ...speseList,
-      { id: Date.now().toString(), descrizione: "", importo: 0 }
+      { id: Date.now().toString(), descrizione: "", importo: "" }
     ]);
   };
 
@@ -204,14 +225,14 @@ export default function AdminAccounting() {
       if (item.id === id) {
         return {
           ...item,
-          [field]: field === "importo" ? (value === "" ? 0 : parseFloat(value) || 0) : value
+          [field]: value
         };
       }
       return item;
     });
     setSpeseList(updated);
 
-    const sumSpese = updated.reduce((acc, curr) => acc + (parseFloat(curr.importo) || 0), 0);
+    const sumSpese = updated.reduce((acc, curr) => acc + parseItalianNumber(curr.importo), 0);
     setFormData((prev) => ({ ...prev, totaleSpese: sumSpese }));
   };
 
@@ -219,7 +240,7 @@ export default function AdminAccounting() {
   const handleRemoveSpesaRow = (id) => {
     const updated = speseList.filter((item) => item.id !== id);
     setSpeseList(updated);
-    const sumSpese = updated.reduce((acc, curr) => acc + (parseFloat(curr.importo) || 0), 0);
+    const sumSpese = updated.reduce((acc, curr) => acc + parseItalianNumber(curr.importo), 0);
     setFormData((prev) => ({ ...prev, totaleSpese: sumSpese }));
   };
 
@@ -227,13 +248,14 @@ export default function AdminAccounting() {
   const handleSaveEvent = async (e) => {
     e.preventDefault();
     try {
-      const sumSpese = speseList.reduce((acc, curr) => acc + (parseFloat(curr.importo) || 0), 0);
+      const sumSpese = speseList.reduce((acc, curr) => acc + parseItalianNumber(curr.importo), 0);
+      const parsedLordo = parseItalianNumber(formData.importoLordo);
       const payload = {
         ...formData,
-        importoLordo: parseFloat(formData.importoLordo) || 0,
+        importoLordo: parsedLordo,
         totaleSpese: sumSpese,
-        speseJson: JSON.stringify(speseList),
-        tasseStimate: parseFloat(formData.tasseStimate) || 0
+        speseJson: JSON.stringify(speseList.map(item => ({ ...item, importo: parseItalianNumber(item.importo) }))),
+        tasseStimate: parseItalianNumber(formData.tasseStimate)
       };
 
       const isEdit = Boolean(editingEvent?.id);
@@ -396,7 +418,14 @@ export default function AdminAccounting() {
           onClick={() => handleOpenNewModal(dateStr)}
         >
           <div className="day-number">
-            <span>{day}</span>
+            <span>
+              {day}
+              {dayEvents.length > 2 && (
+                <span className="badge bg-success bg-opacity-10 text-success ms-1 px-1 py-0 font-monospace" style={{ fontSize: "0.65rem" }} title={`${dayEvents.length} eventi in questo giorno`}>
+                  {dayEvents.length} ev
+                </span>
+              )}
+            </span>
             <i className="bi bi-plus-circle-fill add-event-plus" title="Aggiungi evento"></i>
           </div>
           <div className="events-wrapper">
@@ -411,14 +440,14 @@ export default function AdminAccounting() {
                 title={`${ev.titolo} - Lordo: €${ev.importoLordo}`}
               >
                 <div className="event-chip-header">
-                  <span className="event-chip-title">{ev.titolo}</span>
+                  <span className="event-chip-title text-truncate">{ev.titolo}</span>
                   {ev.contrattoUrl ? (
                     <i className="bi bi-check-circle-fill contract-badge-icon ok" title="Contratto allegato"></i>
                   ) : (
                     <i className="bi bi-exclamation-triangle-fill contract-badge-icon missing" title="Contratto mancante!"></i>
                   )}
                 </div>
-                <span className="event-chip-amount">€ {ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
+                <span className="event-chip-amount text-truncate">€ {ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
               </div>
             ))}
           </div>
@@ -436,9 +465,9 @@ export default function AdminAccounting() {
 
   let tasseCalcolateAnno = 0;
   if (taxMode === "percent") {
-    tasseCalcolateAnno = (nettoOpAnno * (parseFloat(taxPercent) || 0)) / 100;
+    tasseCalcolateAnno = (nettoOpAnno * parseItalianNumber(taxPercent)) / 100;
   } else {
-    tasseCalcolateAnno = parseFloat(taxManualAmount) || 0;
+    tasseCalcolateAnno = parseItalianNumber(taxManualAmount);
   }
 
   const nettoPostTasseAnno = nettoOpAnno - tasseCalcolateAnno;
@@ -468,7 +497,7 @@ export default function AdminAccounting() {
         </Link>
       </div>
 
-      {/* Barra Filtri: Anno, Mesi, Pulsante Nuovo Evento */}
+      {/* Barra Filtri: Anno, Mesi (Swipeable su Touch), Pulsante Nuovo Evento */}
       <div className="card border-0 shadow-sm rounded-4 mb-4">
         <div className="card-body p-3">
           <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -486,8 +515,8 @@ export default function AdminAccounting() {
               </select>
             </div>
 
-            {/* Pillole Mesi */}
-            <div className="d-flex flex-wrap gap-1 align-items-center">
+            {/* Nastro Pillole Mesi Scorrevole Touch */}
+            <div className="month-pills-scroll flex-grow-1 mx-md-2">
               <button
                 className={`month-pill ${selectedMonth === 0 ? "active" : ""}`}
                 onClick={() => setSelectedMonth(0)}
@@ -517,8 +546,9 @@ export default function AdminAccounting() {
                 <button
                   className={`btn ${viewMode === "table" ? "btn-success" : "btn-outline-secondary"}`}
                   onClick={() => setViewMode("table")}
+                  title="Visualizza la lista completa in formato Registro Contabile"
                 >
-                  <i className="bi bi-table me-1"></i> Foglio Excel
+                  <i className="bi bi-journal-text me-1"></i> Registro Contabile
                 </button>
               </div>
 
@@ -533,7 +563,7 @@ export default function AdminAccounting() {
         </div>
       </div>
 
-      {/* KPI Report Finanziario Generale ANNUALE (1 Gennaio - 31 Dicembre) */}
+      {/* KPI Report Finanziario Generale ANNUALE */}
       <div className="row g-3 mb-4">
         <div className="col-12 col-sm-6 col-lg-3">
           <div className="financial-kpi-card kpi-lordo">
@@ -541,7 +571,7 @@ export default function AdminAccounting() {
               <i className="bi bi-cash-stack"></i>
             </div>
             <div>
-              <span className="text-secondary small fw-bold text-uppercase d-block">Totale Lordo Anno {currentYear}</span>
+              <span className="text-secondary small fw-bold text-uppercase d-block">Totale Lordo</span>
               <span className="h4 fw-bold mb-0">€ {lordoTotAnno.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
@@ -553,7 +583,7 @@ export default function AdminAccounting() {
               <i className="bi bi-receipt-cutoff"></i>
             </div>
             <div>
-              <span className="text-secondary small fw-bold text-uppercase d-block">Spese Anno {currentYear}</span>
+              <span className="text-secondary small fw-bold text-uppercase d-block">Spese Collaboratori</span>
               <span className="h4 fw-bold mb-0 text-danger">- € {speseTotAnno.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
@@ -565,13 +595,13 @@ export default function AdminAccounting() {
               <i className="bi bi-wallet2"></i>
             </div>
             <div>
-              <span className="text-secondary small fw-bold text-uppercase d-block">Netto Operativo Anno {currentYear}</span>
+              <span className="text-secondary small fw-bold text-uppercase d-block">Netto Operativo</span>
               <span className="h4 fw-bold mb-0 text-primary">€ {nettoOpAnno.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
         </div>
 
-        {/* Card Netto Post-Tasse Anno */}
+        {/* Card Netto Post-Tasse Anno intuitiva con supporto virgola e modalità % vs € */}
         <div className="col-12 col-sm-6 col-lg-3">
           <div className="financial-kpi-card kpi-tasse">
             <div className="financial-kpi-icon">
@@ -579,7 +609,7 @@ export default function AdminAccounting() {
             </div>
             <div className="w-100 overflow-hidden">
               <div className="d-flex justify-content-between align-items-center mb-1">
-                <span className="text-secondary small fw-bold text-uppercase me-1 text-truncate">Netto Post-Tasse Anno</span>
+                <span className="text-secondary small fw-bold text-uppercase me-1">Netto Post-Tasse</span>
                 
                 {/* Switcher Modalità Tasse % vs € */}
                 <div className="btn-group btn-group-xs flex-shrink-0">
@@ -587,7 +617,7 @@ export default function AdminAccounting() {
                     type="button"
                     className={`btn ${taxMode === "percent" ? "btn-warning text-dark font-monospace" : "btn-outline-secondary font-monospace"}`}
                     onClick={() => setTaxMode("percent")}
-                    title="Calcolo in Percentuale %"
+                    title="Calcola in Percentuale %"
                   >
                     %
                   </button>
@@ -595,7 +625,7 @@ export default function AdminAccounting() {
                     type="button"
                     className={`btn ${taxMode === "manual" ? "btn-warning text-dark font-monospace" : "btn-outline-secondary font-monospace"}`}
                     onClick={() => setTaxMode("manual")}
-                    title="Calcolo in Importo Fisso €"
+                    title="Imposta Cifra Fissa in €"
                   >
                     €
                   </button>
@@ -607,30 +637,35 @@ export default function AdminAccounting() {
               </div>
 
               <div className="d-flex align-items-center gap-1">
-                <span className="text-muted small">Tasse:</span>
                 {taxMode === "percent" ? (
-                  <div className="input-group input-group-sm" style={{ maxWidth: "100px" }}>
-                    <input
-                      type="number"
-                      step="1"
-                      className="form-control form-control-sm text-end font-monospace fw-bold px-1 py-0"
-                      value={taxPercent}
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => setTaxPercent(e.target.value === "" ? 0 : parseFloat(e.target.value) || 0)}
-                    />
-                    <span className="input-group-text px-1 py-0 font-monospace">%</span>
+                  <div className="d-flex align-items-center gap-1 w-100">
+                    <span className="text-muted small">Aliquota:</span>
+                    <div className="input-group input-group-sm" style={{ maxWidth: "110px" }}>
+                      <input
+                        type="text"
+                        className="form-control form-control-sm text-end font-monospace fw-bold px-2 py-0"
+                        value={taxPercent}
+                        placeholder="20"
+                        onFocus={(e) => e.target.select()}
+                        onChange={(e) => setTaxPercent(e.target.value)}
+                      />
+                      <span className="input-group-text px-1 py-0 font-monospace">%</span>
+                    </div>
                   </div>
                 ) : (
-                  <div className="input-group input-group-sm" style={{ maxWidth: "115px" }}>
-                    <span className="input-group-text px-1 py-0 font-monospace">€</span>
-                    <input
-                      type="number"
-                      step="10"
-                      className="form-control form-control-sm text-end font-monospace fw-bold px-1 py-0"
-                      value={taxManualAmount}
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => setTaxManualAmount(e.target.value === "" ? 0 : parseFloat(e.target.value) || 0)}
-                    />
+                  <div className="d-flex align-items-center gap-1 w-100">
+                    <span className="text-muted small">Tasse:</span>
+                    <div className="input-group input-group-sm" style={{ maxWidth: "135px" }}>
+                      <span className="input-group-text px-1 py-0 font-monospace">€</span>
+                      <input
+                        type="text"
+                        className="form-control form-control-sm text-end font-monospace fw-bold px-2 py-0"
+                        value={taxManualAmount}
+                        placeholder="0,00"
+                        onFocus={(e) => e.target.select()}
+                        onChange={(e) => setTaxManualAmount(e.target.value)}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -646,7 +681,7 @@ export default function AdminAccounting() {
             <div className="d-flex flex-wrap align-items-center gap-2">
               <h5 className="fw-bold mb-0 text-success d-flex align-items-center">
                 <i className="bi bi-calendar-event me-2"></i>
-                {selectedMonth === 0 ? `Anno ${currentYear}` : `${MONTH_NAMES[selectedMonth - 1]} ${currentYear}`}
+                {selectedMonth === 0 ? `Panoramica Annuale ${currentYear}` : `${MONTH_NAMES[selectedMonth - 1]} ${currentYear}`}
               </h5>
               
               {/* Riepilogo Finanziario Mensile in piccolo accanto al nome del mese */}
@@ -658,7 +693,7 @@ export default function AdminAccounting() {
             </div>
 
             <span className="badge bg-secondary bg-opacity-10 text-secondary align-self-start align-self-md-auto">
-              {events.length} eventi in programma
+              {events.length} eventi registrati {selectedMonth === 0 ? "in tutto l'anno" : "in questo mese"}
             </span>
           </div>
 
@@ -668,9 +703,56 @@ export default function AdminAccounting() {
               <span>Caricamento eventi in corso...</span>
             </div>
           ) : selectedMonth === 0 ? (
-            <div className="alert alert-info border-0 rounded-4 p-4 text-center my-3">
-              <i className="bi bi-info-circle-fill display-6 mb-2 d-block"></i>
-              Seleziona un mese specifico dalle pillole in alto per visualizzare la griglia del calendario giorno per giorno.
+            <div className="my-2">
+              <div className="alert alert-success bg-success bg-opacity-10 border-0 rounded-4 p-3 mb-4 d-flex align-items-center gap-3">
+                <i className="bi bi-info-circle-fill text-success fs-3"></i>
+                <div>
+                  <h6 className="fw-bold text-success mb-1">Panoramica 12 Mesi - Anno {currentYear}</h6>
+                  <small className="text-secondary">
+                    Fai click su una scheda mensile per aprire la griglia dettagliata del mese oppure clicca su <strong>Registro Contabile</strong> in alto per la tabella generale.
+                  </small>
+                </div>
+              </div>
+
+              <div className="row g-3">
+                {MONTH_NAMES.map((mName, idx) => {
+                  const mNum = idx + 1;
+                  const mEvents = events.filter((ev) => {
+                    if (!ev.dataEvento) return false;
+                    const parts = ev.dataEvento.split("-");
+                    return parseInt(parts[0]) === currentYear && parseInt(parts[1]) === mNum;
+                  });
+
+                  const mLordo = mEvents.reduce((acc, curr) => acc + (curr.importoLordo || 0), 0);
+                  const mSpese = mEvents.reduce((acc, curr) => acc + (curr.totaleSpese || 0), 0);
+                  const mNetto = mLordo - mSpese;
+
+                  return (
+                    <div key={mName} className="col-12 col-sm-6 col-md-4 col-lg-3">
+                      <div
+                        className="month-overview-card p-3"
+                        onClick={() => setSelectedMonth(mNum)}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <span className="fw-bold text-success">{mName}</span>
+                          <span className="badge bg-success bg-opacity-10 text-success rounded-pill font-monospace">
+                            {mEvents.length} {mEvents.length === 1 ? "evento" : "eventi"}
+                          </span>
+                        </div>
+                        <div className="small text-muted mb-1">
+                          Lordo: <strong className="text-dark">€ {mLordo.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong>
+                        </div>
+                        <div className="small text-muted mb-3">
+                          Netto: <strong className="text-primary">€ {mNetto.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong>
+                        </div>
+                        <button className="btn btn-sm btn-outline-success w-100 rounded-pill font-monospace" style={{ fontSize: "0.78rem" }}>
+                          <i className="bi bi-calendar-week me-1"></i> Apri Mese
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ) : (
             <>
@@ -680,26 +762,86 @@ export default function AdminAccounting() {
                 ))}
               </div>
               <div className="calendar-days-grid">{renderCalendarDays()}</div>
+
+              {/* LISTA EVENTI DEL MESE TOUCH-FRIENDLY */}
+              {events.length > 0 && (
+                <div className="mobile-events-section mt-4 pt-3 border-top">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h6 className="fw-bold text-success mb-0 d-flex align-items-center">
+                      <i className="bi bi-list-stars me-2"></i> Eventi del Mese ({events.length})
+                    </h6>
+                    <small className="text-muted" style={{ fontSize: "0.75rem" }}>Tocca per modificare</small>
+                  </div>
+                  <div className="d-flex flex-column gap-2">
+                    {events.map((ev) => (
+                      <div
+                        key={`mobile-list-${ev.id}`}
+                        className="card border-0 shadow-sm rounded-3 p-3 cursor-pointer mobile-event-card"
+                        onClick={() => handleOpenEditModal(ev)}
+                      >
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                          <div>
+                            <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace mb-1">
+                              <i className="bi bi-calendar-event me-1"></i> {ev.dataEvento}
+                            </span>
+                            <h6 className="fw-bold mb-0 text-dark">{ev.titolo}</h6>
+                            {ev.clienteNome && (
+                              <small className="text-muted d-block">
+                                {ev.clienteNome} {ev.clienteCognome} {ev.clienteTelefono && `• ${ev.clienteTelefono}`}
+                              </small>
+                            )}
+                          </div>
+                          {ev.contrattoUrl ? (
+                            <span className="badge bg-success text-white px-2 py-1 flex-shrink-0">
+                              <i className="bi bi-check-circle-fill me-1"></i> PDF Ok
+                            </span>
+                          ) : (
+                            <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 flex-shrink-0">
+                              <i className="bi bi-exclamation-triangle-fill me-1"></i> PDF Mancante
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="d-flex flex-wrap justify-content-between align-items-center pt-2 border-top gap-2">
+                          <div className="d-flex align-items-center gap-3">
+                            <small className="text-muted">Lordo: <strong className="text-dark">€{ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
+                            <small className="text-muted">Netto: <strong className="text-primary">€{ev.totaleNetto?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
+                          </div>
+                          <button className="btn btn-sm btn-outline-success rounded-pill px-3 py-0 font-monospace" style={{ fontSize: "0.75rem" }}>
+                            Modifica <i className="bi bi-chevron-right ms-1"></i>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
       )}
 
-      {/* VISTA TABELLA EXCEL */}
+      {/* VISTA REGISTRO CONTABILE */}
       {viewMode === "table" && (
         <div className="excel-table-card">
           <div className="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
             <h6 className="fw-bold text-secondary mb-0">
-              <i className="bi bi-table me-2"></i>
+              <i className="bi bi-journal-text me-2"></i>
               {selectedMonth === 0 ? `Elenco Completo Anno ${currentYear}` : `Elenco Eventi ${MONTH_NAMES[selectedMonth - 1]} ${currentYear}`}
             </h6>
-            {selectedMonth !== 0 && (
+            {selectedMonth !== 0 ? (
               <span className="badge bg-success bg-opacity-10 text-success font-monospace">
                 Netto Mese: € {nettoOpMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
               </span>
+            ) : (
+              <span className="badge bg-success bg-opacity-10 text-success font-monospace">
+                Netto Anno: € {nettoOpAnno.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+              </span>
             )}
           </div>
-          <div className="table-responsive">
+
+          {/* VISTA TABELLA DESKTOP */}
+          <div className="table-responsive d-none d-md-block">
             <table className="table excel-table align-middle">
               <thead>
                 <tr>
@@ -781,6 +923,59 @@ export default function AdminAccounting() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* VISTA CARD MOBILE PER REGISTRO CONTABILE */}
+          <div className="d-block d-md-none p-3">
+            {loading ? (
+              <div className="text-center py-4 text-muted">Caricamento in corso...</div>
+            ) : events.length === 0 ? (
+              <div className="text-center py-4 text-muted">Nessun evento registrato.</div>
+            ) : (
+              <div className="d-flex flex-column gap-3">
+                {events.map((ev) => (
+                  <div
+                    key={`mobile-reg-${ev.id}`}
+                    className="card border-0 shadow-sm rounded-3 p-3 mobile-event-card cursor-pointer"
+                    onClick={() => handleOpenEditModal(ev)}
+                  >
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                        <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace mb-1">
+                          <i className="bi bi-calendar-event me-1"></i> {ev.dataEvento}
+                        </span>
+                        <h6 className="fw-bold mb-0 text-dark">{ev.titolo}</h6>
+                        {ev.clienteNome && (
+                          <small className="text-muted d-block">
+                            {ev.clienteNome} {ev.clienteCognome} {ev.clienteTelefono && `• ${ev.clienteTelefono}`}
+                          </small>
+                        )}
+                      </div>
+                      {ev.contrattoUrl ? (
+                        <span className="badge bg-success text-white px-2 py-1 flex-shrink-0">
+                          <i className="bi bi-check-circle-fill me-1"></i> PDF Ok
+                        </span>
+                      ) : (
+                        <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 flex-shrink-0">
+                          <i className="bi bi-exclamation-triangle-fill me-1"></i> PDF Mancante
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center pt-2 border-top mt-2">
+                      <div>
+                        <small className="text-muted d-block">Lordo: €{ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</small>
+                        <small className="text-danger d-block">Spese: -€{ev.totaleSpese?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</small>
+                        <small className="text-success fw-bold d-block">Netto: €{ev.totaleNetto?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</small>
+                      </div>
+                      <button className="btn btn-sm btn-outline-success rounded-pill px-3 py-1 font-monospace">
+                        Modifica <i className="bi bi-pencil-square ms-1"></i>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -890,9 +1085,9 @@ export default function AdminAccounting() {
                     </div>
                   </div>
 
-                  {/* SEZIONE 2: ECONOMIA & SPESE COLLABORATORI (STILE EXCEL) */}
+                  {/* SEZIONE 2: ECONOMIA & SPESE COLLABORATORI (GRID) */}
                   <h6 className="fw-bold text-secondary mb-3 text-uppercase small border-bottom pb-2">
-                    2. Contabilità, Prezzo & Spese Fornitori (Excel Grid)
+                    2. Contabilità, Prezzo & Spese Fornitori (Grid)
                   </h6>
                   <div className="row g-3 mb-3">
                     <div className="col-12 col-md-6">
@@ -900,16 +1095,12 @@ export default function AdminAccounting() {
                       <div className="input-group">
                         <span className="input-group-text bg-success bg-opacity-10 text-success fw-bold">€</span>
                         <input
-                          type="number"
-                          step="0.01"
-                          className="form-control form-control-lg fw-bold text-success"
-                          value={formData.importoLordo === 0 || formData.importoLordo === "0" ? "" : formData.importoLordo}
-                          placeholder="0.00"
+                          type="text"
+                          className="form-control form-control-lg fw-bold text-success font-monospace"
+                          value={formData.importoLordo}
+                          placeholder="0,00"
                           onFocus={(e) => e.target.select()}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setFormData({ ...formData, importoLordo: val === "" ? 0 : val });
-                          }}
+                          onChange={(e) => setFormData({ ...formData, importoLordo: e.target.value })}
                         />
                       </div>
                     </div>
@@ -919,7 +1110,7 @@ export default function AdminAccounting() {
                         <div>
                           <small className="text-uppercase fw-bold text-secondary d-block">Totale Netto Operativo</small>
                           <span className="h4 fw-bold text-primary mb-0">
-                            € {((parseFloat(formData.importoLordo) || 0) - (parseFloat(formData.totaleSpese) || 0)).toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+                            € {(parseItalianNumber(formData.importoLordo) - (parseFloat(formData.totaleSpese) || 0)).toLocaleString("it-IT", { minimumFractionDigits: 2 })}
                           </span>
                         </div>
                         <div className="text-end">
@@ -977,11 +1168,10 @@ export default function AdminAccounting() {
                                 </td>
                                 <td>
                                   <input
-                                    type="number"
-                                    step="0.01"
-                                    className="form-control form-control-sm border-0 text-end fw-bold text-danger"
-                                    value={item.importo === 0 || item.importo === "0" ? "" : item.importo}
-                                    placeholder="0.00"
+                                    type="text"
+                                    className="form-control form-control-sm border-0 text-end fw-bold text-danger font-monospace"
+                                    value={item.importo}
+                                    placeholder="0,00"
                                     onFocus={(e) => e.target.select()}
                                     onChange={(e) => handleUpdateSpesaRow(item.id, "importo", e.target.value)}
                                   />
