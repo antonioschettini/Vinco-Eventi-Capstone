@@ -66,19 +66,16 @@ const isValidPhone = (phone) => {
 // Valida Data (deve essere una data futura o da oggi in poi)
 const isValidFutureDate = (dateString) => {
   if (!dateString) return false;
-  const selectedDate = new Date(dateString);
-  if (isNaN(selectedDate.getTime())) return false;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return selectedDate >= today;
+  const todayStr = new Date().toLocaleDateString("sv-SE");
+  return dateString >= todayStr;
 };
 
-// Valida Nome e Cognome (solo lettere, accenti, spazi, apostrofi e trattini, 2-50 caratteri, NESSUN numero o simbolo come 1=1)
+// Valida Nome e Cognome (solo lettere, accenti, punti, spazi, apostrofi e trattini, 2-50 caratteri)
 const isValidPersonName = (name) => {
   if (!name) return false;
   const trimmed = name.trim();
   if (trimmed.length < 2 || trimmed.length > 50) return false;
-  return /^[a-zA-Zà-ùÀ-Ùá-úÁ-Úä-üÄ-ÜñÑ\s'-]+$/.test(trimmed);
+  return /^[a-zA-Zà-ùÀ-Ùá-úÁ-Úä-üÄ-ÜñÑ\s'.-]+$/.test(trimmed);
 };
 
 // Valida Nome Struttura / Location (2-80 caratteri, esclude simboli di injection)
@@ -89,12 +86,12 @@ const isValidVenueName = (venue) => {
   return !/[=<>;$%*|\\{}]/.test(trimmed);
 };
 
-// Valida Città / Località (2-50 caratteri, alfabetico/accentato/spazi)
+// Valida Città / Località (2-50 caratteri, alfabetico/accentato/punti/spazi)
 const isValidCityName = (city) => {
   if (!city) return false;
   const trimmed = city.trim();
   if (trimmed.length < 2 || trimmed.length > 50) return false;
-  return /^[a-zA-Zà-ùÀ-Ùá-úÁ-Úä-üÄ-ÜñÑ\s'-]+$/.test(trimmed);
+  return /^[a-zA-Zà-ùÀ-Ùá-úÁ-Úä-üÄ-ÜñÑ\s'.-]+$/.test(trimmed);
 };
 
 
@@ -106,6 +103,7 @@ function ContactForm() {
   const [formData, setFormData] = useState(initialFormState);
   const [validated, setValidated] = useState(false);
   const [showValidationBanner, setShowValidationBanner] = useState(false);
+  const [activeValidationErrors, setActiveValidationErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // { type: 'success' | 'danger', message: string }
   const [showResetModal, setShowResetModal] = useState(false);
@@ -145,6 +143,13 @@ function ContactForm() {
     }
   };
 
+  const scrollToAndFocusField = (elementId) => {
+    const el = document.getElementById(elementId);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.focus();
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -172,46 +177,132 @@ function ContactForm() {
     });
   };
 
-  const isFormValid = () => {
-    const nameOk = isValidPersonName(formData.nome);
-    const lastNameOk = isValidPersonName(formData.cognome);
-    const emailOk = isValidEmail(formData.email);
-    const phoneOk = isValidPhone(formData.telefono);
-    const venueOk = isValidVenueName(formData.nomeLocation);
-    const cityOk = isValidCityName(formData.cittaLocation);
-    const guestsOk = Number(formData.numeroOspiti) > 0 && Number(formData.numeroOspiti) <= 10000;
-    const dateOk = isValidFutureDate(formData.dataEvento);
-    const eventTypeOk = formData.tipoEvento.trim() !== "";
-    const eventTypeOtherOk = formData.tipoEvento !== "Altro" || formData.tipoEventoAltro.trim() !== "";
-    const ceremonyTypeOtherOk = formData.tipoCerimonia !== "Altro" || formData.tipoCerimoniaAltro.trim() !== "";
-    const timeOfDayOk = formData.momentoGiornata.trim() !== "";
-    const budgetOk = formData.budget.trim() !== "";
+  const getValidationErrors = (data = formData) => {
+    const errors = [];
 
-    return (
-      nameOk &&
-      lastNameOk &&
-      emailOk &&
-      phoneOk &&
-      venueOk &&
-      cityOk &&
-      guestsOk &&
-      dateOk &&
-      eventTypeOk &&
-      eventTypeOtherOk &&
-      ceremonyTypeOtherOk &&
-      timeOfDayOk &&
-      budgetOk &&
-      formData.accettaTermini
-    );
+    if (!isValidPersonName(data.nome)) {
+      errors.push({
+        id: "nome",
+        label: t.firstName || "Nome",
+        guidance: t.validationGuidance?.nome || t.nameInvalidError || "Inserisci un nome valido (almeno 2 caratteri, solo lettere).",
+      });
+    }
+
+    if (!isValidPersonName(data.cognome)) {
+      errors.push({
+        id: "cognome",
+        label: t.lastName || "Cognome",
+        guidance: t.validationGuidance?.cognome || t.lastNameInvalidError || "Inserisci un cognome valido (almeno 2 caratteri, solo lettere).",
+      });
+    }
+
+    if (!isValidEmail(data.email)) {
+      errors.push({
+        id: "email",
+        label: t.email || "Email",
+        guidance: t.validationGuidance?.email || `Inserisci una ${t.email || "email"} valida.`,
+      });
+    }
+
+    if (!isValidPhone(data.telefono)) {
+      errors.push({
+        id: "telefono",
+        label: t.phone || "Telefono",
+        guidance: t.validationGuidance?.telefono || `Il ${t.phone || "telefono"} è obbligatorio (almeno 6 cifre).`,
+      });
+    }
+
+    if (!data.tipoEvento || !data.tipoEvento.trim()) {
+      errors.push({
+        id: "tipoEvento",
+        label: t.eventType || "Tipo di Evento",
+        guidance: t.validationGuidance?.tipoEvento || `Seleziona il ${t.eventType || "tipo di evento"}.`,
+      });
+    } else if (data.tipoEvento === "Altro" && (!data.tipoEventoAltro || !data.tipoEventoAltro.trim())) {
+      errors.push({
+        id: "tipoEventoAltro",
+        label: t.eventTypeOtherLabel || "Specifica tipo di evento",
+        guidance: t.validationGuidance?.tipoEventoAltro || t.eventTypeOtherError || "Specifica il tipo di evento.",
+      });
+    }
+
+    if (!isValidFutureDate(data.dataEvento)) {
+      errors.push({
+        id: "dataEvento",
+        label: t.eventDate || "Data Evento",
+        guidance: t.validationGuidance?.dataEvento || `La ${t.eventDate || "data evento"} è obbligatoria (da oggi in poi).`,
+      });
+    }
+
+    if (!isValidVenueName(data.nomeLocation)) {
+      errors.push({
+        id: "nomeLocation",
+        label: t.venueName || "Nome Struttura / Location",
+        guidance: t.validationGuidance?.nomeLocation || t.venueNameError || "Inserisci il nome valido della struttura o location.",
+      });
+    }
+
+    if (!isValidCityName(data.cittaLocation)) {
+      errors.push({
+        id: "cittaLocation",
+        label: t.cityName || "Città / Località",
+        guidance: t.validationGuidance?.cittaLocation || t.cityNameError || "Inserisci una città o località valida.",
+      });
+    }
+
+    if (!data.momentoGiornata || !data.momentoGiornata.trim()) {
+      errors.push({
+        id: "momentoGiornata",
+        label: t.timeOfDay || "L'evento si svolgerà a",
+        guidance: t.validationGuidance?.momentoGiornata || "Seleziona il momento della giornata.",
+      });
+    }
+
+    if (data.tipoEvento === "Matrimonio" && data.tipoCerimonia === "Altro" && (!data.tipoCerimoniaAltro || !data.tipoCerimoniaAltro.trim())) {
+      errors.push({
+        id: "tipoCerimoniaAltro",
+        label: t.ceremonyTypeOtherLabel || "Specifica tipo di cerimonia",
+        guidance: t.validationGuidance?.tipoCerimoniaAltro || t.ceremonyTypeOtherError || "Specifica il tipo di cerimonia.",
+      });
+    }
+
+    if (!data.budget || !data.budget.trim()) {
+      errors.push({
+        id: "budget",
+        label: t.budget || "Hai un idea di budget per il tuo evento?",
+        guidance: t.validationGuidance?.budget || "Seleziona una fascia di budget.",
+      });
+    }
+
+    if (!data.accettaTermini) {
+      errors.push({
+        id: "accettaTermini",
+        label: t.acceptTerms || "Termini e Condizioni",
+        guidance: t.validationGuidance?.accettaTermini || t.acceptTermsError || "Devi accettare i Termini e Condizioni.",
+      });
+    }
+
+    return errors;
+  };
+
+  const isFormValid = () => {
+    return getValidationErrors(formData).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setValidated(true);
 
-    if (!isFormValid()) {
+    const errors = getValidationErrors(formData);
+    setActiveValidationErrors(errors);
+
+    if (errors.length > 0) {
       setShowValidationBanner(true);
-      scrollToTop();
+      if (errors[0]?.id) {
+        scrollToAndFocusField(errors[0].id);
+      } else {
+        scrollToTop();
+      }
       return;
     }
 
@@ -242,7 +333,7 @@ function ContactForm() {
       dataEvento: formData.dataEvento || null,
       tipoEvento: finalTipoEvento,
       location: combinedLocation,
-      numeroOspiti: String(formData.numeroOspiti),
+      numeroOspiti: formData.numeroOspiti && formData.numeroOspiti.trim() ? formData.numeroOspiti.trim() : null,
       orarioGiornata: formData.momentoGiornata,
       tipoCerimonia: finalTipoCerimonia,
       messaggio: formData.ideaFesta
@@ -279,6 +370,7 @@ function ContactForm() {
     setFormData(initialFormState);
     setValidated(false);
     setShowValidationBanner(false);
+    setActiveValidationErrors([]);
   };
 
   const handleConfirmReset = () => {
@@ -308,12 +400,45 @@ function ContactForm() {
       )}
 
       {showValidationBanner && (
-        <ErrorBanner
-          message={t.validationBanner || t.validationBannerText}
-          type="warning"
-          className="mb-4"
-          onDismiss={() => setShowValidationBanner(false)}
-        />
+        <div className="alert alert-warning border-warning border-2 shadow-sm rounded-3 p-3 mb-4 font-body" role="alert">
+          <div className="d-flex align-items-start gap-2 mb-2">
+            <i className="bi bi-exclamation-triangle-fill fs-5 text-warning flex-shrink-0 mt-1"></i>
+            <div className="me-auto">
+              <h6 className="fw-bold mb-1 text-warning-emphasis">
+                {t.validationHeader || "Attenzione: Compila o correggi i seguenti campi obbligatori per inviare la richiesta:"}
+              </h6>
+              <p className="small mb-0 text-body-secondary">
+                {t.validationBanner || "Compila tutti i campi obbligatori contrassegnati dall'asterisco (*). Clicca sul campo in errore per compilarlo direttamente:"}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn-close"
+              aria-label="Close"
+              onClick={() => setShowValidationBanner(false)}
+            ></button>
+          </div>
+          {activeValidationErrors.length > 0 ? (
+            <ul className="mb-0 ps-4 small">
+              {activeValidationErrors.map((err) => (
+                <li key={err.id} className="mb-1">
+                  <button
+                    type="button"
+                    onClick={() => scrollToAndFocusField(err.id)}
+                    className="btn btn-link p-0 text-decoration-underline text-warning-emphasis fw-semibold text-start border-0 align-baseline ms-1"
+                  >
+                    {err.label}
+                  </button>
+                  <span className="text-body">: {err.guidance}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="small mb-0 text-warning-emphasis">
+              {t.validationBanner || "Compila tutti i campi obbligatori contrassegnati dall'asterisco (*)."}
+            </p>
+          )}
+        </div>
       )}
 
       <form onSubmit={handleSubmit} noValidate>
@@ -337,7 +462,7 @@ function ContactForm() {
               required
             />
             <div className="invalid-feedback">
-              {t.nameInvalidError || "Inserisci un nome valido (solo lettere, senza cifre o simboli malevoli)."}
+              {t.validationGuidance?.nome || t.nameInvalidError || "Inserisci un nome valido (solo lettere, senza cifre o simboli)."}
             </div>
           </div>
 
@@ -359,7 +484,7 @@ function ContactForm() {
               required
             />
             <div className="invalid-feedback">
-              {t.lastNameInvalidError || "Inserisci un cognome valido (solo lettere, senza cifre o simboli malevoli)."}
+              {t.validationGuidance?.cognome || t.lastNameInvalidError || "Inserisci un cognome valido (solo lettere, senza cifre o simboli)."}
             </div>
           </div>
         </div>
@@ -383,7 +508,9 @@ function ContactForm() {
               }`}
               required
             />
-            <div className="invalid-feedback">Inserisci una {t.email} valida.</div>
+            <div className="invalid-feedback">
+              {t.validationGuidance?.email || `Inserisci una ${t.email} valida.`}
+            </div>
           </div>
 
           <div className="col-12 col-md-6">
@@ -486,7 +613,9 @@ function ContactForm() {
                 }`}
                 required
               />
-              <div className="invalid-feedback">Il {t.phone} è obbligatorio (inserisci un numero di almeno 6 cifre).</div>
+              <div className="invalid-feedback">
+                {t.validationGuidance?.telefono || `Il ${t.phone} è obbligatorio (inserisci un numero di almeno 6 cifre).`}
+              </div>
             </div>
           </div>
         </div>
@@ -504,7 +633,7 @@ function ContactForm() {
               value={formData.tipoEvento}
               onChange={handleChange}
               className={`form-select font-body ${
-                validated && !formData.tipoEvento ? "is-invalid" : ""
+                validated && (!formData.tipoEvento || !formData.tipoEvento.trim()) ? "is-invalid" : ""
               }`}
               required
             >
@@ -514,7 +643,9 @@ function ContactForm() {
               <option value="Evento privato">{t.eventTypes.private}</option>
               <option value="Altro">{t.eventTypes.other}</option>
             </select>
-            <div className="invalid-feedback">Seleziona il {t.eventType}.</div>
+            <div className="invalid-feedback">
+              {t.validationGuidance?.tipoEvento || `Seleziona il ${t.eventType}.`}
+            </div>
 
             {formData.tipoEvento === "Altro" && (
               <div className="mt-2">
@@ -535,7 +666,7 @@ function ContactForm() {
                   required
                 />
                 <div className="invalid-feedback">
-                  {t.eventTypeOtherError || "Specifica il tipo di evento."}
+                  {t.validationGuidance?.tipoEventoAltro || t.eventTypeOtherError || "Specifica il tipo di evento."}
                 </div>
               </div>
             )}
@@ -550,7 +681,7 @@ function ContactForm() {
               id="dataEvento"
               name="dataEvento"
               tabIndex={6}
-              min={new Date().toISOString().split("T")[0]}
+              min={new Date().toLocaleDateString("sv-SE")}
               value={formData.dataEvento}
               onChange={handleChange}
               className={`form-control font-body ${
@@ -560,7 +691,9 @@ function ContactForm() {
               }`}
               required
             />
-            <div className="invalid-feedback">La {t.eventDate} è obbligatoria.</div>
+            <div className="invalid-feedback">
+              {t.validationGuidance?.dataEvento || `La ${t.eventDate} è obbligatoria.`}
+            </div>
           </div>
         </div>
 
@@ -584,7 +717,7 @@ function ContactForm() {
               required
             />
             <div className="invalid-feedback">
-              {t.venueNameError || "Inserisci il nome valido della struttura o location (es. Masseria Coccaro)."}
+              {t.validationGuidance?.nomeLocation || t.venueNameError || "Inserisci il nome valido della struttura o location (es. Masseria Coccaro)."}
             </div>
           </div>
 
@@ -606,7 +739,7 @@ function ContactForm() {
               required
             />
             <div className="invalid-feedback">
-              {t.cityNameError || "Inserisci una città o località valida (es. Monopoli)."}
+              {t.validationGuidance?.cittaLocation || t.cityNameError || "Inserisci una città o località valida (es. Monopoli)."}
             </div>
           </div>
         </div>
@@ -624,7 +757,7 @@ function ContactForm() {
               value={formData.momentoGiornata}
               onChange={handleChange}
               className={`form-select font-body ${
-                validated && !formData.momentoGiornata ? "is-invalid" : ""
+                validated && (!formData.momentoGiornata || !formData.momentoGiornata.trim()) ? "is-invalid" : ""
               }`}
               required
             >
@@ -632,7 +765,9 @@ function ContactForm() {
               <option value="Pranzo">{t.timeOfDayOptions.lunch}</option>
               <option value="Cena">{t.timeOfDayOptions.dinner}</option>
             </select>
-            <div className="invalid-feedback">Seleziona il momento della giornata.</div>
+            <div className="invalid-feedback">
+              {t.validationGuidance?.momentoGiornata || "Seleziona il momento della giornata."}
+            </div>
           </div>
 
           {formData.tipoEvento === "Matrimonio" && (
@@ -673,7 +808,7 @@ function ContactForm() {
                     required
                   />
                   <div className="invalid-feedback">
-                    {t.ceremonyTypeOtherError || "Specifica il tipo di cerimonia."}
+                    {t.validationGuidance?.tipoCerimoniaAltro || t.ceremonyTypeOtherError || "Specifica il tipo di cerimonia."}
                   </div>
                 </div>
               )}
@@ -727,7 +862,7 @@ function ContactForm() {
             value={formData.budget}
             onChange={handleChange}
             className={`form-select font-body ${
-              validated && !formData.budget ? "is-invalid" : ""
+              validated && (!formData.budget || !formData.budget.trim()) ? "is-invalid" : ""
             }`}
             required
           >
@@ -736,7 +871,9 @@ function ContactForm() {
             <option value="3.000€-5.000€">{t.budgetOptions.tier2}</option>
             <option value="+5.000€">{t.budgetOptions.tier3}</option>
           </select>
-          <div className="invalid-feedback">Seleziona una fascia di budget.</div>
+          <div className="invalid-feedback">
+            {t.validationGuidance?.budget || "Seleziona una fascia di budget."}
+          </div>
         </div>
 
         {/* Row 9: Checkbox Termini e Condizioni */}
@@ -757,7 +894,7 @@ function ContactForm() {
             {t.acceptTerms} <span className="text-danger">*</span>
           </label>
           <div className="invalid-feedback">
-            {t.acceptTermsError || "Devi prendere visione dell'Informativa sulla Privacy e accettare i Termini e Condizioni per proseguire."}
+            {t.validationGuidance?.accettaTermini || t.acceptTermsError || "Devi prendere visione dell'Informativa sulla Privacy e accettare i Termini e Condizioni per proseguire."}
           </div>
         </div>
 

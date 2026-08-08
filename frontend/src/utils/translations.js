@@ -302,6 +302,23 @@ export const translations = {
       confirmReset: "Conferma Reset",
       validationBanner:
         "Attenzione: Compila tutti i campi obbligatori contrassegnati dall'asterisco (*).",
+      validationHeader:
+        "Attenzione: Compila o correggi i seguenti campi obbligatori per inviare la richiesta:",
+      validationGuidance: {
+        nome: "Inserisci un nome valido (almeno 2 caratteri, solo lettere, senza numeri o simboli).",
+        cognome: "Inserisci un cognome valido (almeno 2 caratteri, solo lettere, senza numeri o simboli).",
+        email: "Inserisci un indirizzo email valido (es. nome@dominio.it).",
+        telefono: "Inserisci un numero di telefono valido (almeno 6 cifre numeriche).",
+        tipoEvento: "Seleziona la tipologia di evento.",
+        tipoEventoAltro: "Hai selezionato 'Altro': specifica il tipo di evento (es. Laurea, Anniversario).",
+        dataEvento: "Seleziona una data valida per l'evento (da oggi in poi).",
+        nomeLocation: "Inserisci il nome della struttura o location (es. Masseria Coccaro).",
+        cittaLocation: "Inserisci la città o località dell'evento (es. Monopoli).",
+        momentoGiornata: "Seleziona se l'evento si svolgerà a Pranzo o Cena.",
+        tipoCerimoniaAltro: "Hai selezionato 'Altro': specifica il tipo di cerimonia.",
+        budget: "Seleziona una fascia di budget indicativa per il tuo evento.",
+        accettaTermini: "Accetta l'informativa sulla Privacy ed i Termini e Condizioni per proseguire.",
+      },
       successMessage:
         "Richiesta inviata con successo! Ti risponderemo al più presto.",
       errorMessage: "Si è verificato un errore. Riprova più tardi.",
@@ -646,6 +663,23 @@ export const translations = {
       confirmReset: "Confirm Reset",
       validationBanner:
         "Please complete all mandatory fields marked with an asterisk (*).",
+      validationHeader:
+        "Attention: Please complete or correct the following mandatory fields to submit your request:",
+      validationGuidance: {
+        nome: "Please enter a valid first name (at least 2 characters, letters only).",
+        cognome: "Please enter a valid last name (at least 2 characters, letters only).",
+        email: "Please enter a valid email address (e.g. name@domain.com).",
+        telefono: "Please enter a valid phone number (at least 6 digits).",
+        tipoEvento: "Please select an event type.",
+        tipoEventoAltro: "You selected 'Other': please specify the event type (e.g. Graduation, Anniversary).",
+        dataEvento: "Please select a valid event date (starting from today).",
+        nomeLocation: "Please enter a valid venue or location name (e.g. Masseria Coccaro).",
+        cittaLocation: "Please enter a valid city or town (e.g. Monopoli).",
+        momentoGiornata: "Please select whether the event will take place at Lunch or Dinner.",
+        tipoCerimoniaAltro: "You selected 'Other': please specify the ceremony type.",
+        budget: "Please select an estimated budget range.",
+        accettaTermini: "Please check the box to accept the Privacy Policy and Terms.",
+      },
       successMessage:
         "Request submitted successfully! We will get back to you soon.",
       errorMessage: "An error occurred. Please try again later.",
