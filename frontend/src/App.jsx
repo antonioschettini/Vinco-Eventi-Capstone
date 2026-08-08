@@ -20,6 +20,7 @@ import Gallery from "./pages/Gallery";
 import About from "./pages/About";
 import AdminLogin from "./pages/AdminLogin";
 import AdminQuotes from "./pages/AdminQuotes";
+import AdminAccounting from "./pages/AdminAccounting";
 
 // Layout base condiviso da tutte le pagine
 function Layout() {
@@ -84,6 +85,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminQuotes />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin-enzo/agenda"
+            element={
+              <ProtectedRoute>
+                <AdminAccounting />
               </ProtectedRoute>
             }
           />

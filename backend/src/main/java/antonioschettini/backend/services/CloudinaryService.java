@@ -42,6 +42,37 @@ public class CloudinaryService {
         }
     }
 
+    public Map<String, String> uploadContractPdf(MultipartFile file) throws IOException {
+        String filename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "contratto.pdf";
+        String contentType = file.getContentType();
+        if (contentType != null && !contentType.toLowerCase().contains("pdf") && !filename.toLowerCase().endsWith(".pdf")) {
+            throw new RuntimeException("Tipo file non supportato per i contratti. Caricare solo file PDF.");
+        }
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("folder", "vinco_eventi_contratti");
+            params.put("resource_type", "auto");
+
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), params);
+            String secureUrl = uploadResult.get("secure_url") != null ? uploadResult.get("secure_url").toString() : uploadResult.get("url").toString();
+            String publicId = uploadResult.get("public_id") != null ? uploadResult.get("public_id").toString() : "";
+
+            return Map.of(
+                    "url", secureUrl,
+                    "publicId", publicId,
+                    "filename", filename
+            );
+        } catch (Exception e) {
+            System.err.println("Upload Cloudinary contratto non riuscito: " + e.getMessage() + ". Salvataggio locale in fallback.");
+            Map<String, String> localResult = saveLocally(file, "vinco_eventi_contratti");
+            return Map.of(
+                    "url", localResult.get("url"),
+                    "publicId", "",
+                    "filename", filename
+            );
+        }
+    }
+
     public String uploadMedia(MultipartFile file) throws IOException {
         Map<String, String> result = uploadMediaWithMetadata(file);
         return result.get("url");

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 import { authApiFetch } from "../utils/apiClient";
 import { handleEmailClick, handlePhoneClick } from "../utils/contactHelpers";
@@ -77,6 +78,25 @@ function AdminQuotes() {
 
   const handleUpdateStatus = async (id, newStatus) => {
     setActionError("");
+
+    const targetQuote = allQuotes.find((q) => q.id === id);
+    const oldStatus = targetQuote?.stato;
+
+    // Modali di conferma per l'Agenda Contabile
+    if (newStatus === "PROCESSED") {
+      const clientName = targetQuote ? `${targetQuote.nome} ${targetQuote.cognome}` : "il cliente";
+      const eventDate = targetQuote?.dataEvento || "la data concordata";
+      const confirmProceed = window.confirm(
+        `Il preventivo di ${clientName} (${eventDate}) è stato confermato?\n\nImpostando lo stato su GESTITO, l'evento verrà automaticamente inserito nell'Agenda Contabile.`
+      );
+      if (!confirmProceed) return;
+    } else if (oldStatus === "PROCESSED" && newStatus !== "PROCESSED") {
+      const confirmWarning = window.confirm(
+        `ATTENZIONE: Questo preventivo è attualmente inserito nell'Agenda Contabile.\n\nCambiando lo stato da GESTITO a ${newStatus}, l'evento verrà rimosso dall'Agenda Contabile. Vuoi proseguire?`
+      );
+      if (!confirmWarning) return;
+    }
+
     try {
       const updated = await authApiFetch(
         `${API_BASE_URL}/api/admin/quotes/${id}/status`,
@@ -100,6 +120,15 @@ function AdminQuotes() {
 
   const handleDeleteQuote = async (id) => {
     setActionError("");
+
+    const targetQuote = allQuotes.find((q) => q.id === id);
+    if (targetQuote?.stato === "PROCESSED") {
+      const confirmDelete = window.confirm(
+        `ATTENZIONE: Questo preventivo è in stato GESTITO e presente nell'Agenda Contabile.\n\nEliminando definitivamente la pratica, verrà rimosso anche l'evento associato dall'Agenda Contabile. Vuoi proseguire?`
+      );
+      if (!confirmDelete) return;
+    }
+
     try {
       await authApiFetch(
         `${API_BASE_URL}/api/admin/quotes/${id}`,
@@ -213,6 +242,16 @@ function AdminQuotes() {
 
   return (
     <div className="container admin-quotes-page">
+      {/* Sub-Navigazione Tab per passare tra Preventivi e Agenda Contabile */}
+      <div className="admin-subnav">
+        <Link to="/admin-enzo/preventivi" className="admin-nav-link active">
+          <i className="bi bi-file-earmark-text me-1"></i> Richieste Preventivo
+        </Link>
+        <Link to="/admin-enzo/agenda" className="admin-nav-link">
+          <i className="bi bi-calendar-check me-1"></i> Agenda & Contabilità
+        </Link>
+      </div>
+
       {/* 1. Header Card con KPI e Titolo */}
       <div className="admin-header-card p-3 p-md-4 mb-4">
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">

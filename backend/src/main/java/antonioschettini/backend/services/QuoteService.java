@@ -20,6 +20,9 @@ public class QuoteService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private AccountingService accountingService;
+
     public QuoteRequest createQuote(QuoteRequestDTO dto) {
         QuoteRequest quote = QuoteRequest.builder()
                 .nome(sanitizeText(dto.nome()))
@@ -70,12 +73,24 @@ public class QuoteService {
 
     public QuoteRequest updateQuoteStatus(UUID id, QuoteStatus newStatus) {
         QuoteRequest quote = getQuoteById(id);
+        QuoteStatus oldStatus = quote.getStato();
         quote.setStato(newStatus);
-        return quoteRepository.save(quote);
+        QuoteRequest saved = quoteRepository.save(quote);
+
+        if (newStatus == QuoteStatus.PROCESSED) {
+            accountingService.createOrLinkEventFromQuote(saved);
+        } else if (oldStatus == QuoteStatus.PROCESSED) {
+            accountingService.unlinkOrDeleteByQuoteId(saved.getId());
+        }
+
+        return saved;
     }
 
     public void deleteQuote(UUID id) {
         QuoteRequest quote = getQuoteById(id);
+        if (quote.getStato() == QuoteStatus.PROCESSED) {
+            accountingService.unlinkOrDeleteByQuoteId(quote.getId());
+        }
         quoteRepository.delete(quote);
     }
 
