@@ -3,7 +3,7 @@ package antonioschettini.backend.services;
 import antonioschettini.backend.entities.AccountingEvent;
 import antonioschettini.backend.entities.QuoteRequest;
 import antonioschettini.backend.exceptions.NotFoundException;
-import antonioschettini.backend.payloads.AccountingReportDTO;
+import antonioschettini.backend.recordsDTO.AccountingReportDTO;
 import antonioschettini.backend.recordsDTO.AccountingEventDTO;
 import antonioschettini.backend.repositories.AccountingEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
