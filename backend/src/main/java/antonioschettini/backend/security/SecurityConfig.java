@@ -33,6 +33,9 @@ public class SecurityConfig {
     private JWTFilter jwtFilter;
 
     @Autowired
+    private RateLimitingFilter rateLimitingFilter;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Bean
@@ -50,6 +53,12 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.deny())
+                .contentTypeOptions(contentType -> {})
+                .xssProtection(xss -> {})
+                .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api/health").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
@@ -59,6 +68,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
             )
+            .addFilterBefore(rateLimitingFilter, JWTFilter.class)
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

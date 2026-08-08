@@ -2,15 +2,27 @@ package antonioschettini.backend.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Servizio di Traduzione Multilingua Ottimizzato.
+ * Supporta autodetect per qualsiasi lingua (Giapponese, Cinese, Russo, Tedesco, Francese, Inglese, Spagnolo, ecc.).
+ * Utilizza un decoding rigorosamente in UTF-8 sui byte array di risposta per prevenire ogni problema di
+ * alterazione dei caratteri (es. 'ã・・・・') e decodifica le entità HTML.
+ */
 @Service
 public class TranslationService {
 
@@ -19,13 +31,14 @@ public class TranslationService {
 
     public TranslationService() {
         this.restTemplate = new RestTemplate();
+        // Configura il convertitore di messaggi per usare UTF-8 in modo nativo
+        this.restTemplate.getMessageConverters().removeIf(c -> c instanceof StringHttpMessageConverter);
+        this.restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         this.objectMapper = new ObjectMapper();
     }
 
     /**
      * Traduce il testo da una lingua di origine a una di destinazione.
-     * Supporta l'autodetect per qualsiasi lingua (giapponese, tedesco, francese, inglese, spagnolo, ecc.)
-     * ed esegue la traduzione paragrafo per paragrafo per gestire correttamente testi con lingue miste.
      */
     public String translate(String text, String sourceLang, String targetLang) {
         if (text == null || text.isBlank()) {
@@ -40,7 +53,7 @@ public class TranslationService {
         }
 
         try {
-            // Separazione per righe/paragrafi per consentire l'autodetect dinamico su ciascuna porzione di testo
+            // Separazione per righe/paragrafi per conservare la formattazione e tradurre correttamente testi multilinea
             String[] paragraphs = text.split("\r?\n");
             List<String> translatedParagraphs = new ArrayList<>();
 
@@ -88,10 +101,17 @@ public class TranslationService {
                     .queryParam("dt", "t")
                     .queryParam("q", chunk)
                     .build()
+                    .encode(StandardCharsets.UTF_8)
                     .toUri();
 
-            String jsonResponse = restTemplate.getForObject(uri, String.class);
-            if (jsonResponse != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+            headers.set("Accept-Charset", "UTF-8");
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<byte[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, byte[].class);
+            if (response.getBody() != null && response.getBody().length > 0) {
+                String jsonResponse = new String(response.getBody(), StandardCharsets.UTF_8);
                 JsonNode rootNode = objectMapper.readTree(jsonResponse);
                 JsonNode sentences = rootNode.path(0);
                 if (sentences.isArray() && sentences.size() > 0) {
@@ -115,7 +135,7 @@ public class TranslationService {
 
     private String translateSingleChunkMyMemory(String chunk, String src, String tgt) {
         try {
-            String pair = src + "|" + tgt;
+            String pair = (src == null || src.equalsIgnoreCase("autodetect") ? "autodetect" : src) + "|" + tgt;
 
             URI uri = UriComponentsBuilder
                     .fromUriString("https://api.mymemory.translated.net/get")
@@ -123,10 +143,16 @@ public class TranslationService {
                     .queryParam("langpair", pair)
                     .queryParam("de", "vincoeventi@gmail.com")
                     .build()
+                    .encode(StandardCharsets.UTF_8)
                     .toUri();
 
-            String jsonResponse = restTemplate.getForObject(uri, String.class);
-            if (jsonResponse != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Accept-Charset", "UTF-8");
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<byte[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, byte[].class);
+            if (response.getBody() != null && response.getBody().length > 0) {
+                String jsonResponse = new String(response.getBody(), StandardCharsets.UTF_8);
                 JsonNode rootNode = objectMapper.readTree(jsonResponse);
                 JsonNode responseData = rootNode.path("responseData");
                 String translated = responseData.path("translatedText").asText("");
@@ -161,8 +187,26 @@ public class TranslationService {
                !upper.contains("MYMEMORY WARNING");
     }
 
+    /**
+     * Riconosce se un testo contiene caratteri o parole straniere (Inglese, Francese, Giapponese, Cinese, Russo, ecc.).
+     */
     public boolean isLikelyForeign(String text) {
         if (text == null || text.isBlank()) return false;
+
+        // 1. Rilevamento immediato di alfabeti non latini (Giapponese, Cinese, Cirillico, Arabo, Greco)
+        for (char c : text.toCharArray()) {
+            Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+            if (block == Character.UnicodeBlock.HIRAGANA ||
+                block == Character.UnicodeBlock.KATAKANA ||
+                block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS ||
+                block == Character.UnicodeBlock.CYRILLIC ||
+                block == Character.UnicodeBlock.ARABIC ||
+                block == Character.UnicodeBlock.GREEK) {
+                return true;
+            }
+        }
+
+        // 2. Rilevamento parole chiave straniere in alfabeto latino
         String lower = " " + text.toLowerCase().replaceAll("[^a-zàèéìòùáéíóúâêîôûäëïöüñ]", " ") + " ";
 
         String[] foreignKeywords = {
@@ -174,7 +218,7 @@ public class TranslationService {
             "prefer", "warm", "romantic", "party", "please", "let", "know", "equipment", "requirements",
             "setup", "venue", "happy", "favorite", "songs", "with", "from", "your", "have", "need",
             // Tedesco / Spagnolo
-            "und", "mit", "für", "hochzeit", "musik", "para", "con", "boda", "fiesta", "gracias"
+            "und", "mit", "für", "hochzeit", "musik", "para", "con", "boda", "fiesta", "gracias", "dies", "ist", "ein"
         };
 
         int count = 0;
@@ -191,10 +235,14 @@ public class TranslationService {
         if (input == null) return "";
         return input.replace("&quot;", "\"")
                     .replace("&#39;", "'")
+                    .replace("&#039;", "'")
                     .replace("&amp;", "&")
                     .replace("&lt;", "<")
                     .replace("&gt;", ">")
-                    .replace("&deg;", "°");
+                    .replace("&deg;", "°")
+                    .replace("&nbsp;", " ")
+                    .replace("\\u0027", "'")
+                    .replace("\\u0026", "&");
     }
 
     public String translateItToEn(String text) {

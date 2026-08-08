@@ -56,11 +56,11 @@ public class JWTFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        } catch (UnauthorizedException ex) {
+        } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"message\": \"" + ex.getMessage() + "\"}");
+            response.getWriter().write("{\"message\": \"Token non valido o scaduto! Per favore effettua nuovamente il login.\"}");
             return;
         }
 
