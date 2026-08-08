@@ -13,7 +13,7 @@ async function testQuoteSubmission() {
     dataEvento: "2026-08-09",
     tipoEvento: "Matrimonio",
     location: "Masseria Coccaro, Monopoli",
-    numeroOspiti: null,
+    numeroOspiti: "120",
     orarioGiornata: "Pranzo",
     tipoCerimonia: "Religioso",
     messaggio: "Test richiesta preventivo da script di verifica",

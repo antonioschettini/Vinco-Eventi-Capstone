@@ -94,6 +94,13 @@ const isValidCityName = (city) => {
   return /^[a-zA-Zà-ùÀ-Ùá-úÁ-Úä-üÄ-ÜñÑ\s'.-]+$/.test(trimmed);
 };
 
+// Valida Numero Ospiti (numero intero positivo compreso tra 1 e 10000)
+const isValidGuestsCount = (guests) => {
+  if (!guests) return false;
+  const num = Number(guests);
+  return !isNaN(num) && num > 0 && num <= 10000 && Number.isInteger(num);
+};
+
 
 function ContactForm() {
   const formRef = useRef(null);
@@ -247,6 +254,14 @@ function ContactForm() {
         id: "cittaLocation",
         label: t.cityName || "Città / Località",
         guidance: t.validationGuidance?.cittaLocation || t.cityNameError || "Inserisci una città o località valida.",
+      });
+    }
+
+    if (!isValidGuestsCount(data.numeroOspiti)) {
+      errors.push({
+        id: "numeroOspiti",
+        label: t.guestsCount || "Numero di ospiti",
+        guidance: t.validationGuidance?.numeroOspiti || t.guestsCountError || "Inserisci un numero di ospiti valido (es. 100).",
       });
     }
 
@@ -744,16 +759,40 @@ function ContactForm() {
           </div>
         </div>
 
-        {/* Row 5: Momento Giornata (Pranzo/Cena) e Tipo Cerimonia (se Matrimonio) */}
+        {/* Row 5: Numero Ospiti e Momento Giornata */}
         <div className="row g-3 mb-3">
-          <div className={`col-12 ${formData.tipoEvento === "Matrimonio" ? "col-md-6" : "col-md-12"}`}>
+          <div className="col-12 col-md-6">
+            <label htmlFor="numeroOspiti" className="form-label font-body fw-semibold text-body fs-7">
+              {t.guestsCount || "Numero di ospiti"} <span className="text-danger">*</span>
+            </label>
+            <input
+              type="number"
+              id="numeroOspiti"
+              name="numeroOspiti"
+              tabIndex={9}
+              min="1"
+              max="10000"
+              value={formData.numeroOspiti}
+              onChange={handleChange}
+              placeholder={t.guestsPlaceholder || "Es. 100"}
+              className={`form-control font-body ${
+                validated && !isValidGuestsCount(formData.numeroOspiti) ? "is-invalid" : ""
+              }`}
+              required
+            />
+            <div className="invalid-feedback">
+              {t.validationGuidance?.numeroOspiti || t.guestsCountError || "Inserisci un numero di ospiti valido (es. 100)."}
+            </div>
+          </div>
+
+          <div className="col-12 col-md-6">
             <label htmlFor="momentoGiornata" className="form-label font-body fw-semibold text-body fs-7">
               {t.timeOfDay} <span className="text-danger">*</span>
             </label>
             <select
               id="momentoGiornata"
               name="momentoGiornata"
-              tabIndex={9}
+              tabIndex={10}
               value={formData.momentoGiornata}
               onChange={handleChange}
               className={`form-select font-body ${
@@ -769,16 +808,19 @@ function ContactForm() {
               {t.validationGuidance?.momentoGiornata || "Seleziona il momento della giornata."}
             </div>
           </div>
+        </div>
 
-          {formData.tipoEvento === "Matrimonio" && (
-            <div className="col-12 col-md-6">
+        {/* Row 5b: Tipo Cerimonia (se Matrimonio) */}
+        {formData.tipoEvento === "Matrimonio" && (
+          <div className="row g-3 mb-3">
+            <div className="col-12">
               <label htmlFor="tipoCerimonia" className="form-label font-body fw-semibold text-body fs-7">
                 {t.ceremonyType} <span className="text-body-secondary fw-normal">{t.optional}</span>
               </label>
               <select
                 id="tipoCerimonia"
                 name="tipoCerimonia"
-                tabIndex={10}
+                tabIndex={11}
                 value={formData.tipoCerimonia}
                 onChange={handleChange}
                 className="form-select font-body"
@@ -798,7 +840,7 @@ function ContactForm() {
                     type="text"
                     id="tipoCerimoniaAltro"
                     name="tipoCerimoniaAltro"
-                    tabIndex={10}
+                    tabIndex={11}
                     value={formData.tipoCerimoniaAltro}
                     onChange={handleChange}
                     placeholder={t.ceremonyTypeOtherPlaceholder || "Es. All'aperto, Umanista, Simbolica..."}
@@ -813,8 +855,8 @@ function ContactForm() {
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Row 6: Idea Festa (Textarea) */}
         <div className="mb-3">

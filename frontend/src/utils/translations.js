@@ -267,6 +267,8 @@ export const translations = {
       cityNamePlaceholder: "Es. Monopoli",
       cityNameError: "Inserisci una città o località valida.",
       guestsCount: "Numero di ospiti",
+      guestsPlaceholder: "Es. 100",
+      guestsCountError: "Inserisci un numero di ospiti valido (es. 100).",
       timeOfDay: "L'evento si svolgerà a:",
       selectTimeOfDay: "-- Seleziona Orario --",
       timeOfDayOptions: {
@@ -314,6 +316,7 @@ export const translations = {
         dataEvento: "Seleziona una data valida per l'evento (da oggi in poi).",
         nomeLocation: "Inserisci il nome della struttura o location (es. Masseria Coccaro).",
         cittaLocation: "Inserisci la città o località dell'evento (es. Monopoli).",
+        numeroOspiti: "Inserisci il numero indicativo di ospiti del tuo evento (es. 100).",
         momentoGiornata: "Seleziona se l'evento si svolgerà a Pranzo o Cena.",
         tipoCerimoniaAltro: "Hai selezionato 'Altro': specifica il tipo di cerimonia.",
         budget: "Seleziona una fascia di budget indicativa per il tuo evento.",
@@ -628,6 +631,8 @@ export const translations = {
       cityNamePlaceholder: "E.g. Monopoli",
       cityNameError: "Please enter a valid city or town.",
       guestsCount: "Number of guests",
+      guestsPlaceholder: "E.g. 100",
+      guestsCountError: "Please enter a valid number of guests (e.g. 100).",
       timeOfDay: "The event will take place at:",
       selectTimeOfDay: "-- Select Time --",
       timeOfDayOptions: {
@@ -675,6 +680,7 @@ export const translations = {
         dataEvento: "Please select a valid event date (starting from today).",
         nomeLocation: "Please enter a valid venue or location name (e.g. Masseria Coccaro).",
         cittaLocation: "Please enter a valid city or town (e.g. Monopoli).",
+        numeroOspiti: "Please enter the estimated number of guests for your event (e.g. 100).",
         momentoGiornata: "Please select whether the event will take place at Lunch or Dinner.",
         tipoCerimoniaAltro: "You selected 'Other': please specify the ceremony type.",
         budget: "Please select an estimated budget range.",
