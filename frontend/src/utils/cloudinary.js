@@ -50,42 +50,33 @@ export function getOptimizedCloudinaryUrl(url, options = {}) {
 
   let publicIdPath = publicIdParts.join("/");
 
-  // Se richiesto poster da un video, genera l'immagine del primo frame in formato JPG comprimibile
-  if (type === "poster" && isVideo) {
-    const cleanPublicId = publicIdPath.replace(/\.[^/.]+$/, "");
-    const posterTransforms = `f_jpg,q_${quality},so_0,w_${width || 720},c_${crop}`;
+  // PER I VIDEO: Non applichiamo trasformazioni URL dinamiche (w_480, w_720, q_auto:eco, so_0)
+  // al volo per azzerare il consumo di "Video Transformations" su Cloudinary.
+  // I video vengono serviti direttamente dall'URL raw CDN pulito.
+  if (isVideo) {
+    // Se richiesta la copertina/poster ed è fornita in options, la utilizziamo direttamente
+    if (type === "poster" && options.posterUrl) {
+      return getOptimizedCloudinaryUrl(options.posterUrl, { type: "grid" });
+    }
     const versionPath = version ? `${version}/` : "";
-    return `${prefix}${posterTransforms}/${versionPath}${cleanPublicId}.jpg`;
+    return `${prefix}${versionPath}${publicIdPath}`;
   }
 
+  // PER LE IMMAGINI: Manteniamo le ottimizzazioni f_auto, q_auto e ridimensionamento responsivo
   let transformQuality = quality;
   const transformList = [`f_${format}`];
 
   if (width) {
     transformList.push(`q_${transformQuality}`, `w_${width}`, `c_${crop}`);
   } else if (type === "carousel") {
-    // 720p HD per il carosello "Momenti in Evidenza" in alto (nitidezza e colori superiori)
-    if (isVideo) {
-      transformList.push("q_auto", "w_720", `c_${crop}`);
-    } else {
-      transformList.push("q_auto", "w_1200", `c_${crop}`);
-    }
+    transformList.push("q_auto", "w_1200", `c_${crop}`);
   } else if (type === "grid") {
-    // 480p per anteprime animate veloci in griglia (download istantaneo in < 100ms)
-    if (isVideo) {
-      transformList.push("q_auto:eco", "w_480", `c_${crop}`);
-    } else {
-      transformList.push("q_auto", "w_800", `c_${crop}`);
-    }
+    transformList.push("q_auto", "w_800", `c_${crop}`);
   } else if (type === "modal") {
-    // 720p HD ad avvio istantaneo (< 260ms streaming range request) per il modale video
-    if (isVideo) {
-      transformList.push("q_auto:eco", "w_720", `c_${crop}`);
-    } else {
-      transformList.push("q_auto", "w_1600", `c_${crop}`);
-    }
+    transformList.push("q_auto", "w_1600", `c_${crop}`);
   }
 
   const versionPath = version ? `${version}/` : "";
   return `${prefix}${transformList.join(",")}/${versionPath}${publicIdPath}`;
 }
+

@@ -98,15 +98,10 @@ public class CloudinaryService {
             Map<String, Object> params = new HashMap<>();
             params.put("folder", "vinco_eventi_galleria");
             params.put("resource_type", isVideo ? "video" : "auto");
-            params.put("quality", "auto");
-            params.put("fetch_format", "auto");
 
-            if (isVideo) {
-                params.put("eager_async", false);
-                params.put("eager", Arrays.asList(
-                        new com.cloudinary.Transformation().rawTransformation("q_auto:eco,f_auto,w_720,c_limit"),
-                        new com.cloudinary.Transformation().rawTransformation("f_jpg,q_auto,w_720,so_0")
-                ));
+            if (!isVideo) {
+                params.put("quality", "auto");
+                params.put("fetch_format", "auto");
             }
 
             if (fileSize > CHUNKED_UPLOAD_THRESHOLD) {
