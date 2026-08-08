@@ -72,8 +72,12 @@ public class JWTFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         AntPathMatcher pathMatcher = new AntPathMatcher();
         return pathMatcher.match("/api/auth/**", path)
+                || pathMatcher.match("/api/health", path)
                 || (pathMatcher.match("/api/quotes", path) && request.getMethod().equalsIgnoreCase("POST"))
+                || (pathMatcher.match("/api/quotes/*/calendar.ics", path) && request.getMethod().equalsIgnoreCase("GET"))
+                || (pathMatcher.match("/api/services", path) && request.getMethod().equalsIgnoreCase("GET"))
                 || (pathMatcher.match("/api/services/**", path) && request.getMethod().equalsIgnoreCase("GET"))
+                || (pathMatcher.match("/api/gallery", path) && request.getMethod().equalsIgnoreCase("GET"))
                 || (pathMatcher.match("/api/gallery/**", path) && request.getMethod().equalsIgnoreCase("GET"));
     }
 }

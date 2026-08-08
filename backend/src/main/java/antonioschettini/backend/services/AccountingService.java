@@ -260,7 +260,10 @@ public class AccountingService {
     private BigDecimal parseBudgetToBigDecimal(String budgetStr) {
         if (budgetStr == null || budgetStr.isBlank()) return BigDecimal.ZERO;
         try {
-            String cleaned = budgetStr.replaceAll("[^0-9.,]", "").replace(",", ".");
+            // Se è presente un intervallo (es. "1.500€-3.000€"), prendiamo la cifra di partenza
+            String firstPart = budgetStr.split("-")[0];
+            // Estraiamo solo le cifre numeriche (in italiano es. 1.500 -> 1500)
+            String cleaned = firstPart.replaceAll("[^0-9]", "");
             if (cleaned.isBlank()) return BigDecimal.ZERO;
             return new BigDecimal(cleaned);
         } catch (Exception e) {

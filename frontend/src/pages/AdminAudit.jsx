@@ -492,7 +492,9 @@ export default function AdminAudit() {
     }
   }, [errorsPage, token, dispatch]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchStats(); }, [fetchStats]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchErrors(); }, [fetchErrors]);
 
   // ─────────────────────────────────────────

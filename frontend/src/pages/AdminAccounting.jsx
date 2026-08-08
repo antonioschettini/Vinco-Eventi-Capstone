@@ -118,6 +118,7 @@ export default function AdminAccounting() {
 
   // Reset pagina al cambio filtri
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [selectedMonth, currentYear, viewMode]);
 
@@ -226,6 +227,7 @@ export default function AdminAccounting() {
   }, [currentYear, selectedMonth, token, dispatch]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchEventsAndReport();
   }, [fetchEventsAndReport]);
 
@@ -279,7 +281,7 @@ export default function AdminAccounting() {
     try {
       const parsed = ev.speseJson ? JSON.parse(ev.speseJson) : [];
       setSpeseList(Array.isArray(parsed) ? parsed : []);
-    } catch (e) {
+    } catch {
       setSpeseList([]);
     }
 
@@ -572,7 +574,7 @@ export default function AdminAccounting() {
   const speseTotAnno = annualReport?.totaleSpese || 0;
   const nettoOpAnno = lordoTotAnno - speseTotAnno;
 
-  let tasseCalcolateAnno = 0;
+  let tasseCalcolateAnno;
   if (taxMode === "percent") {
     tasseCalcolateAnno = (nettoOpAnno * parseItalianNumber(taxPercent)) / 100;
   } else {
@@ -591,6 +593,7 @@ export default function AdminAccounting() {
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentPage(totalPages);
     }
   }, [events.length, totalPages, currentPage]);

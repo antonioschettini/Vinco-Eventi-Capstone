@@ -300,10 +300,6 @@ function ContactForm() {
     return errors;
   };
 
-  const isFormValid = () => {
-    return getValidationErrors(formData).length === 0;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setValidated(true);

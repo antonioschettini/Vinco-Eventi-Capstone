@@ -601,7 +601,7 @@ function AdminQuotes() {
                           )}
 
                           <button
-                            onClick={() => setDeleteConfirmId(q.id)}
+                            onClick={() => handleDeleteQuote(q.id)}
                             className="btn btn-outline-danger"
                             title="Elimina richiesta"
                           >
@@ -749,7 +749,7 @@ function AdminQuotes() {
                         )}
 
                         <button
-                          onClick={() => setDeleteConfirmId(q.id)}
+                          onClick={() => handleDeleteQuote(q.id)}
                           className="btn btn-outline-danger"
                           title="Elimina"
                         >

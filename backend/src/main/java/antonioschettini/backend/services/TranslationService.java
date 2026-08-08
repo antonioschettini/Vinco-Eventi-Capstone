@@ -24,8 +24,8 @@ public class TranslationService {
 
     /**
      * Traduce il testo da una lingua di origine a una di destinazione.
-     * Supporta l'autodetect per qualsiasi lingua (francese, inglese, tedesco, spagnolo, ecc.)
-     * ed esegue la traduzione paragrafo per paragrafo per gestire testi con lingue miste.
+     * Supporta l'autodetect per qualsiasi lingua (giapponese, tedesco, francese, inglese, spagnolo, ecc.)
+     * ed esegue la traduzione paragrafo per paragrafo per gestire correttamente testi con lingue miste.
      */
     public String translate(String text, String sourceLang, String targetLang) {
         if (text == null || text.isBlank()) {
@@ -65,6 +65,55 @@ public class TranslationService {
             return "";
         }
 
+        // 1. Motore Primario: Google Translate GTX (supporto eccellente multilingua e autodetect per frase)
+        String gtxResult = translateSingleChunkGtx(chunk, src, tgt);
+        if (gtxResult != null && !gtxResult.isBlank()) {
+            return gtxResult;
+        }
+
+        // 2. Motore di Fallback: MyMemory API
+        return translateSingleChunkMyMemory(chunk, src, tgt);
+    }
+
+    private String translateSingleChunkGtx(String chunk, String src, String tgt) {
+        try {
+            String sl = (src == null || src.isBlank() || src.equalsIgnoreCase("autodetect")) ? "auto" : src.toLowerCase().trim();
+            String tl = (tgt == null || tgt.isBlank()) ? "it" : tgt.toLowerCase().trim();
+
+            URI uri = UriComponentsBuilder
+                    .fromUriString("https://translate.googleapis.com/translate_a/single")
+                    .queryParam("client", "gtx")
+                    .queryParam("sl", sl)
+                    .queryParam("tl", tl)
+                    .queryParam("dt", "t")
+                    .queryParam("q", chunk)
+                    .build()
+                    .toUri();
+
+            String jsonResponse = restTemplate.getForObject(uri, String.class);
+            if (jsonResponse != null) {
+                JsonNode rootNode = objectMapper.readTree(jsonResponse);
+                JsonNode sentences = rootNode.path(0);
+                if (sentences.isArray() && sentences.size() > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    for (JsonNode sentence : sentences) {
+                        if (sentence.isArray() && sentence.size() > 0) {
+                            sb.append(sentence.get(0).asText(""));
+                        }
+                    }
+                    String translated = sb.toString();
+                    if (!translated.isBlank()) {
+                        return cleanTranslation(translated);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[WARN TranslationService] Errore motore primario GTX: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private String translateSingleChunkMyMemory(String chunk, String src, String tgt) {
         try {
             String pair = src + "|" + tgt;
 
@@ -90,15 +139,13 @@ public class TranslationService {
                 }
             }
         } catch (HttpClientErrorException e) {
-            // Se MyMemory rileva che la lingua sorgente è già quella di destinazione (es. autodetect su testo italiano -> it|it)
-            // restituisce HTTP 403 "PLEASE SELECT TWO DISTINCT LANGUAGES", gestito qui senza inquinare i log di warning
             String body = e.getResponseBodyAsString();
             if (body != null && body.toUpperCase().contains("PLEASE SELECT TWO DISTINCT LANGUAGES")) {
                 return chunk;
             }
             System.err.println("[WARN TranslationService] Errore HTTP MyMemory API (" + e.getStatusCode() + "): " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("[WARN TranslationService] Errore durante la traduzione del chunk: " + e.getMessage());
+            System.err.println("[WARN TranslationService] Errore durante la traduzione MyMemory: " + e.getMessage());
         }
 
         return chunk;
