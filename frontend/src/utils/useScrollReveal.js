@@ -6,7 +6,7 @@ import { useEffect } from "react";
  * attivando la classe CSS 'is-in-view' che applica il passaggio da scala di grigi a colore pieno e l'illuminazione dello sfondo.
  */
 export function useScrollReveal(
-  selector = ".scroll-reveal, .entertainment-card, .hero-gallery-section, .hero-bio-section, .service-card-box, .stat-card, .pillar-card, .story-img-wrapper, .about-quote-wrapper, .instagram-mockup-container, .gallery-media-card"
+  selector = ".scroll-reveal, .entertainment-card, .hero-gallery-section, .hero-bio-section, .service-card-box, .stat-card, .pillar-card, .story-img-wrapper, .about-quote-wrapper, .instagram-mockup-container, .gallery-media-card, .footer-section"
 ) {
   useEffect(() => {
     if (!("IntersectionObserver" in window)) {

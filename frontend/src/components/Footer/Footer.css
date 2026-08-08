@@ -28,8 +28,18 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(240, 245, 242, 0.70) 100%);
 }
 
-.footer-section:hover .footer-overlay {
-  opacity: 0.08;
+/* Desktop Hover per Footer */
+@media (hover: hover) and (pointer: fine) {
+  .footer-section:hover .footer-overlay {
+    opacity: 0.08;
+  }
+}
+
+/* Dispositivi Touch & Mobile: Illuminazione dinamica allo scroll (is-in-view) */
+@media (hover: none), (max-width: 991.98px) {
+  .footer-section.is-in-view .footer-overlay {
+    opacity: 0.18 !important;
+  }
 }
 
 .footer-content {
