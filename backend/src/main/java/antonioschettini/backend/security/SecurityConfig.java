@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/health").permitAll()
+                .requestMatchers("/", "/health", "/api/health", "/api/auth/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/quotes").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/quotes/*/calendar.ics").permitAll()
