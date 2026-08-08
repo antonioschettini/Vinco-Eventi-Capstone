@@ -87,5 +87,63 @@ class BackendApplicationTests {
         assertFalse(violations.isEmpty(), "La location malevola con '1=1' deve essere rifiutata");
         assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("location")));
     }
+
+    @Test
+    void testEmailServiceClientConfirmationFormattingItalianAndEnglish() {
+        antonioschettini.backend.services.EmailService emailService = new antonioschettini.backend.services.EmailService();
+        // Set dummy brevo api key via reflection so it proceeds past the null check to format templates
+        try {
+            java.lang.reflect.Field field = antonioschettini.backend.services.EmailService.class.getDeclaredField("brevoApiKey");
+            field.setAccessible(true);
+            field.set(emailService, "dummy-test-key");
+        } catch (Exception e) {
+            fail("Reflection error: " + e.getMessage());
+        }
+
+        antonioschettini.backend.entities.QuoteRequest quoteIt = antonioschettini.backend.entities.QuoteRequest.builder()
+                .id(java.util.UUID.randomUUID())
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("mario.rossi@example.com")
+                .telefono("+39 3331234567")
+                .dataEvento(LocalDate.now().plusDays(30))
+                .tipoEvento("Matrimonio")
+                .location("Masseria Coccaro, Monopoli")
+                .numeroOspiti("120")
+                .budget("1.500€-3.000€")
+                .lingua("it")
+                .build();
+
+        antonioschettini.backend.entities.QuoteRequest quoteEn = antonioschettini.backend.entities.QuoteRequest.builder()
+                .id(java.util.UUID.randomUUID())
+                .nome("John")
+                .cognome("Doe")
+                .email("john.doe@example.com")
+                .telefono("+1 555123456")
+                .dataEvento(LocalDate.now().plusDays(30))
+                .tipoEvento("Wedding")
+                .location("Masseria Coccaro, Monopoli")
+                .numeroOspiti("100")
+                .budget("3.000€-5.000€")
+                .lingua("en")
+                .build();
+
+        // Redirect System.err to capture any log errors
+        java.io.ByteArrayOutputStream errStream = new java.io.ByteArrayOutputStream();
+        java.io.PrintStream originalErr = System.err;
+        try {
+            System.setErr(new java.io.PrintStream(errStream));
+
+            emailService.sendConfirmationEmailToClient(quoteIt);
+            emailService.sendConfirmationEmailToClient(quoteEn);
+            emailService.sendQuoteNotificationEmail(quoteIt);
+
+            String errLog = errStream.toString();
+            assertFalse(errLog.contains("Conversion = ';'"), "L'invio email non deve generare eccezioni Conversion = ';'");
+            assertFalse(errLog.contains("[ERROR EmailService]"), "Non ci devono essere errori di formattazione in EmailService");
+        } finally {
+            System.setErr(originalErr);
+        }
+    }
 }
 
