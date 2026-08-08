@@ -700,4 +700,29 @@ input:focus:not(:focus-visible) {
   outline: none !important;
 }
 
+/* Utility Globali Mobile-First */
+.badge-container-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.text-break-word {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Padding di sicurezza inferiore per evitare la copertina del player audio fisso su mobile */
+@media (max-width: 819.98px) {
+  .admin-quotes-page,
+  .admin-accounting-page,
+  .admin-audit-page {
+    padding-bottom: 6rem !important;
+  }
+}
+
+
 

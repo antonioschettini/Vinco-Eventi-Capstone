@@ -85,17 +85,18 @@
   transform: translateY(0) scale(0.96);
 }
 
-/* Responsiveness: Per schermi piccoli (< 820px) posizioniamo il pulsante a destra in basso (bottom: 60px, right: 14px), perfettamente simmetrico rispetto al widget Speed Dial a sinistra (bottom: 60px, left: 16px) e sopra il player audio (0px) */
+/* Responsiveness: Per schermi piccoli (< 820px) posizioniamo il pulsante a destra in basso (bottom: 64px, right: 14px), perfettamente simmetrico rispetto al widget Speed Dial a sinistra (bottom: 60px, left: 16px) e sopra il player audio (48px) con sicurezza */
 @media (max-width: 819.98px) {
   .scroll-to-top-btn {
-    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
     right: 14px;
     padding: 8px 12px;
     font-size: 0.72rem;
-    z-index: 1040;
+    z-index: 1045;
   }
 
   .scroll-top-text {
     font-size: 0.7rem;
   }
 }
+

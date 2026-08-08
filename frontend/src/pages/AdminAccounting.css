@@ -416,16 +416,31 @@
 .pdf-upload-dropzone {
   border: 2px dashed rgba(25, 135, 84, 0.4);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1.25rem 1rem;
   text-align: center;
   background: rgba(25, 135, 84, 0.03);
   transition: all 0.2s ease;
   cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .pdf-upload-dropzone:hover {
   border-color: #198754;
   background: rgba(25, 135, 84, 0.07);
+}
+
+.file-input-wrapper {
+  max-width: 100%;
+  width: 280px;
+  overflow: hidden;
+}
+
+.file-input-wrapper input[type="file"] {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pdf-badge-card {

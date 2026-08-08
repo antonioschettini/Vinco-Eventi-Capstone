@@ -27,6 +27,14 @@ const metaConfig = {
     "/admin-enzo/preventivi": {
       title: "Gestione Preventivi Admin | VINCO EVENTI",
       description: "Pannello di controllo per la gestione ed il tracciamento delle richieste di preventivo ricevute."
+    },
+    "/admin-enzo/agenda": {
+      title: "Agenda Contabile & Eventi Admin | VINCO EVENTI",
+      description: "Pannello di controllo per la gestione del registro contabile, scadenze e calendario eventi."
+    },
+    "/admin-enzo/audit": {
+      title: "Audit & Log di Sistema Admin | VINCO EVENTI",
+      description: "Pannello di controllo per l'analisi dei log, visite, avvisi e tracciamento delle attività di sistema."
     }
   },
   en: {
@@ -53,6 +61,14 @@ const metaConfig = {
     "/admin-enzo/preventivi": {
       title: "Admin Quote Management | VINCO EVENTI",
       description: "Control panel for managing and tracking received quote requests."
+    },
+    "/admin-enzo/agenda": {
+      title: "Admin Accounting & Events Agenda | VINCO EVENTI",
+      description: "Control panel for managing financial records, event calendar, and income reports."
+    },
+    "/admin-enzo/audit": {
+      title: "Admin System Audit & Logs | VINCO EVENTI",
+      description: "Control panel for monitoring system logs, visits, security warnings, and activity records."
     }
   }
 };

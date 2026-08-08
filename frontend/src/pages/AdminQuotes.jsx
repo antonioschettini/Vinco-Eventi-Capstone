@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 import { authApiFetch } from "../utils/apiClient";
 import { handleEmailClick, handlePhoneClick } from "../utils/contactHelpers";
@@ -8,6 +7,7 @@ import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import CalendarChoiceModal from "../components/CalendarChoiceModal/CalendarChoiceModal";
 import AdminConfirmModal from "../components/Admin/AdminConfirmModal";
+import AdminSubnav from "../components/Admin/AdminSubnav";
 import "./AdminQuotes.css";
 
 const getEventTypeBadgeClass = (tipo) => {
@@ -292,18 +292,8 @@ function AdminQuotes() {
 
   return (
     <div className="container admin-quotes-page">
-      {/* Sub-Navigazione Tab per passare tra Preventivi e Agenda Contabile */}
-      <div className="admin-subnav">
-        <Link to="/admin-enzo/preventivi" className="admin-nav-link active">
-          <i className="bi bi-file-earmark-text me-1"></i> Richieste Preventivo
-        </Link>
-        <Link to="/admin-enzo/agenda" className="admin-nav-link">
-          <i className="bi bi-calendar-check me-1"></i> Agenda & Contabilità
-        </Link>
-        <Link to="/admin-enzo/audit" className="admin-nav-link">
-          <i className="bi bi-shield-check me-1"></i> Audit
-        </Link>
-      </div>
+      {/* Sub-Navigazione Tab per passare tra Preventivi, Agenda ed Audit */}
+      <AdminSubnav activeTab="preventivi" />
 
       {/* 1. Header Card con KPI e Titolo */}
       <div className="admin-header-card p-3 p-md-4 mb-4">

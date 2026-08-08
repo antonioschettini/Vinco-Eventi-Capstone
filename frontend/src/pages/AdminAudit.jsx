@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 import { authApiFetch } from "../utils/apiClient";
 import { setGlobalError } from "../redux/slices/uiSlice";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
+import AdminSubnav from "../components/Admin/AdminSubnav";
 import "./AdminAudit.css";
 
 // ─────────────────────────────────────────────────────
@@ -527,17 +527,7 @@ export default function AdminAudit() {
         <div className="container-fluid container-lg">
 
           {/* ── Sub-nav Admin ── */}
-          <div className="admin-subnav">
-            <Link to="/admin-enzo/preventivi" className="admin-nav-link">
-              <i className="bi bi-file-earmark-text" aria-hidden="true"></i> Preventivi
-            </Link>
-            <Link to="/admin-enzo/agenda" className="admin-nav-link">
-              <i className="bi bi-calendar-check" aria-hidden="true"></i> Agenda
-            </Link>
-            <Link to="/admin-enzo/audit" className="admin-nav-link active" aria-current="page">
-              <i className="bi bi-shield-check" aria-hidden="true"></i> Audit
-            </Link>
-          </div>
+          <AdminSubnav activeTab="audit" />
 
           {/* ── Header + filtri ── */}
           <div className="d-flex align-items-start align-items-sm-center justify-content-between gap-3 mb-4 flex-column flex-sm-row">

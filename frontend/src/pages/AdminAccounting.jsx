@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 import { authApiFetch } from "../utils/apiClient";
 import { setGlobalError, setTaxSettings } from "../redux/slices/uiSlice";
 import { handleEmailClick, handlePhoneClick } from "../utils/contactHelpers";
 import AdminConfirmModal from "../components/Admin/AdminConfirmModal";
+import AdminSubnav from "../components/Admin/AdminSubnav";
 import "./AdminAccounting.css";
 
 const MONTH_NAMES = [
@@ -613,18 +613,8 @@ export default function AdminAccounting() {
         <h1 className="h2 fw-bold mb-0">Agenda Contabile & Eventi</h1>
       </div>
 
-      {/* Sub-Navigazione per passare tra Preventivi e Agenda */}
-      <div className="admin-subnav">
-        <Link to="/admin-enzo/preventivi" className="admin-nav-link">
-          <i className="bi bi-file-earmark-text me-1"></i> Richieste Preventivo
-        </Link>
-        <Link to="/admin-enzo/agenda" className="admin-nav-link active">
-          <i className="bi bi-calendar-check me-1"></i> Agenda & Contabilità
-        </Link>
-        <Link to="/admin-enzo/audit" className="admin-nav-link">
-          <i className="bi bi-shield-check me-1"></i> Audit
-        </Link>
-      </div>
+      {/* Sub-Navigazione per passare tra Preventivi, Agenda ed Audit */}
+      <AdminSubnav activeTab="agenda" />
 
       {/* Barra Filtri: Anno, Mesi (Swipeable su Touch), Pulsante Nuovo Evento */}
       <div className="card border-0 shadow-sm rounded-4 mb-4">
@@ -924,33 +914,33 @@ export default function AdminAccounting() {
                         className="card border-0 shadow-sm rounded-3 p-3 cursor-pointer mobile-event-card"
                         onClick={() => handleOpenEditModal(ev)}
                       >
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <div>
-                            <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace mb-1 me-2">
+                        <div className="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-2">
+                          <div className="d-flex flex-wrap align-items-center gap-1 min-w-0">
+                            <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace">
                               <i className="bi bi-calendar-event me-1"></i>
                               {ev.dataEvento} {ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento ? `➔ ${ev.dataFineEvento}` : ""}
                             </span>
-                            
                             {ev.hasDjSet && (
-                              <span className="badge bg-warning text-dark font-monospace mb-1 me-2">
+                              <span className="badge bg-warning text-dark font-monospace">
                                 <i className="bi bi-disc-fill me-1"></i> DJ Set Enzo
                               </span>
                             )}
-
-                            <h6 className="fw-bold mb-0 text-body">{ev.titolo}</h6>
-                            <small className="text-muted d-block">
-                              {ev.clienteNome} {ev.clienteCognome} {ev.location && `• ${ev.location}`}
-                            </small>
                           </div>
                           {ev.contrattoUrl ? (
-                            <span className="badge bg-success text-white px-2 py-1 flex-shrink-0">
+                            <span className="badge bg-success text-white px-2 py-1">
                               <i className="bi bi-check-circle-fill me-1"></i> PDF Ok
                             </span>
                           ) : (
-                            <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 flex-shrink-0">
+                            <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">
                               <i className="bi bi-exclamation-triangle-fill me-1"></i> PDF Mancante
                             </span>
                           )}
+                        </div>
+                        <div className="mb-2">
+                          <h6 className="fw-bold mb-0 text-body">{ev.titolo}</h6>
+                          <small className="text-muted d-block">
+                            {ev.clienteNome} {ev.clienteCognome} {ev.location && `• ${ev.location}`}
+                          </small>
                         </div>
 
                         <div className="d-flex flex-wrap justify-content-between align-items-center pt-2 border-top gap-2">
@@ -1105,24 +1095,17 @@ export default function AdminAccounting() {
                     className="card border-0 shadow-sm rounded-3 p-3 mobile-event-card cursor-pointer"
                     onClick={() => handleOpenEditModal(ev)}
                   >
-                    <div className="d-flex justify-content-between align-items-start mb-2">
-                      <div>
-                        <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace mb-1 me-1">
+                    <div className="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-2">
+                      <div className="d-flex flex-wrap align-items-center gap-1 min-w-0">
+                        <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace">
                           <i className="bi bi-calendar-event me-1"></i> {ev.dataEvento}
                           {ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento ? ` ➔ ${ev.dataFineEvento}` : ""}
                         </span>
 
                         {ev.hasDjSet && (
-                          <span className="badge bg-warning text-dark font-monospace mb-1">
+                          <span className="badge bg-warning text-dark font-monospace">
                             <i className="bi bi-disc-fill me-1"></i> DJ Enzo
                           </span>
-                        )}
-
-                        <h6 className="fw-bold mb-0 text-body">{ev.titolo}</h6>
-                        {ev.clienteNome && (
-                          <small className="text-muted d-block">
-                            {ev.clienteNome} {ev.clienteCognome} {ev.location && `• ${ev.location}`}
-                          </small>
                         )}
                       </div>
                       {ev.contrattoUrl ? (
@@ -1130,7 +1113,7 @@ export default function AdminAccounting() {
                           href={ev.contrattoUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="badge bg-success text-white px-2 py-1 flex-shrink-0 text-decoration-none shadow-sm cursor-pointer d-inline-flex align-items-center gap-1"
+                          className="badge bg-success text-white px-2 py-1 text-decoration-none shadow-sm cursor-pointer d-inline-flex align-items-center gap-1"
                           title="Apri e visualizza il contratto PDF"
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -1143,11 +1126,20 @@ export default function AdminAccounting() {
                             e.stopPropagation();
                             handleOpenEditModal(ev);
                           }}
-                          className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 flex-shrink-0 cursor-pointer text-decoration-none border-0 d-inline-flex align-items-center gap-1"
+                          className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 cursor-pointer text-decoration-none border-0 d-inline-flex align-items-center gap-1"
                           title="PDF Mancante! Clicca per caricare"
                         >
-                          <i className="bi bi-exclamation-triangle-fill"></i> PDF Mancante (Carica)
+                          <i className="bi bi-exclamation-triangle-fill"></i> PDF Mancante
                         </button>
+                      )}
+                    </div>
+
+                    <div className="mb-2">
+                      <h6 className="fw-bold mb-0 text-body">{ev.titolo}</h6>
+                      {ev.clienteNome && (
+                        <small className="text-muted d-block">
+                          {ev.clienteNome} {ev.clienteCognome} {ev.location && `• ${ev.location}`}
+                        </small>
                       )}
                     </div>
 
@@ -1498,13 +1490,15 @@ export default function AdminAccounting() {
                         <i className="bi bi-cloud-arrow-up-fill text-success display-6 mb-2 d-block"></i>
                         <div className="fw-bold text-body mb-1">Upload Contratto PDF</div>
                         <small className="text-muted d-block mb-3">Seleziona il contratto siglato in formato .pdf</small>
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          onChange={handleUploadContract}
-                          disabled={uploadingPdf || !editingEvent?.id}
-                          className="form-control form-control-sm w-auto mx-auto"
-                        />
+                        <div className="file-input-wrapper mx-auto">
+                          <input
+                            type="file"
+                            accept="application/pdf"
+                            onChange={handleUploadContract}
+                            disabled={uploadingPdf || !editingEvent?.id}
+                            className="form-control form-control-sm"
+                          />
+                        </div>
                         {uploadingPdf && <small className="text-success d-block mt-2 fw-bold">Caricamento su Cloudinary in corso...</small>}
                         {!editingEvent?.id && (
                           <div className="alert alert-warning border border-warning border-opacity-50 text-dark fw-bold rounded-3 py-2 px-3 mt-3 mb-0 d-inline-flex align-items-center gap-2 small">
@@ -1615,38 +1609,22 @@ export default function AdminAccounting() {
                 <div className="d-flex flex-column gap-3">
                   {dayEventsModal.events.map((ev) => (
                     <div key={`day-modal-ev-${ev.id}`} className="card border shadow-sm rounded-3 p-3">
-                      <div className="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                          <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
-                            <span className="badge bg-success text-white fw-bold">
-                              {ev.tipoEvento || "Matrimonio"}
+                      <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                        <div className="d-flex flex-wrap align-items-center gap-1 min-w-0">
+                          <span className="badge bg-success text-white fw-bold">
+                            {ev.tipoEvento || "Matrimonio"}
+                          </span>
+                          {ev.hasDjSet && (
+                            <span className="badge bg-warning text-dark font-monospace">
+                              <i className="bi bi-disc-fill me-1"></i> DJ Set Enzo
                             </span>
-                            {ev.hasDjSet && (
-                              <span className="badge bg-warning text-dark font-monospace">
-                                <i className="bi bi-disc-fill me-1"></i> DJ Set Enzo
-                              </span>
-                            )}
-                            {ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento && (
-                              <span className="badge bg-info text-white font-monospace">
-                                Multi-Giorno (fino al {ev.dataFineEvento})
-                              </span>
-                            )}
-                          </div>
-                          <h5 className="fw-bold text-body mb-1">{ev.titolo}</h5>
-                          {(ev.clienteNome || ev.clienteCognome) && (
-                            <p className="mb-1 text-muted small fw-semibold">
-                              <i className="bi bi-person me-1"></i>
-                              {ev.clienteNome} {ev.clienteCognome}
-                            </p>
                           )}
-                          {ev.location && (
-                            <p className="mb-1 text-muted small">
-                              <i className="bi bi-geo-alt me-1"></i>
-                              {ev.location}
-                            </p>
+                          {ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento && (
+                            <span className="badge bg-info text-white font-monospace">
+                              Multi-Giorno (fino al {ev.dataFineEvento})
+                            </span>
                           )}
                         </div>
-
                         <div>
                           {ev.contrattoUrl ? (
                             <a
@@ -1670,11 +1648,25 @@ export default function AdminAccounting() {
                               className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 cursor-pointer text-decoration-none border-0 d-inline-flex align-items-center gap-1"
                               title="PDF Mancante! Clicca qui per caricare il contratto PDF"
                             >
-                              <i className="bi bi-exclamation-triangle-fill"></i> PDF Mancante (Carica)
+                              <i className="bi bi-exclamation-triangle-fill"></i> PDF Mancante
                             </button>
                           )}
                         </div>
                       </div>
+
+                      <h5 className="fw-bold text-body mb-1">{ev.titolo}</h5>
+                      {(ev.clienteNome || ev.clienteCognome) && (
+                        <p className="mb-1 text-muted small fw-semibold">
+                          <i className="bi bi-person me-1"></i>
+                          {ev.clienteNome} {ev.clienteCognome}
+                        </p>
+                      )}
+                      {ev.location && (
+                        <p className="mb-1 text-muted small">
+                          <i className="bi bi-geo-alt me-1"></i>
+                          {ev.location}
+                        </p>
+                      )}
 
                       {/* Dettagli contatto rapido */}
                       {(ev.clienteTelefono || ev.clienteEmail) && (
