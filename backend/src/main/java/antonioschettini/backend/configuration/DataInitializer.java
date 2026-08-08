@@ -13,6 +13,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import java.util.List;
 
 @Component
@@ -33,15 +35,31 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Value("${admin.password}")
     private String adminPassword;
 
     @Override
     public void run(String... args) throws Exception {
+        ensureAccountingTableSchema();
         seedAdminUser();
         seedDefaultServices();
         seedDefaultGalleryItems();
         seedDefaultQuoteRequests();
+    }
+
+    private void ensureAccountingTableSchema() {
+        try {
+            jdbcTemplate.execute("ALTER TABLE accounting_events ADD COLUMN IF NOT EXISTS has_dj_set BOOLEAN DEFAULT FALSE;");
+            jdbcTemplate.execute("ALTER TABLE accounting_events ADD COLUMN IF NOT EXISTS data_fine_evento DATE;");
+            jdbcTemplate.execute("UPDATE accounting_events SET data_fine_evento = data_evento WHERE data_fine_evento IS NULL;");
+            jdbcTemplate.execute("UPDATE accounting_events SET has_dj_set = FALSE WHERE has_dj_set IS NULL;");
+            System.out.println(">>> Schema tabella accounting_events migrato con successo (aggiunti campi has_dj_set e data_fine_evento).");
+        } catch (Exception e) {
+            System.err.println(">>> Avviso durante l'aggiornamento dello schema accounting_events: " + e.getMessage());
+        }
     }
 
     private void seedAdminUser() {
