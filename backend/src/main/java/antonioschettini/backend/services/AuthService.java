@@ -1,6 +1,7 @@
 package antonioschettini.backend.services;
 
 import antonioschettini.backend.entities.User;
+import antonioschettini.backend.exceptions.BadRequestException;
 import antonioschettini.backend.exceptions.TooManyRequestsException;
 import antonioschettini.backend.exceptions.UnauthorizedException;
 import antonioschettini.backend.recordsDTO.LoginDTO;
@@ -27,13 +28,21 @@ public class AuthService {
     private LoginAttemptService loginAttemptService;
 
     public LoginResponseDTO authenticateUser(LoginDTO body, String clientIp) {
-        String key = (clientIp != null ? clientIp : "") + "_" + (body.email() != null ? body.email().trim().toLowerCase() : "");
+        if (body == null) {
+            throw new BadRequestException("I dati di autenticazione non possono essere nulli!");
+        }
+
+        String userEmail = body.email() != null ? body.email().trim().toLowerCase() : "";
+        if (userEmail.isBlank() || body.password() == null || body.password().isBlank()) {
+            throw new BadRequestException("Email e password sono obbligatorie!");
+        }
+
+        String key = (clientIp != null ? clientIp : "") + "_" + userEmail;
 
         if (loginAttemptService.isBlocked(key)) {
             throw new TooManyRequestsException("Troppi tentativi di login falliti. L'accesso è temporaneamente bloccato per 15 minuti.");
         }
 
-        String userEmail = body.email() != null ? body.email().trim().toLowerCase() : "";
         User user = userRepository.findByEmail(userEmail).orElse(null);
 
         if (user == null || !passwordEncoder.matches(body.password(), user.getPassword())) {

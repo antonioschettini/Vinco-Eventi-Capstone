@@ -61,7 +61,10 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorPayload handleGenericException(Exception ex, HttpServletRequest request) {
         auditService.logError(request, ex, HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return new ErrorPayload("Si è verificato un errore interno del server: " + ex.getMessage(),
+        String msg = (ex != null && ex.getMessage() != null && !ex.getMessage().isBlank())
+                ? ex.getMessage()
+                : "Errore interno non specificato";
+        return new ErrorPayload("Si è verificato un errore interno del server: " + msg,
                 LocalDateTime.now());
     }
 }
