@@ -117,7 +117,7 @@
   color: #58bc82;
 }
 
-/* Pulsanti Social Rotondi ed Eleganti */
+/* Styling dei Pulsanti Social in Light & Dark Mode */
 .social-btn {
   width: 44px;
   height: 44px;
@@ -132,18 +132,30 @@
               color 0.3s ease, 
               border-color 0.3s ease,
               box-shadow 0.3s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 [data-bs-theme="dark"] .social-btn {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: var(--dark-text, #e4ece7);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.10);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 [data-bs-theme="light"] .social-btn {
-  border: 1px solid rgba(32, 74, 53, 0.25);
-  background-color: rgba(32, 74, 53, 0.04);
+  border: 1px solid rgba(32, 74, 53, 0.35);
+  background-color: rgba(255, 255, 255, 0.90);
   color: var(--primary-forest, #204a35);
+  box-shadow: 0 4px 12px rgba(32, 74, 53, 0.15);
+}
+
+[data-bs-theme="light"] .social-btn .mixcloud-svg {
+  fill: var(--primary-forest, #204a35);
+}
+
+[data-bs-theme="dark"] .social-btn .mixcloud-svg {
+  fill: #ffffff;
 }
 
 /* Transizione specifica per l'icona SVG Mixcloud */
@@ -151,46 +163,69 @@
   transition: fill 0.3s ease;
 }
 
-/* Effetti Hover Social Personalizzati */
-.social-btn:hover {
-  transform: translateY(-4px);
-  color: #ffffff !important;
-  border-color: transparent !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+/* Al passaggio del mouse da desktop: le scritte ed i pulsanti diventano bianchi luminosi */
+@media (hover: hover) and (pointer: fine) {
+  .footer-section:hover .footer-overlay {
+    background: linear-gradient(135deg, rgba(12, 18, 14, 0.88) 0%, rgba(8, 12, 10, 0.76) 100%) !important;
+  }
+
+  .footer-section:hover .footer-title,
+  .footer-section:hover .company-info,
+  .footer-section:hover .company-info span,
+  .footer-section:hover .info-link,
+  .footer-section:hover .copyright p,
+  .footer-section:hover .text-forest {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75), 0 0 15px rgba(255, 255, 255, 0.3) !important;
+  }
+
+  .footer-section:hover .social-btn {
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .footer-section:hover .social-btn .mixcloud-svg {
+    fill: #ffffff !important;
+  }
 }
 
-/* Colori specifici al passaggio del mouse */
+/* Effetti Hover Singolo Pulsante Social con Colori Brand e Bagliore */
+.social-btn:hover {
+  transform: translateY(-4px) scale(1.1) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
 .social-btn.spotify:hover {
-  background-color: #1db954;
+  background-color: #1db954 !important;
 }
 
 .social-btn.instagram:hover {
-  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%) !important;
 }
 
 .social-btn.matrimonio:hover {
-  background-color: #e25c80; /* Colore brand Matrimonio.com */
+  background-color: #e25c80 !important;
 }
 
 .social-btn.tiktok:hover {
-  background-color: #000000;
-}
-
-[data-bs-theme="dark"] .social-btn.tiktok:hover {
-  background-color: #ffffff;
-  color: #000000 !important;
+  background-color: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 .social-btn.whatsapp:hover {
-  background-color: #25d366; /* Verde brand WhatsApp */
+  background-color: #25d366 !important;
 }
 
 .social-btn.mixcloud:hover {
-  background-color: #52aad8; /* Celeste Mixcloud */
+  background-color: #52aad8 !important;
 }
 
 .social-btn.mixcloud:hover .mixcloud-svg {
-  fill: #ffffff;
+  fill: #ffffff !important;
 }
 
 /* Copyright Section */
