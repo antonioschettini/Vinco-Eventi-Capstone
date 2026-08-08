@@ -294,6 +294,9 @@ function AdminQuotes() {
         <Link to="/admin-enzo/agenda" className="admin-nav-link">
           <i className="bi bi-calendar-check me-1"></i> Agenda & Contabilità
         </Link>
+        <Link to="/admin-enzo/audit" className="admin-nav-link">
+          <i className="bi bi-shield-check me-1"></i> Audit
+        </Link>
       </div>
 
       {/* 1. Header Card con KPI e Titolo */}

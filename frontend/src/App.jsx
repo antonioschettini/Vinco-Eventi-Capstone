@@ -21,6 +21,7 @@ import About from "./pages/About";
 import AdminLogin from "./pages/AdminLogin";
 import AdminQuotes from "./pages/AdminQuotes";
 import AdminAccounting from "./pages/AdminAccounting";
+import AdminAudit from "./pages/AdminAudit";
 
 // Layout base condiviso da tutte le pagine
 function Layout() {
@@ -93,6 +94,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminAccounting />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin-enzo/audit"
+            element={
+              <ProtectedRoute>
+                <AdminAudit />
               </ProtectedRoute>
             }
           />

@@ -618,6 +618,9 @@ export default function AdminAccounting() {
         <Link to="/admin-enzo/agenda" className="admin-nav-link active">
           <i className="bi bi-calendar-check me-1"></i> Agenda & Contabilità
         </Link>
+        <Link to="/admin-enzo/audit" className="admin-nav-link">
+          <i className="bi bi-shield-check me-1"></i> Audit
+        </Link>
       </div>
 
       {/* Barra Filtri: Anno, Mesi (Swipeable su Touch), Pulsante Nuovo Evento */}

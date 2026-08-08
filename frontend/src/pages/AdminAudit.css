@@ -1,0 +1,568 @@
+/* AdminAudit.css — Dashboard Auditing Vinco Eventi */
+
+/* ═══════════════════════════════════════════
+   Layout Principale
+═══════════════════════════════════════════ */
+.admin-audit-page {
+  padding-top: 1rem;
+  padding-bottom: 4rem;
+  min-height: 85vh;
+}
+
+.audit-loading-center {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+/* Spinner per il bottone refresh */
+@keyframes audit-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.audit-spin {
+  display: inline-block;
+  animation: audit-spin 0.8s linear infinite;
+}
+
+/* Badge range date */
+.audit-date-range-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 50rem;
+  background: rgba(25, 135, 84, 0.1);
+  color: #198754;
+  white-space: nowrap;
+}
+
+[data-bs-theme="dark"] .audit-date-range-badge {
+  background: rgba(25, 135, 84, 0.15);
+  color: #3dd68c;
+}
+
+/* ═══════════════════════════════════════════
+   Sub-navigazione Admin (locale — evita dipendenza da AdminAccounting.css)
+═══════════════════════════════════════════ */
+.admin-audit-page .admin-subnav {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  padding-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-audit-page .admin-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  border-radius: 50rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--bs-secondary-color);
+  background: transparent;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: all 0.18s ease;
+}
+
+.admin-audit-page .admin-nav-link:hover {
+  color: #198754;
+  background: rgba(25, 135, 84, 0.08);
+}
+
+.admin-audit-page .admin-nav-link.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.28);
+}
+
+/* ═══════════════════════════════════════════
+   KPI Cards
+═══════════════════════════════════════════ */
+.audit-kpi-card {
+  border-radius: 14px;
+  background: var(--bs-body-bg);
+  border: 1px solid rgba(128, 128, 128, 0.18);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 100px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.audit-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.audit-kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.audit-kpi-icon.visits {
+  background: rgba(25, 135, 84, 0.12);
+  color: #198754;
+}
+.audit-kpi-icon.errors {
+  background: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+}
+.audit-kpi-icon.warnings {
+  background: rgba(255, 193, 7, 0.15);
+  color: #f59e0b;
+}
+.audit-kpi-icon.info {
+  background: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+}
+
+.audit-kpi-value {
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.15rem;
+}
+
+.audit-kpi-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+}
+
+/* ═══════════════════════════════════════════
+   Sezioni card panel
+═══════════════════════════════════════════ */
+.audit-panel {
+  border-radius: 16px;
+  background: var(--bs-body-bg);
+  border: 1px solid rgba(128, 128, 128, 0.15);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.audit-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.audit-panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ═══════════════════════════════════════════
+   Filtri data
+═══════════════════════════════════════════ */
+.audit-filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.audit-filter-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 50rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  background: transparent;
+  color: var(--bs-secondary-color);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.audit-filter-btn:hover {
+  background: rgba(25, 135, 84, 0.08);
+  border-color: #198754;
+  color: #198754;
+}
+
+.audit-filter-btn.active {
+  background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(25, 135, 84, 0.28);
+}
+
+/* ═══════════════════════════════════════════
+   Grafici a barre CSS puri (senza librerie)
+═══════════════════════════════════════════ */
+.audit-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+/* Grafico a barre orizzontale per errori per status */
+.audit-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.audit-bar-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 50px;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+}
+
+.audit-bar-label {
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.audit-bar-track {
+  background: rgba(128, 128, 128, 0.1);
+  border-radius: 50rem;
+  height: 22px;
+  overflow: hidden;
+  position: relative;
+}
+
+.audit-bar-fill {
+  height: 100%;
+  border-radius: 50rem;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.audit-bar-fill.status-2xx { background: linear-gradient(90deg, #198754, #20c997); }
+.audit-bar-fill.status-3xx { background: linear-gradient(90deg, #0d6efd, #6ea8fe); }
+.audit-bar-fill.status-4xx { background: linear-gradient(90deg, #f59e0b, #fcd34d); }
+.audit-bar-fill.status-5xx { background: linear-gradient(90deg, #dc3545, #f08080); }
+.audit-bar-fill.status-other { background: linear-gradient(90deg, #6c757d, #adb5bd); }
+
+.audit-bar-count {
+  font-weight: 700;
+  text-align: left;
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+}
+
+/* ═══════════════════════════════════════════
+   Grafico a linea SVG per visite nel tempo
+═══════════════════════════════════════════ */
+.audit-line-chart-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.audit-line-chart-svg {
+  width: 100%;
+  min-width: 300px;
+  height: 160px;
+  display: block;
+}
+
+.audit-chart-x-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  padding: 0 4px;
+}
+
+.audit-chart-x-label {
+  font-size: 0.68rem;
+  color: var(--bs-secondary-color);
+  text-align: center;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════
+   Tabella Errori
+═══════════════════════════════════════════ */
+.audit-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+}
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  min-width: 640px;
+}
+
+.audit-table th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bs-secondary-color);
+  padding: 0.6rem 0.75rem;
+  border-bottom: 2px solid rgba(128, 128, 128, 0.15);
+  white-space: nowrap;
+}
+
+.audit-table td {
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.08);
+  vertical-align: middle;
+}
+
+.audit-table tr:last-child td {
+  border-bottom: none;
+}
+
+[data-bs-theme="dark"] .audit-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-bs-theme="light"] .audit-table tr:hover td {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Badge Status HTTP */
+.audit-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 40px;
+}
+
+.audit-status-badge.s2xx {
+  background: rgba(25, 135, 84, 0.12);
+  color: #198754;
+}
+.audit-status-badge.s3xx {
+  background: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+}
+.audit-status-badge.s4xx {
+  background: rgba(255, 193, 7, 0.15);
+  color: #b45309;
+}
+.audit-status-badge.s5xx {
+  background: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+}
+
+/* Method Badge */
+.audit-method-badge {
+  display: inline-flex;
+  padding: 0.15rem 0.45rem;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.audit-method-badge.GET    { background: rgba(13, 110, 253, 0.08); color: #0d6efd; }
+.audit-method-badge.POST   { background: rgba(25, 135, 84, 0.1);  color: #198754; }
+.audit-method-badge.PUT    { background: rgba(255, 193, 7, 0.12); color: #b45309; }
+.audit-method-badge.DELETE { background: rgba(220, 53, 69, 0.1);  color: #dc3545; }
+.audit-method-badge.PATCH  { background: rgba(102, 16, 242, 0.08); color: #6610f2; }
+
+/* URI troncata */
+.audit-uri {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 0.78rem;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+/* Messaggio errore troncato */
+.audit-error-msg {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--bs-secondary-color);
+  font-size: 0.78rem;
+}
+
+/* Timestamp */
+.audit-timestamp {
+  white-space: nowrap;
+  color: var(--bs-secondary-color);
+  font-size: 0.76rem;
+}
+
+/* ═══════════════════════════════════════════
+   Top Pages
+═══════════════════════════════════════════ */
+.audit-top-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.audit-top-page-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.audit-top-page-uri {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audit-top-page-bar {
+  width: 80px;
+  height: 6px;
+  background: rgba(128, 128, 128, 0.12);
+  border-radius: 50rem;
+  overflow: hidden;
+}
+
+.audit-top-page-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #198754, #20c997);
+  border-radius: 50rem;
+  transition: width 0.5s ease;
+}
+
+/* Rank badge nelle top pages */
+.audit-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(128, 128, 128, 0.12);
+  font-size: 0.65rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-right: 0.4rem;
+  color: var(--bs-secondary-color);
+}
+
+.audit-top-page-count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  min-width: 32px;
+  text-align: right;
+  color: var(--bs-secondary-color);
+}
+
+/* ═══════════════════════════════════════════
+   Paginazione
+═══════════════════════════════════════════ */
+.audit-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.audit-page-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+  color: var(--bs-body-color);
+}
+
+.audit-page-btn:hover:not(:disabled) {
+  background: rgba(25, 135, 84, 0.08);
+  border-color: #198754;
+  color: #198754;
+}
+
+.audit-page-btn.active {
+  background: #198754;
+  border-color: #198754;
+  color: #fff;
+}
+
+.audit-page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════
+   Empty / Loading state
+═══════════════════════════════════════════ */
+.audit-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--bs-secondary-color);
+}
+
+.audit-empty i {
+  font-size: 2.5rem;
+  opacity: 0.35;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════
+   Responsive
+═══════════════════════════════════════════ */
+@media (max-width: 576px) {
+  .audit-panel {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .audit-kpi-card {
+    padding: 0.9rem 1rem;
+    min-height: 85px;
+  }
+
+  .audit-kpi-value {
+    font-size: 1.4rem;
+  }
+
+  .audit-bar-row {
+    grid-template-columns: 45px 1fr 42px;
+    font-size: 0.72rem;
+  }
+
+  .audit-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
