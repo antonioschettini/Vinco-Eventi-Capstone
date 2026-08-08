@@ -56,7 +56,38 @@ export default function AdminAccounting() {
 
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // 1-12, 0 = tutti
-  const [viewMode, setViewMode] = useState("calendar"); // "calendar" | "table"
+  const [viewMode, setViewMode] = useState("table"); // Default a "table" (Registro Contabile / Panoramica)
+
+  // Gestione dinamica degli anni nel dropdown
+  const baseYears = [2024, 2025, 2026, 2027, 2028, 2029, 2030];
+  const [customYears, setCustomYears] = useState([]);
+
+  const availableYears = Array.from(
+    new Set([...baseYears, ...customYears, currentYear, new Date().getFullYear()])
+  ).sort((a, b) => a - b);
+
+  // Gesture Swipe Mobile per scorrere i mesi nel calendario come un'app nativa
+  const [touchStartX, setTouchStartX] = useState(null);
+
+  const handleTouchStart = (e) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchStartX - touchEndX;
+
+    // Swipe a sinistra (mese successivo)
+    if (diffX > 50) {
+      setSelectedMonth((prev) => (prev >= 12 ? 1 : prev === 0 ? 1 : prev + 1));
+    }
+    // Swipe a destra (mese precedente)
+    else if (diffX < -50) {
+      setSelectedMonth((prev) => (prev <= 1 ? 12 : prev - 1));
+    }
+    setTouchStartX(null);
+  };
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -597,13 +628,29 @@ export default function AdminAccounting() {
               <label className="fw-bold text-secondary me-1 small">Anno:</label>
               <select
                 className="form-select form-select-sm rounded-pill font-monospace"
-                style={{ width: "110px" }}
+                style={{ width: "135px" }}
                 value={currentYear}
-                onChange={(e) => setCurrentYear(parseInt(e.target.value))}
+                onChange={(e) => {
+                  if (e.target.value === "ADD_NEW") {
+                    const inputYear = prompt("Inserisci l'anno da aggiungere all'Agenda (es. 2029, 2030):");
+                    if (inputYear) {
+                      const parsedY = parseInt(inputYear.trim(), 10);
+                      if (!isNaN(parsedY) && parsedY >= 2020 && parsedY <= 2050) {
+                        setCustomYears((prev) => [...prev, parsedY]);
+                        setCurrentYear(parsedY);
+                      } else {
+                        alert("Anno non valido. Inserisci un anno compreso tra 2020 e 2050.");
+                      }
+                    }
+                  } else {
+                    setCurrentYear(parseInt(e.target.value, 10));
+                  }
+                }}
               >
-                {[2024, 2025, 2026, 2027, 2028].map((y) => (
+                {availableYears.map((y) => (
                   <option key={y} value={y}>{y}</option>
                 ))}
+                <option value="ADD_NEW">+ Nuovo Anno...</option>
               </select>
             </div>
 
@@ -766,9 +813,9 @@ export default function AdminAccounting() {
         </div>
       </div>
 
-      {/* VISTA CALENDARIO */}
+      {/* VISTA CALENDARIO CON GESTURE SWIPE MOBILE */}
       {viewMode === "calendar" && (
-        <div className="calendar-container">
+        <div className="calendar-container" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
             <div className="d-flex flex-wrap align-items-center gap-2">
               <h5 className="fw-bold mb-0 text-success d-flex align-items-center">
@@ -997,14 +1044,14 @@ export default function AdminAccounting() {
                           <span className="text-muted small">-</span>
                         )}
                       </td>
-                      <td className="text-end fw-bold text-dark">
-                        € {ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+                      <td className="text-end fw-bold text-dark font-monospace">
+                        € {parseItalianNumber(ev.importoLordo).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
-                      <td className="text-end text-danger fw-semibold">
-                        € {ev.totaleSpese?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+                      <td className="text-end text-danger fw-semibold font-monospace">
+                        -€ {parseItalianNumber(ev.totaleSpese).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
-                      <td className="text-end text-success fw-bold">
-                        € {ev.totaleNetto?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+                      <td className="text-end text-success fw-bold font-monospace">
+                        € {parseItalianNumber(ev.totaleNetto).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td className="text-center">
                         {ev.contrattoUrl ? (
@@ -1026,9 +1073,9 @@ export default function AdminAccounting() {
                       <td className="text-end">
                         <button
                           onClick={() => handleOpenEditModal(ev)}
-                          className="btn btn-sm btn-outline-primary rounded-pill me-1"
+                          className="btn btn-sm btn-success rounded-pill px-3 py-1 fw-bold shadow-sm font-monospace d-inline-flex align-items-center gap-1"
                         >
-                          <i className="bi bi-pencil-square me-1"></i> Modifica
+                          <i className="bi bi-pencil-square"></i> Modifica
                         </button>
                       </td>
                     </tr>
@@ -1085,11 +1132,11 @@ export default function AdminAccounting() {
 
                     <div className="d-flex justify-content-between align-items-center pt-2 border-top mt-2">
                       <div>
-                        <small className="text-muted d-block">Lordo: €{ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</small>
-                        <small className="text-danger d-block">Spese: -€{ev.totaleSpese?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</small>
-                        <small className="text-success fw-bold d-block">Netto: €{ev.totaleNetto?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</small>
+                        <small className="text-muted d-block">Lordo: <strong className="text-dark">€{parseItalianNumber(ev.importoLordo).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></small>
+                        <small className="text-danger d-block">Spese: -€{parseItalianNumber(ev.totaleSpese).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>
+                        <small className="text-success fw-bold d-block">Netto: €{parseItalianNumber(ev.totaleNetto).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>
                       </div>
-                      <button className="btn btn-sm btn-outline-success rounded-pill px-3 py-1 font-monospace">
+                      <button className="btn btn-sm btn-success rounded-pill px-3 py-1 font-monospace fw-bold shadow-sm">
                         Modifica <i className="bi bi-pencil-square ms-1"></i>
                       </button>
                     </div>

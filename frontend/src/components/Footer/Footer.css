@@ -27,25 +27,26 @@
 }
 
 [data-bs-theme="light"] .footer-overlay {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 245, 242, 0.55) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(240, 245, 242, 0.82) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-[data-bs-theme="dark"] .footer-section:hover .footer-overlay {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(12, 18, 14, 0.75) 0%,
-    rgba(8, 12, 10, 0.50) 60%,
-    rgba(0, 0, 0, 0.10) 100%
-  ) !important;
-}
+/* Al passaggio del mouse da desktop: le scritte diventano bianche con bagliore elegante */
+@media (hover: hover) and (pointer: fine) {
+  .footer-section:hover .footer-overlay {
+    background: linear-gradient(135deg, rgba(12, 18, 14, 0.85) 0%, rgba(8, 12, 10, 0.72) 100%) !important;
+  }
 
-[data-bs-theme="light"] .footer-section:hover .footer-overlay {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 255, 255, 0.42) 0%,
-    rgba(240, 245, 242, 0.20) 60%,
-    rgba(255, 255, 255, 0.05) 100%
-  ) !important;
+  .footer-section:hover .footer-title,
+  .footer-section:hover .company-info,
+  .footer-section:hover .company-info span,
+  .footer-section:hover .info-link,
+  .footer-section:hover .copyright p,
+  .footer-section:hover .text-forest {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75), 0 0 15px rgba(255, 255, 255, 0.3) !important;
+  }
 }
 
 .footer-content {
