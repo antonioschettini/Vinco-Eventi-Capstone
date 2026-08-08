@@ -27,7 +27,25 @@
 }
 
 [data-bs-theme="light"] .footer-overlay {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 245, 242, 0.90) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 245, 242, 0.55) 100%);
+}
+
+[data-bs-theme="dark"] .footer-section:hover .footer-overlay {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(12, 18, 14, 0.75) 0%,
+    rgba(8, 12, 10, 0.50) 60%,
+    rgba(0, 0, 0, 0.10) 100%
+  ) !important;
+}
+
+[data-bs-theme="light"] .footer-section:hover .footer-overlay {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.42) 0%,
+    rgba(240, 245, 242, 0.20) 60%,
+    rgba(255, 255, 255, 0.05) 100%
+  ) !important;
 }
 
 .footer-content {
