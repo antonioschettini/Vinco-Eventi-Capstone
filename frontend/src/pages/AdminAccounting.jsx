@@ -1113,19 +1113,19 @@ export default function AdminAccounting() {
 
       {/* MODALE EDITOR EVENTO COMPLETO CON CAMPI SPLITTATI, EVENTI MULTI-GIORNO & SWITCH DJ SET */}
       {showModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
-          <div className="modal-dialog modal-lg modal-dialog-scrollable">
-            <div className="modal-content border-0 shadow-lg rounded-4">
-              <div className="modal-header border-0 pb-0">
-                <h5 className="modal-title fw-bold text-success">
-                  <i className="bi bi-calculator me-2"></i>
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.65)" }}>
+          <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" style={{ maxHeight: "90vh" }}>
+            <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden d-flex flex-column" style={{ maxHeight: "88vh" }}>
+              <div className="modal-header border-bottom flex-shrink-0 bg-body-tertiary px-4 py-3">
+                <h5 className="modal-title fw-bold text-success mb-0 d-flex align-items-center gap-2">
+                  <i className="bi bi-calculator fs-4"></i>
                   {editingEvent ? "Modifica Evento Contabile" : "Nuovo Evento in Agenda"}
                 </h5>
                 <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
               </div>
 
-              <form onSubmit={handleSaveEvent}>
-                <div className="modal-body p-4">
+              <form onSubmit={handleSaveEvent} className="d-flex flex-column flex-grow-1 overflow-hidden" style={{ minHeight: 0 }}>
+                <div className="modal-body p-4 flex-grow-1 overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
                   
                   {/* BOX PARTECIPAZIONE DJ SET ADMIN (ENZO) */}
                   <div className="dj-switch-box mb-4">
@@ -1436,22 +1436,25 @@ export default function AdminAccounting() {
                   </div>
                 </div>
 
-                <div className="modal-footer border-0 pt-0">
-                  {editingEvent && (
+                <div className="modal-footer border-top bg-body-tertiary flex-shrink-0 px-4 py-3 d-flex justify-content-between align-items-center">
+                  {editingEvent ? (
                     <button
                       type="button"
                       onClick={() => handleDeleteEvent(editingEvent.id)}
-                      className="btn btn-outline-danger rounded-pill me-auto"
+                      className="btn btn-outline-danger rounded-pill px-3"
                     >
                       <i className="bi bi-trash me-1"></i> Elimina Evento
                     </button>
-                  )}
-                  <button type="button" className="btn btn-light rounded-pill px-4" onClick={() => setShowModal(false)}>
-                    Annulla
-                  </button>
-                  <button type="submit" className="btn btn-success rounded-pill px-4 fw-bold">
-                    <i className="bi bi-check-lg me-1"></i> Salva Evento
-                  </button>
+                  ) : <div></div>}
+
+                  <div className="d-flex gap-2">
+                    <button type="button" className="btn btn-secondary rounded-pill px-4" onClick={() => setShowModal(false)}>
+                      Annulla
+                    </button>
+                    <button type="submit" className="btn btn-success rounded-pill px-4 fw-bold shadow-sm">
+                      <i className="bi bi-check-lg me-1"></i> Salva Evento
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>

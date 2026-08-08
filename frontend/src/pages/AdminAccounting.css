@@ -230,17 +230,25 @@
   opacity: 1;
 }
 
-/* Event Chip nel Calendario con Touch Scroll Isolato */
+/* Event Chip nel Calendario con Touch Scroll Isolato e barre di scorrimento totalmente nascoste */
 .events-wrapper {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  overflow-y: auto;
-  max-height: 85px;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  max-height: 82px;
   width: 100%;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  scrollbar-width: thin;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.events-wrapper::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .event-chip {
@@ -512,4 +520,33 @@
     font-size: 0.85rem;
     padding: 0.45rem 1rem;
   }
+}
+
+/* Regole per il Modale Editor Evento Scrollabile e Flessibile */
+.modal-dialog-scrollable .modal-content {
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.modal-dialog-scrollable .modal-content form {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.modal-dialog-scrollable .modal-body {
+  overflow-y: auto !important;
+  flex: 1 1 auto !important;
+  scrollbar-width: thin;
+}
+
+.modal-dialog-scrollable .modal-footer {
+  flex-shrink: 0 !important;
+  position: relative !important;
+  z-index: 10 !important;
+  background: var(--bs-body-bg);
 }
