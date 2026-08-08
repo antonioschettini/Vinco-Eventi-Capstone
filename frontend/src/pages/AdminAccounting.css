@@ -105,11 +105,11 @@
   white-space: nowrap;
   padding-bottom: 0.35rem;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
 
 .month-pills-scroll::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
 
 .month-pill {
@@ -230,7 +230,7 @@
   opacity: 1;
 }
 
-/* Event Chip nel Calendario */
+/* Event Chip nel Calendario con Touch Scroll Isolato */
 .events-wrapper {
   display: flex;
   flex-direction: column;
@@ -238,6 +238,9 @@
   overflow-y: auto;
   max-height: 85px;
   width: 100%;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
 }
 
 .event-chip {
@@ -283,9 +286,15 @@
   display: block;
 }
 
+.event-chip-icons {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
 .contract-badge-icon {
   font-size: 0.7rem;
-  flex-shrink: 0;
 }
 
 .contract-badge-icon.ok {
@@ -296,14 +305,48 @@
   color: #ff4d4d;
 }
 
-.event-chip-amount {
-  font-size: 0.68rem;
-  opacity: 0.95;
-  display: block;
+.dj-badge-icon {
+  font-size: 0.72rem;
+  color: #ffca28;
+}
+
+.multi-day-badge {
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 0.6rem;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.event-chip-sub {
+  font-size: 0.65rem;
+  opacity: 0.9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.event-chip-location {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 100%;
+  max-width: 70%;
+}
+
+.event-chip-amount {
+  font-size: 0.68rem;
+  opacity: 0.95;
+  white-space: nowrap;
+}
+
+/* Box Toggle DJ Set Admin in Modal */
+.dj-switch-box {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
 }
 
 /* Card Mobile Eventi */

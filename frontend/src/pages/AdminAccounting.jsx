@@ -34,6 +34,10 @@ export default function AdminAccounting() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Paginazione per la vista Registro Contabile (10 eventi per pagina)
+  const [currentPage, setCurrentPage] = useState(1);
+  const EVENTS_PER_PAGE = 10;
+
   // Report Finanziario Annuale (1 Gennaio - 31 Dicembre dell'anno selezionato)
   const [annualReport, setAnnualReport] = useState({
     totaleLordo: 0,
@@ -71,6 +75,11 @@ export default function AdminAccounting() {
     localStorage.setItem("vinco_admin_tax_manual", taxManualAmount.toString());
   }, [taxMode, taxPercent, taxManualAmount]);
 
+  // Reset pagina al cambio filtri
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedMonth, currentYear, viewMode]);
+
   // Stato per la modale di editing/creazione evento
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
@@ -81,6 +90,8 @@ export default function AdminAccounting() {
     clienteEmail: "",
     clienteTelefono: "",
     dataEvento: "",
+    dataFineEvento: "",
+    hasDjSet: true,
     location: "",
     tipoEvento: "Matrimonio",
     importoLordo: "",
@@ -158,7 +169,7 @@ export default function AdminAccounting() {
     fetchEventsAndReport();
   }, [fetchEventsAndReport]);
 
-  // Apertura modale per NUOVO evento
+  // Apertura modale per NUOVO evento (anche date nel passato)
   const handleOpenNewModal = (defaultDate = "") => {
     const today = new Date();
     const formattedDate = defaultDate || `${currentYear}-${String(selectedMonth || (today.getMonth() + 1)).padStart(2, "0")}-01`;
@@ -170,6 +181,8 @@ export default function AdminAccounting() {
       clienteEmail: "",
       clienteTelefono: "",
       dataEvento: formattedDate,
+      dataFineEvento: formattedDate,
+      hasDjSet: true,
       location: "",
       tipoEvento: "Matrimonio",
       importoLordo: "",
@@ -192,6 +205,8 @@ export default function AdminAccounting() {
       clienteEmail: ev.clienteEmail || "",
       clienteTelefono: ev.clienteTelefono || "",
       dataEvento: ev.dataEvento || "",
+      dataFineEvento: ev.dataFineEvento || ev.dataEvento || "",
+      hasDjSet: ev.hasDjSet !== undefined ? ev.hasDjSet : true,
       location: ev.location || "",
       tipoEvento: ev.tipoEvento || "Matrimonio",
       importoLordo: ev.importoLordo || "",
@@ -255,7 +270,8 @@ export default function AdminAccounting() {
         importoLordo: parsedLordo,
         totaleSpese: sumSpese,
         speseJson: JSON.stringify(speseList.map(item => ({ ...item, importo: parseItalianNumber(item.importo) }))),
-        tasseStimate: parseItalianNumber(formData.tasseStimate)
+        tasseStimate: parseItalianNumber(formData.tasseStimate),
+        dataFineEvento: formData.dataFineEvento || formData.dataEvento
       };
 
       const isEdit = Boolean(editingEvent?.id);
@@ -386,7 +402,7 @@ export default function AdminAccounting() {
     });
   };
 
-  // Costruzione griglia calendario mensile
+  // Costruzione griglia calendario mensile con supporto ad eventi multi-giorno
   const renderCalendarDays = () => {
     const monthIndex = selectedMonth === 0 ? 0 : selectedMonth - 1;
     const firstDayOfMonth = new Date(currentYear, monthIndex, 1);
@@ -408,7 +424,14 @@ export default function AdminAccounting() {
 
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = `${currentYear}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-      const dayEvents = events.filter((ev) => ev.dataEvento === dateStr);
+      
+      // Supporto eventi multi-giorno: dataEvento <= dateStr <= dataFineEvento
+      const dayEvents = events.filter((ev) => {
+        const start = ev.dataEvento;
+        const end = ev.dataFineEvento || ev.dataEvento;
+        return start <= dateStr && dateStr <= end;
+      });
+
       const isToday = dateStr === todayStr;
 
       cells.push(
@@ -429,27 +452,49 @@ export default function AdminAccounting() {
             <i className="bi bi-plus-circle-fill add-event-plus" title="Aggiungi evento"></i>
           </div>
           <div className="events-wrapper">
-            {dayEvents.map((ev) => (
-              <div
-                key={ev.id}
-                className={`event-chip ${ev.isManual ? "manual-event" : ""}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenEditModal(ev);
-                }}
-                title={`${ev.titolo} - Lordo: €${ev.importoLordo}`}
-              >
-                <div className="event-chip-header">
-                  <span className="event-chip-title text-truncate">{ev.titolo}</span>
-                  {ev.contrattoUrl ? (
-                    <i className="bi bi-check-circle-fill contract-badge-icon ok" title="Contratto allegato"></i>
-                  ) : (
-                    <i className="bi bi-exclamation-triangle-fill contract-badge-icon missing" title="Contratto mancante!"></i>
-                  )}
+            {dayEvents.map((ev) => {
+              const isMultiDay = ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento;
+              const displayName = ev.clienteCognome ? `${ev.clienteCognome}` : ev.titolo;
+              const displayLoc = ev.location || ev.tipoEvento || "";
+
+              return (
+                <div
+                  key={`${ev.id}-${dateStr}`}
+                  className={`event-chip ${ev.isManual ? "manual-event" : ""}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenEditModal(ev);
+                  }}
+                  title={`${ev.titolo} - Client: ${ev.clienteNome || ""} ${ev.clienteCognome || ""} - Location: ${ev.location || ""} - Lordo: €${ev.importoLordo}`}
+                >
+                  <div className="event-chip-header">
+                    <span className="event-chip-title text-truncate">
+                      {displayName}
+                    </span>
+                    <div className="event-chip-icons">
+                      {/* Badge DJ Set Enzo (Console DJ Icona) */}
+                      {ev.hasDjSet && (
+                        <i className="bi bi-disc-fill dj-badge-icon" title="Presenza DJ Set Enzo (Admin DJ)"></i>
+                      )}
+                      
+                      {/* Badge Stato Contratto PDF */}
+                      {ev.contrattoUrl ? (
+                        <i className="bi bi-check-circle-fill contract-badge-icon ok" title="Contratto allegato"></i>
+                      ) : (
+                        <i className="bi bi-exclamation-triangle-fill contract-badge-icon missing" title="Contratto mancante!"></i>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="event-chip-sub">
+                    <span className="event-chip-location text-truncate">
+                      {displayLoc}
+                    </span>
+                    {isMultiDay && <span className="multi-day-badge">2 GG</span>}
+                  </div>
                 </div>
-                <span className="event-chip-amount text-truncate">€ {ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       );
@@ -476,6 +521,13 @@ export default function AdminAccounting() {
   const lordoTotMese = monthlyReport?.totaleLordo || 0;
   const speseTotMese = monthlyReport?.totaleSpese || 0;
   const nettoOpMese = lordoTotMese - speseTotMese;
+
+  // Paginazione Registro Contabile
+  const totalPages = Math.ceil(events.length / EVENTS_PER_PAGE);
+  const displayedEvents = events.slice(
+    (currentPage - 1) * EVENTS_PER_PAGE,
+    currentPage * EVENTS_PER_PAGE
+  );
 
   return (
     <div className="admin-accounting-page container">
@@ -781,15 +833,21 @@ export default function AdminAccounting() {
                       >
                         <div className="d-flex justify-content-between align-items-start mb-2">
                           <div>
-                            <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace mb-1">
-                              <i className="bi bi-calendar-event me-1"></i> {ev.dataEvento}
+                            <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace mb-1 me-2">
+                              <i className="bi bi-calendar-event me-1"></i>
+                              {ev.dataEvento} {ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento ? `➔ ${ev.dataFineEvento}` : ""}
                             </span>
-                            <h6 className="fw-bold mb-0 text-dark">{ev.titolo}</h6>
-                            {ev.clienteNome && (
-                              <small className="text-muted d-block">
-                                {ev.clienteNome} {ev.clienteCognome} {ev.clienteTelefono && `• ${ev.clienteTelefono}`}
-                              </small>
+                            
+                            {ev.hasDjSet && (
+                              <span className="badge bg-warning text-dark font-monospace mb-1 me-2">
+                                <i className="bi bi-disc-fill me-1"></i> DJ Set Enzo
+                              </span>
                             )}
+
+                            <h6 className="fw-bold mb-0 text-dark">{ev.titolo}</h6>
+                            <small className="text-muted d-block">
+                              {ev.clienteNome} {ev.clienteCognome} {ev.location && `• ${ev.location}`}
+                            </small>
                           </div>
                           {ev.contrattoUrl ? (
                             <span className="badge bg-success text-white px-2 py-1 flex-shrink-0">
@@ -845,9 +903,10 @@ export default function AdminAccounting() {
             <table className="table excel-table align-middle">
               <thead>
                 <tr>
-                  <th>Data</th>
+                  <th>Data Evento</th>
                   <th>Titolo Evento / Cliente</th>
                   <th>Tipo / Location</th>
+                  <th className="text-center">Presenza DJ</th>
                   <th className="text-end">Lordo (€)</th>
                   <th className="text-end">Spese (€)</th>
                   <th className="text-end">Netto (€)</th>
@@ -858,20 +917,25 @@ export default function AdminAccounting() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="8" className="text-center py-4 text-muted">
+                    <td colSpan="9" className="text-center py-4 text-muted">
                       Caricamento in corso...
                     </td>
                   </tr>
                 ) : events.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="text-center py-5 text-muted">
+                    <td colSpan="9" className="text-center py-5 text-muted">
                       Nessun evento registrato per il periodo selezionato.
                     </td>
                   </tr>
                 ) : (
-                  events.map((ev) => (
+                  displayedEvents.map((ev) => (
                     <tr key={ev.id}>
-                      <td className="fw-bold font-monospace text-success">{ev.dataEvento}</td>
+                      <td className="fw-bold font-monospace text-success">
+                        {ev.dataEvento}
+                        {ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento && (
+                          <span className="d-block text-muted small font-monospace">➔ {ev.dataFineEvento}</span>
+                        )}
+                      </td>
                       <td>
                         <div className="fw-bold">{ev.titolo}</div>
                         {ev.clienteNome && (
@@ -883,6 +947,15 @@ export default function AdminAccounting() {
                       <td>
                         <span className="badge bg-light text-dark me-1">{ev.tipoEvento || "Evento"}</span>
                         <small className="text-muted">{ev.location}</small>
+                      </td>
+                      <td className="text-center">
+                        {ev.hasDjSet ? (
+                          <span className="badge bg-warning text-dark font-monospace px-2 py-1" title="Presenza DJ Set Admin (Enzo)">
+                            <i className="bi bi-disc-fill me-1"></i> DJ Enzo
+                          </span>
+                        ) : (
+                          <span className="text-muted small">-</span>
+                        )}
                       </td>
                       <td className="text-end fw-bold text-dark">
                         € {ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
@@ -933,7 +1006,7 @@ export default function AdminAccounting() {
               <div className="text-center py-4 text-muted">Nessun evento registrato.</div>
             ) : (
               <div className="d-flex flex-column gap-3">
-                {events.map((ev) => (
+                {displayedEvents.map((ev) => (
                   <div
                     key={`mobile-reg-${ev.id}`}
                     className="card border-0 shadow-sm rounded-3 p-3 mobile-event-card cursor-pointer"
@@ -941,13 +1014,21 @@ export default function AdminAccounting() {
                   >
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <div>
-                        <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace mb-1">
+                        <span className="badge bg-success bg-opacity-10 text-success fw-bold font-monospace mb-1 me-1">
                           <i className="bi bi-calendar-event me-1"></i> {ev.dataEvento}
+                          {ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento ? ` ➔ ${ev.dataFineEvento}` : ""}
                         </span>
+
+                        {ev.hasDjSet && (
+                          <span className="badge bg-warning text-dark font-monospace mb-1">
+                            <i className="bi bi-disc-fill me-1"></i> DJ Enzo
+                          </span>
+                        )}
+
                         <h6 className="fw-bold mb-0 text-dark">{ev.titolo}</h6>
                         {ev.clienteNome && (
                           <small className="text-muted d-block">
-                            {ev.clienteNome} {ev.clienteCognome} {ev.clienteTelefono && `• ${ev.clienteTelefono}`}
+                            {ev.clienteNome} {ev.clienteCognome} {ev.location && `• ${ev.location}`}
                           </small>
                         )}
                       </div>
@@ -977,10 +1058,44 @@ export default function AdminAccounting() {
               </div>
             )}
           </div>
+
+          {/* CONTROLLI PAGINAZIONE REGISTRO CONTABILE (10 Eventi per Pagina) */}
+          {totalPages > 1 && (
+            <div className="p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 bg-light">
+              <small className="text-muted font-monospace">
+                Mostrati <strong>{((currentPage - 1) * EVENTS_PER_PAGE) + 1} - {Math.min(currentPage * EVENTS_PER_PAGE, events.length)}</strong> di <strong>{events.length}</strong> eventi
+              </small>
+              <div className="btn-group btn-group-sm">
+                <button
+                  className="btn btn-outline-secondary rounded-start-pill px-3"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                >
+                  <i className="bi bi-chevron-left me-1"></i> Precedente
+                </button>
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    className={`btn ${currentPage === i + 1 ? "btn-success fw-bold" : "btn-outline-secondary"}`}
+                    onClick={() => setCurrentPage(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  className="btn btn-outline-secondary rounded-end-pill px-3"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                >
+                  Successivo <i className="bi bi-chevron-right ms-1"></i>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* MODALE EXCEL EDITOR EVENTO */}
+      {/* MODALE EDITOR EVENTO COMPLETO CON CAMPI SPLITTATI, EVENTI MULTI-GIORNO & SWITCH DJ SET */}
       {showModal && (
         <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.6)" }}>
           <div className="modal-dialog modal-lg modal-dialog-scrollable">
@@ -995,9 +1110,31 @@ export default function AdminAccounting() {
 
               <form onSubmit={handleSaveEvent}>
                 <div className="modal-body p-4">
-                  {/* SEZIONE 1: DATI EVENTO E CLIENTE */}
+                  
+                  {/* BOX PARTECIPAZIONE DJ SET ADMIN (ENZO) */}
+                  <div className="dj-switch-box mb-4">
+                    <div className="form-check form-switch d-flex align-items-center justify-content-between p-0 mb-0">
+                      <label className="form-check-label fw-bold text-dark me-3 cursor-pointer d-flex align-items-center gap-2" htmlFor="hasDjSetSwitch">
+                        <i className="bi bi-disc-fill text-warning fs-4"></i>
+                        <div>
+                          <div className="fs-6">Presenza DJ Set Admin (Enzo Colaluca)</div>
+                          <small className="text-muted fw-normal">Attiva per mostrare il badge consolle DJ nel calendario e reminder operativo.</small>
+                        </div>
+                      </label>
+                      <input
+                        className="form-check-input fs-4 cursor-pointer m-0 flex-shrink-0"
+                        type="checkbox"
+                        role="switch"
+                        id="hasDjSetSwitch"
+                        checked={formData.hasDjSet}
+                        onChange={(e) => setFormData({ ...formData, hasDjSet: e.target.checked })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* SEZIONE 1: DATI EVENTO, DATE MULTI-GIORNO & CLIENTE */}
                   <h6 className="fw-bold text-secondary mb-3 text-uppercase small border-bottom pb-2">
-                    1. Informazioni Generali & Cliente
+                    1. Informazioni Evento, Date & Cliente
                   </h6>
                   <div className="row g-3 mb-4">
                     <div className="col-12 col-md-6">
@@ -1011,48 +1148,70 @@ export default function AdminAccounting() {
                         onChange={(e) => setFormData({ ...formData, titolo: e.target.value })}
                       />
                     </div>
+
                     <div className="col-12 col-md-3">
-                      <label className="form-label small fw-bold">Data Evento *</label>
+                      <label className="form-label small fw-bold">Data Inizio Evento *</label>
                       <input
                         type="date"
                         className="form-control rounded-3"
                         required
                         value={formData.dataEvento}
-                        onChange={(e) => setFormData({ ...formData, dataEvento: e.target.value })}
-                      />
-                    </div>
-                    <div className="col-12 col-md-3">
-                      <label className="form-label small fw-bold">Tipo Evento</label>
-                      <input
-                        type="text"
-                        className="form-control rounded-3"
-                        placeholder="es. Matrimonio, Evento Aziendale"
-                        value={formData.tipoEvento}
-                        onChange={(e) => setFormData({ ...formData, tipoEvento: e.target.value })}
+                        onChange={(e) => {
+                          const newStart = e.target.value;
+                          setFormData((prev) => ({
+                            ...prev,
+                            dataEvento: newStart,
+                            dataFineEvento: prev.dataFineEvento && prev.dataFineEvento >= newStart ? prev.dataFineEvento : newStart
+                          }));
+                        }}
                       />
                     </div>
 
-                    <div className="col-12 col-md-4">
+                    <div className="col-12 col-md-3">
+                      <label className="form-label small fw-bold">Data Fine Evento (Multi-Giorno)</label>
+                      <input
+                        type="date"
+                        className="form-control rounded-3"
+                        value={formData.dataFineEvento}
+                        min={formData.dataEvento}
+                        onChange={(e) => setFormData({ ...formData, dataFineEvento: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="col-12 col-md-6">
                       <label className="form-label small fw-bold">Nome Cliente</label>
                       <input
                         type="text"
                         className="form-control rounded-3"
-                        placeholder="es. Nome"
+                        placeholder="es. Marco"
                         value={formData.clienteNome}
                         onChange={(e) => setFormData({ ...formData, clienteNome: e.target.value })}
                       />
                     </div>
-                    <div className="col-12 col-md-4">
-                      <label className="form-label small fw-bold">Cognome Cliente</label>
+                    
+                    <div className="col-12 col-md-6">
+                      <label className="form-label small fw-bold">Cognome Cliente (Mostrato in Cella)</label>
                       <input
                         type="text"
                         className="form-control rounded-3"
-                        placeholder="es. Cognome"
+                        placeholder="es. Rossi"
                         value={formData.clienteCognome}
                         onChange={(e) => setFormData({ ...formData, clienteCognome: e.target.value })}
                       />
                     </div>
-                    <div className="col-12 col-md-4">
+
+                    <div className="col-12 col-md-6">
+                      <label className="form-label small fw-bold">Email Cliente</label>
+                      <input
+                        type="email"
+                        className="form-control rounded-3"
+                        placeholder="es. cliente@email.it"
+                        value={formData.clienteEmail}
+                        onChange={(e) => setFormData({ ...formData, clienteEmail: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="col-12 col-md-6">
                       <label className="form-label small fw-bold">Telefono Cliente</label>
                       <input
                         type="text"
@@ -1064,30 +1223,31 @@ export default function AdminAccounting() {
                     </div>
 
                     <div className="col-12 col-md-8">
-                      <label className="form-label small fw-bold">Location / Venue</label>
+                      <label className="form-label small fw-bold">Location / Villa (Mostrata in Cella)</label>
                       <input
                         type="text"
                         className="form-control rounded-3"
-                        placeholder="es. Villa / Location"
+                        placeholder="es. Villa Rosa, Tenuta Colaluca"
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                       />
                     </div>
+
                     <div className="col-12 col-md-4">
-                      <label className="form-label small fw-bold">Email Cliente</label>
+                      <label className="form-label small fw-bold">Tipo Evento</label>
                       <input
-                        type="email"
+                        type="text"
                         className="form-control rounded-3"
-                        placeholder="es. cliente@email.it"
-                        value={formData.clienteEmail}
-                        onChange={(e) => setFormData({ ...formData, clienteEmail: e.target.value })}
+                        placeholder="es. Matrimonio, Pool Party"
+                        value={formData.tipoEvento}
+                        onChange={(e) => setFormData({ ...formData, tipoEvento: e.target.value })}
                       />
                     </div>
                   </div>
 
-                  {/* SEZIONE 2: ECONOMIA & SPESE COLLABORATORI (GRID) */}
+                  {/* SEZIONE 2: ECONOMIA & SPESE COLLABORATORI */}
                   <h6 className="fw-bold text-secondary mb-3 text-uppercase small border-bottom pb-2">
-                    2. Contabilità, Prezzo & Spese Fornitori (Grid)
+                    2. Contabilità, Prezzo & Spese Fornitori
                   </h6>
                   <div className="row g-3 mb-3">
                     <div className="col-12 col-md-6">

@@ -3,8 +3,8 @@ package antonioschettini.backend.services;
 import antonioschettini.backend.entities.AccountingEvent;
 import antonioschettini.backend.entities.QuoteRequest;
 import antonioschettini.backend.exceptions.NotFoundException;
+import antonioschettini.backend.payloads.AccountingReportDTO;
 import antonioschettini.backend.recordsDTO.AccountingEventDTO;
-import antonioschettini.backend.recordsDTO.AccountingReportDTO;
 import antonioschettini.backend.repositories.AccountingEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,15 +30,15 @@ public class AccountingService {
     private CloudinaryService cloudinaryService;
 
     public List<AccountingEvent> getAllEvents(Integer year, Integer month) {
-        if (year != null && month != null) {
+        if (year != null && month != null && month > 0) {
             YearMonth ym = YearMonth.of(year, month);
             LocalDate start = ym.atDay(1);
             LocalDate end = ym.atEndOfMonth();
-            return accountingRepository.findByDataEventoBetweenOrderByDataEventoAsc(start, end);
+            return accountingRepository.findEventsForPeriod(start, end);
         } else if (year != null) {
             LocalDate start = LocalDate.of(year, 1, 1);
             LocalDate end = LocalDate.of(year, 12, 31);
-            return accountingRepository.findByDataEventoBetweenOrderByDataEventoAsc(start, end);
+            return accountingRepository.findEventsForPeriod(start, end);
         }
         return accountingRepository.findAllByOrderByDataEventoAsc();
     }
@@ -62,6 +62,8 @@ public class AccountingService {
                 .clienteEmail(dto.clienteEmail())
                 .clienteTelefono(dto.clienteTelefono())
                 .dataEvento(dto.dataEvento())
+                .dataFineEvento(dto.dataFineEvento() != null ? dto.dataFineEvento() : dto.dataEvento())
+                .hasDjSet(dto.hasDjSet() != null ? dto.hasDjSet() : false)
                 .location(dto.location())
                 .tipoEvento(dto.tipoEvento())
                 .importoLordo(lordo)
@@ -90,6 +92,9 @@ public class AccountingService {
             ev.setClienteEmail(quote.getEmail());
             ev.setClienteTelefono(quote.getTelefono());
             ev.setDataEvento(quote.getDataEvento());
+            if (ev.getDataFineEvento() == null) {
+                ev.setDataFineEvento(quote.getDataEvento());
+            }
             ev.setLocation(quote.getLocation());
             ev.setTipoEvento(quote.getTipoEvento());
             return accountingRepository.save(ev);
@@ -105,6 +110,8 @@ public class AccountingService {
                 .clienteEmail(quote.getEmail())
                 .clienteTelefono(quote.getTelefono())
                 .dataEvento(quote.getDataEvento())
+                .dataFineEvento(quote.getDataEvento())
+                .hasDjSet(true) // Per default le richieste preventivo includono il DJ Set di Enzo
                 .location(quote.getLocation())
                 .tipoEvento(quote.getTipoEvento())
                 .importoLordo(importoEstimato)
@@ -131,6 +138,8 @@ public class AccountingService {
         event.setClienteEmail(dto.clienteEmail());
         event.setClienteTelefono(dto.clienteTelefono());
         event.setDataEvento(dto.dataEvento());
+        event.setDataFineEvento(dto.dataFineEvento() != null ? dto.dataFineEvento() : dto.dataEvento());
+        event.setHasDjSet(dto.hasDjSet() != null ? dto.hasDjSet() : false);
         event.setLocation(dto.location());
         event.setTipoEvento(dto.tipoEvento());
 
@@ -144,7 +153,9 @@ public class AccountingService {
         if (dto.tasseStimate() != null) {
             event.setTasseStimate(dto.tasseStimate());
         }
-        event.setNote(dto.note());
+        if (dto.note() != null) {
+            event.setNote(dto.note());
+        }
 
         return accountingRepository.save(event);
     }

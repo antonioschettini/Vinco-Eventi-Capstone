@@ -2,6 +2,8 @@ package antonioschettini.backend.repositories;
 
 import antonioschettini.backend.entities.AccountingEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -14,7 +16,12 @@ public interface AccountingEventRepository extends JpaRepository<AccountingEvent
 
     Optional<AccountingEvent> findByQuoteRequestId(UUID quoteRequestId);
 
-    List<AccountingEvent> findByDataEventoBetweenOrderByDataEventoAsc(LocalDate start, LocalDate end);
+    @Query("SELECT a FROM AccountingEvent a WHERE " +
+           "(a.dataEvento BETWEEN :start AND :end) OR " +
+           "(a.dataFineEvento IS NOT NULL AND a.dataFineEvento BETWEEN :start AND :end) OR " +
+           "(a.dataFineEvento IS NOT NULL AND a.dataEvento <= :end AND a.dataFineEvento >= :start) " +
+           "ORDER BY a.dataEvento ASC")
+    List<AccountingEvent> findEventsForPeriod(@Param("start") LocalDate start, @Param("end") LocalDate end);
 
     List<AccountingEvent> findAllByOrderByDataEventoAsc();
 

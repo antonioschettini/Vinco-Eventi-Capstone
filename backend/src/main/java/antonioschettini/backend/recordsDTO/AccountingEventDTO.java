@@ -14,6 +14,8 @@ public record AccountingEventDTO(
     String clienteEmail,
     String clienteTelefono,
     LocalDate dataEvento,
+    LocalDate dataFineEvento,
+    Boolean hasDjSet,
     String location,
     String tipoEvento,
     BigDecimal importoLordo,

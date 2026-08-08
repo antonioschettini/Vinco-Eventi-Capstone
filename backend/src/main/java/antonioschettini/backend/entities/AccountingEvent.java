@@ -48,6 +48,13 @@ public class AccountingEvent {
     @Column(name = "data_evento")
     private LocalDate dataEvento;
 
+    @Column(name = "data_fine_evento")
+    private LocalDate dataFineEvento;
+
+    @Builder.Default
+    @Column(name = "has_dj_set", nullable = false)
+    private boolean hasDjSet = false;
+
     private String location;
 
     @Column(name = "tipo_evento")
@@ -98,17 +105,10 @@ public class AccountingEvent {
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        if (this.importoLordo == null) this.importoLordo = BigDecimal.ZERO;
-        if (this.totaleSpese == null) this.totaleSpese = BigDecimal.ZERO;
-        if (this.totaleNetto == null) this.totaleNetto = this.importoLordo.subtract(this.totaleSpese);
-        if (this.tasseStimate == null) this.tasseStimate = BigDecimal.ZERO;
     }
 
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
-        if (this.importoLordo == null) this.importoLordo = BigDecimal.ZERO;
-        if (this.totaleSpese == null) this.totaleSpese = BigDecimal.ZERO;
-        this.totaleNetto = this.importoLordo.subtract(this.totaleSpese);
     }
 }
