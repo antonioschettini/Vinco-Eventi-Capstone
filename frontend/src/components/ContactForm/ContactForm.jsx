@@ -36,7 +36,8 @@ const initialFormState = {
   tipoEvento: "",
   tipoEventoAltro: "",
   dataEvento: "",
-  luogoEvento: "",
+  nomeLocation: "",
+  cittaLocation: "",
   numeroOspiti: "",
   momentoGiornata: "",
   tipoCerimonia: "",
@@ -48,29 +49,52 @@ const initialFormState = {
 };
 
 // Valida Email
-const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+const isValidEmail = (email) => {
+  if (!email) return false;
+  const trimmed = email.trim();
+  if (trimmed.length > 100) return false;
+  return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(trimmed);
+};
 
-// Valida Telefono (almeno 6 cifre numeriche)
+// Valida Telefono (almeno 6 cifre numeriche fino a 15)
 const isValidPhone = (phone) => {
   if (!phone) return false;
   const digitsOnly = phone.replace(/[^\d]/g, "");
   return digitsOnly.length >= 6 && digitsOnly.length <= 15;
 };
 
-// Valida Data (deve essere da oggi in poi)
+// Valida Data (deve essere una data futura o da oggi in poi)
 const isValidFutureDate = (dateString) => {
   if (!dateString) return false;
   const selectedDate = new Date(dateString);
+  if (isNaN(selectedDate.getTime())) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return selectedDate >= today;
 };
 
-// Valida Luogo Evento (deve contenere la virgola per separare luogo e località: es. Masseria Coccaro, Monopoli)
-const isValidLocation = (location) => {
-  if (!location) return false;
-  const parts = location.split(",");
-  return parts.length >= 2 && parts[0].trim().length > 0 && parts[1].trim().length > 0;
+// Valida Nome e Cognome (solo lettere, accenti, spazi, apostrofi e trattini, 2-50 caratteri, NESSUN numero o simbolo come 1=1)
+const isValidPersonName = (name) => {
+  if (!name) return false;
+  const trimmed = name.trim();
+  if (trimmed.length < 2 || trimmed.length > 50) return false;
+  return /^[a-zA-Zà-ùÀ-Ùá-úÁ-Úä-üÄ-ÜñÑ\s'-]+$/.test(trimmed);
+};
+
+// Valida Nome Struttura / Location (2-80 caratteri, esclude simboli di injection)
+const isValidVenueName = (venue) => {
+  if (!venue) return false;
+  const trimmed = venue.trim();
+  if (trimmed.length < 2 || trimmed.length > 80) return false;
+  return !/[=<>;$%*|\\{}]/.test(trimmed);
+};
+
+// Valida Città / Località (2-50 caratteri, alfabetico/accentato/spazi)
+const isValidCityName = (city) => {
+  if (!city) return false;
+  const trimmed = city.trim();
+  if (trimmed.length < 2 || trimmed.length > 50) return false;
+  return /^[a-zA-Zà-ùÀ-Ùá-úÁ-Úä-üÄ-ÜñÑ\s'-]+$/.test(trimmed);
 };
 
 
@@ -149,39 +173,34 @@ function ContactForm() {
   };
 
   const isFormValid = () => {
-    const basicFields = [
-      "nome",
-      "cognome",
-      "tipoEvento",
-      "momentoGiornata",
-      "budget",
-    ];
-
-    const allBasicFilled = basicFields.every(
-      (field) => formData[field].toString().trim() !== ""
-    );
-
-    const eventTypeOtherOk =
-      formData.tipoEvento !== "Altro" || formData.tipoEventoAltro.trim() !== "";
-
-    const ceremonyTypeOtherOk =
-      formData.tipoCerimonia !== "Altro" || formData.tipoCerimoniaAltro.trim() !== "";
-
+    const nameOk = isValidPersonName(formData.nome);
+    const lastNameOk = isValidPersonName(formData.cognome);
     const emailOk = isValidEmail(formData.email);
     const phoneOk = isValidPhone(formData.telefono);
-    const locationOk = isValidLocation(formData.luogoEvento);
-    const guestsOk = Number(formData.numeroOspiti) > 0;
+    const venueOk = isValidVenueName(formData.nomeLocation);
+    const cityOk = isValidCityName(formData.cittaLocation);
+    const guestsOk = Number(formData.numeroOspiti) > 0 && Number(formData.numeroOspiti) <= 10000;
     const dateOk = isValidFutureDate(formData.dataEvento);
+    const eventTypeOk = formData.tipoEvento.trim() !== "";
+    const eventTypeOtherOk = formData.tipoEvento !== "Altro" || formData.tipoEventoAltro.trim() !== "";
+    const ceremonyTypeOtherOk = formData.tipoCerimonia !== "Altro" || formData.tipoCerimoniaAltro.trim() !== "";
+    const timeOfDayOk = formData.momentoGiornata.trim() !== "";
+    const budgetOk = formData.budget.trim() !== "";
 
     return (
-      allBasicFilled &&
-      eventTypeOtherOk &&
-      ceremonyTypeOtherOk &&
+      nameOk &&
+      lastNameOk &&
       emailOk &&
       phoneOk &&
-      locationOk &&
+      venueOk &&
+      cityOk &&
       guestsOk &&
       dateOk &&
+      eventTypeOk &&
+      eventTypeOtherOk &&
+      ceremonyTypeOtherOk &&
+      timeOfDayOk &&
+      budgetOk &&
       formData.accettaTermini
     );
   };
@@ -213,20 +232,22 @@ function ContactForm() {
         ? (formData.tipoCerimoniaAltro.trim() ? `Altro: ${formData.tipoCerimoniaAltro.trim()}` : "Altro")
         : formData.tipoCerimonia;
 
+    const combinedLocation = `${formData.nomeLocation.trim()}, ${formData.cittaLocation.trim()}`;
+
     const payload = {
-      nome: formData.nome,
-      cognome: formData.cognome,
-      email: formData.email,
+      nome: formData.nome.trim(),
+      cognome: formData.cognome.trim(),
+      email: formData.email.trim(),
       telefono: fullPhone,
       dataEvento: formData.dataEvento || null,
       tipoEvento: finalTipoEvento,
-      location: formData.luogoEvento,
+      location: combinedLocation,
       numeroOspiti: String(formData.numeroOspiti),
       orarioGiornata: formData.momentoGiornata,
       tipoCerimonia: finalTipoCerimonia,
       messaggio: formData.ideaFesta
-        ? `${formData.ideaFesta}${formData.ulterioriInfo ? "\n\nInfo aggiuntive: " + formData.ulterioriInfo : ""}`
-        : formData.ulterioriInfo || "",
+        ? `${formData.ideaFesta.trim()}${formData.ulterioriInfo ? "\n\nInfo aggiuntive: " + formData.ulterioriInfo.trim() : ""}`
+        : formData.ulterioriInfo ? formData.ulterioriInfo.trim() : "",
       budget: formData.budget,
       lingua: lang,
     };
@@ -311,11 +332,13 @@ function ContactForm() {
               onChange={handleChange}
               placeholder="Es. Mario"
               className={`form-control font-body ${
-                validated && !formData.nome.trim() ? "is-invalid" : ""
+                validated && !isValidPersonName(formData.nome) ? "is-invalid" : ""
               }`}
               required
             />
-            <div className="invalid-feedback">{t.firstName} è obbligatorio.</div>
+            <div className="invalid-feedback">
+              {t.nameInvalidError || "Inserisci un nome valido (solo lettere, senza cifre o simboli malevoli)."}
+            </div>
           </div>
 
           <div className="col-12 col-md-6">
@@ -331,11 +354,13 @@ function ContactForm() {
               onChange={handleChange}
               placeholder="Es. Rossi"
               className={`form-control font-body ${
-                validated && !formData.cognome.trim() ? "is-invalid" : ""
+                validated && !isValidPersonName(formData.cognome) ? "is-invalid" : ""
               }`}
               required
             />
-            <div className="invalid-feedback">{t.lastName} è obbligatorio.</div>
+            <div className="invalid-feedback">
+              {t.lastNameInvalidError || "Inserisci un cognome valido (solo lettere, senza cifre o simboli malevoli)."}
+            </div>
           </div>
         </div>
 
@@ -539,66 +564,50 @@ function ContactForm() {
           </div>
         </div>
 
-        {/* Row 4: Luogo Evento e Numero di ospiti */}
+        {/* Row 4: Location (Nome Struttura e Città/Località) */}
         <div className="row g-3 mb-3">
           <div className="col-12 col-md-6">
-            <label htmlFor="luogoEvento" className="form-label font-body fw-semibold text-body fs-7">
-              {t.eventLocation} <span className="text-danger">*</span>
+            <label htmlFor="nomeLocation" className="form-label font-body fw-semibold text-body fs-7">
+              {t.venueName || "Nome Struttura / Location"} <span className="text-danger">*</span>
             </label>
-
-            <div className="position-relative">
-              {validated && !isValidLocation(formData.luogoEvento) && (
-                <div className="location-fumetto-speech-bubble" role="alert">
-                  <i className="bi bi-info-circle-fill me-2 text-warning fs-6"></i>
-                  <span>
-                    {t.locationFumettoHint ||
-                      "Inserisci sia il Luogo che la Località separati da una virgola (es. Masseria Coccaro, Monopoli)"}
-                  </span>
-                </div>
-              )}
-
-              <input
-                type="text"
-                id="luogoEvento"
-                name="luogoEvento"
-                tabIndex={7}
-                value={formData.luogoEvento}
-                onChange={handleChange}
-                placeholder={t.eventLocationPlaceholder || "Es. Masseria Coccaro, Monopoli"}
-                className={`form-control font-body ${
-                  validated && !isValidLocation(formData.luogoEvento) ? "is-invalid" : ""
-                }`}
-                required
-              />
-            </div>
+            <input
+              type="text"
+              id="nomeLocation"
+              name="nomeLocation"
+              tabIndex={7}
+              value={formData.nomeLocation}
+              onChange={handleChange}
+              placeholder={t.venueNamePlaceholder || "Es. Masseria Coccaro"}
+              className={`form-control font-body ${
+                validated && !isValidVenueName(formData.nomeLocation) ? "is-invalid" : ""
+              }`}
+              required
+            />
             <div className="invalid-feedback">
-              {t.locationInvalidError ||
-                "Inserisci il Luogo e la Località separati da una virgola (es. Masseria Coccaro, Monopoli)."}
+              {t.venueNameError || "Inserisci il nome valido della struttura o location (es. Masseria Coccaro)."}
             </div>
           </div>
 
           <div className="col-12 col-md-6">
-            <label htmlFor="numeroOspiti" className="form-label font-body fw-semibold text-body fs-7">
-              {t.guestsCount} <span className="text-danger">*</span>
+            <label htmlFor="cittaLocation" className="form-label font-body fw-semibold text-body fs-7">
+              {t.cityName || "Città / Località"} <span className="text-danger">*</span>
             </label>
             <input
-              type="number"
-              id="numeroOspiti"
-              name="numeroOspiti"
+              type="text"
+              id="cittaLocation"
+              name="cittaLocation"
               tabIndex={8}
-              min="1"
-              value={formData.numeroOspiti}
+              value={formData.cittaLocation}
               onChange={handleChange}
-              placeholder="Es. 120"
+              placeholder={t.cityNamePlaceholder || "Es. Monopoli"}
               className={`form-control font-body ${
-                validated &&
-                (!formData.numeroOspiti || Number(formData.numeroOspiti) <= 0)
-                  ? "is-invalid"
-                  : ""
+                validated && !isValidCityName(formData.cittaLocation) ? "is-invalid" : ""
               }`}
               required
             />
-            <div className="invalid-feedback">Inserisci il {t.guestsCount}.</div>
+            <div className="invalid-feedback">
+              {t.cityNameError || "Inserisci una città o località valida (es. Monopoli)."}
+            </div>
           </div>
         </div>
 

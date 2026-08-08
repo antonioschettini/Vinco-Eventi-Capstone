@@ -57,26 +57,17 @@ public class EmailService {
 
     @Async
     public void sendQuoteNotificationEmail(QuoteRequest quote) {
-        if (mailSender == null) {
-            System.out.println("[WARN EmailService] JavaMailSender non configurato. Salto l'invio email admin.");
+        if (quote == null) {
+            return;
+        }
+
+        if (mailSender == null && (brevoApiKey == null || brevoApiKey.isBlank())) {
+            System.out.println("[WARN EmailService] Né JavaMailSender né Brevo API Key configurati. Salto l'invio email admin.");
             return;
         }
 
         try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
-            helper.setFrom(mailFrom, "VINCO EVENTI - Web App");
-            helper.setTo("vincoeventi@gmail.com");
-            if (quote.getEmail() != null && !quote.getEmail().isBlank()) {
-                helper.setReplyTo(quote.getEmail(), quote.getNome() + " " + quote.getCognome());
-            }
-
             String subject = "Richiesta Preventivo VINCO EVENTI - " + quote.getNome() + " " + quote.getCognome();
-            helper.setSubject(subject);
-
-            mimeMessage.setHeader("X-Mailer", "VINCO EVENTI Web Application");
-            mimeMessage.setHeader("Auto-Submitted", "auto-generated");
 
             String dataEventoFormatted = quote.getDataEvento() != null 
                     ? quote.getDataEvento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) 
@@ -358,8 +349,6 @@ public class EmailService {
                 </html>
                 """.formatted(dataRichiestaFormatted));
 
-            helper.setText(plainTextBuilder.toString(), htmlBuilder.toString());
-
             byte[] icsBytes = null;
             // Allegato .ics per Apple Mail / iOS / Outlook: salvataggio istantaneo in 1 tap senza chiamate al server
             if (quote.getDataEvento() != null && quoteService != null) {
@@ -367,7 +356,6 @@ public class EmailService {
                     String icsContent = quoteService.generateIcsContent(quote);
                     if (icsContent != null && !icsContent.isBlank()) {
                         icsBytes = icsContent.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-                        helper.addAttachment("evento-vinco.ics", new org.springframework.core.io.ByteArrayResource(icsBytes), "text/calendar; charset=UTF-8");
                     }
                 } catch (Exception icsEx) {
                     System.err.println("[WARN EmailService] Impossibile allegare file .ics all'email: " + icsEx.getMessage());
@@ -390,8 +378,26 @@ public class EmailService {
             }
 
             if (mailSender != null) {
+                MimeMessage mimeMessage = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+                helper.setFrom(mailFrom, "VINCO EVENTI - Web App");
+                helper.setTo("vincoeventi@gmail.com");
+                if (quote.getEmail() != null && !quote.getEmail().isBlank()) {
+                    helper.setReplyTo(quote.getEmail(), quote.getNome() + " " + quote.getCognome());
+                }
+                helper.setSubject(subject);
+                mimeMessage.setHeader("X-Mailer", "VINCO EVENTI Web Application");
+                mimeMessage.setHeader("Auto-Submitted", "auto-generated");
+                helper.setText(plainTextBuilder.toString(), htmlBuilder.toString());
+                if (icsBytes != null) {
+                    helper.addAttachment("evento-vinco.ics", new org.springframework.core.io.ByteArrayResource(icsBytes), "text/calendar; charset=UTF-8");
+                }
+
                 mailSender.send(mimeMessage);
                 System.out.println(">>> Email di notifica preventivo inviata con successo all'admin VINCO EVENTI via SMTP!");
+            } else {
+                System.err.println("[WARN EmailService] Impossibile inviare l'email di notifica all'admin via SMTP (JavaMailSender non configurato).");
             }
         } catch (Exception ex) {
             System.err.println("[ERROR EmailService] Impossibile inviare l'email di notifica all'admin: " + ex.getMessage());
@@ -439,14 +445,16 @@ public class EmailService {
 
     @Async
     public void sendConfirmationEmailToClient(QuoteRequest quote) {
-        if (mailSender == null || quote.getEmail() == null || quote.getEmail().isBlank()) {
+        if (quote == null || quote.getEmail() == null || quote.getEmail().isBlank()) {
+            return;
+        }
+
+        if (mailSender == null && (brevoApiKey == null || brevoApiKey.isBlank())) {
+            System.out.println("[WARN EmailService] Né JavaMailSender né Brevo API Key configurati. Salto l'invio email cliente.");
             return;
         }
 
         try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
             boolean isEnglish = quote.getLingua() != null && quote.getLingua().equalsIgnoreCase("en");
             String messaggioOriginale = quote.getMessaggio() != null ? quote.getMessaggio().trim() : "";
 
@@ -464,17 +472,9 @@ public class EmailService {
 
             boolean showItalianNotice = isEnglish || isForeignMessage;
 
-            helper.setFrom(mailFrom, "VINCO EVENTI");
-            helper.setReplyTo("vincoeventi@gmail.com", "VINCO EVENTI");
-            helper.setTo(quote.getEmail());
-            
             String subject = isEnglish 
                     ? "VINCO EVENTI - Quote Request Confirmation" 
                     : "VINCO EVENTI - Ricezione Richiesta Preventivo";
-            helper.setSubject(subject);
-
-            mimeMessage.setHeader("X-Mailer", "VINCO EVENTI Web Application");
-            mimeMessage.setHeader("Auto-Submitted", "auto-generated");
 
             String dataEventoFormatted = quote.getDataEvento() != null 
                     ? quote.getDataEvento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) 
@@ -786,11 +786,7 @@ public class EmailService {
                         waIconUri,
                         itLanguageNoticeHtml
                 );
-            }
-
-            helper.setText(plainText, htmlBody);
-
-            // Tenta prima l'invio via Brevo REST API su HTTPS (Porta 443)
+            }            // Tenta prima l'invio via Brevo REST API su HTTPS (Porta 443)
             boolean sentViaApi = sendViaBrevoApi(
                 quote.getEmail(),
                 subject,
@@ -806,8 +802,21 @@ public class EmailService {
             }
 
             if (mailSender != null) {
+                MimeMessage mimeMessage = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+                helper.setFrom(mailFrom, "VINCO EVENTI");
+                helper.setReplyTo("vincoeventi@gmail.com", "VINCO EVENTI");
+                helper.setTo(quote.getEmail());
+                helper.setSubject(subject);
+                mimeMessage.setHeader("X-Mailer", "VINCO EVENTI Web Application");
+                mimeMessage.setHeader("Auto-Submitted", "auto-generated");
+                helper.setText(plainText, htmlBody);
+
                 mailSender.send(mimeMessage);
                 System.out.println(">>> Email di conferma inviata con successo al cliente VINCO EVENTI via SMTP: " + quote.getEmail());
+            } else {
+                System.err.println("[WARN EmailService] Impossibile inviare l'email al cliente via SMTP (JavaMailSender non configurato).");
             }
         } catch (Exception ex) {
             System.err.println("[ERROR EmailService] Impossibile inviare l'email al cliente: " + ex.getMessage());

@@ -1,7 +1,7 @@
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
-const footerBgImage = "https://res.cloudinary.com/ytjdxerb/image/upload/v1786087542/vinco_eventi_assets/grx32y3fmenjhcwk1god.webp";
+const footerBgImage = "https://res.cloudinary.com/ytjdxerb/image/upload/c_crop,g_center,y_0,h_0.92/v1786087542/vinco_eventi_assets/grx32y3fmenjhcwk1god.webp";
 import "./Footer.css";
 
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";

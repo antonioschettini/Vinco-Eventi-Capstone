@@ -22,19 +22,19 @@ public class QuoteService {
 
     public QuoteRequest createQuote(QuoteRequestDTO dto) {
         QuoteRequest quote = QuoteRequest.builder()
-                .nome(dto.nome())
-                .cognome(dto.cognome())
-                .email(dto.email())
-                .telefono(dto.telefono())
+                .nome(sanitizeText(dto.nome()))
+                .cognome(sanitizeText(dto.cognome()))
+                .email(dto.email() != null ? sanitizeText(dto.email()).toLowerCase() : null)
+                .telefono(sanitizeText(dto.telefono()))
                 .dataEvento(dto.dataEvento())
-                .tipoEvento(dto.tipoEvento())
-                .location(dto.location())
-                .numeroOspiti(dto.numeroOspiti())
-                .orarioGiornata(dto.orarioGiornata())
-                .tipoCerimonia(dto.tipoCerimonia())
-                .messaggio(dto.messaggio())
-                .budget(dto.budget())
-                .lingua(dto.lingua() != null && !dto.lingua().isBlank() ? dto.lingua() : "it")
+                .tipoEvento(sanitizeText(dto.tipoEvento()))
+                .location(sanitizeText(dto.location()))
+                .numeroOspiti(sanitizeText(dto.numeroOspiti()))
+                .orarioGiornata(sanitizeText(dto.orarioGiornata()))
+                .tipoCerimonia(sanitizeText(dto.tipoCerimonia()))
+                .messaggio(sanitizeText(dto.messaggio()))
+                .budget(sanitizeText(dto.budget()))
+                .lingua(dto.lingua() != null && !dto.lingua().isBlank() ? sanitizeText(dto.lingua()) : "it")
                 .stato(QuoteStatus.PENDING)
                 .build();
 
@@ -45,6 +45,15 @@ public class QuoteService {
         emailService.sendConfirmationEmailToClient(saved);
 
         return saved;
+    }
+
+    private String sanitizeText(String input) {
+        if (input == null) return null;
+        String s = input.trim();
+        // Rimuove eventuali tag HTML/Script e caratteri di controllo non stampabili
+        s = s.replaceAll("<[^>]*>", "").replaceAll("[\\p{C}]", "");
+        // Normalizza spazi multipli
+        return s.replaceAll("\\s+", " ");
     }
 
     public List<QuoteRequest> getAllQuotes(QuoteStatus status) {
