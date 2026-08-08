@@ -7,6 +7,7 @@ import { handleEmailClick, handlePhoneClick } from "../utils/contactHelpers";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import CalendarChoiceModal from "../components/CalendarChoiceModal/CalendarChoiceModal";
+import AdminConfirmModal from "../components/Admin/AdminConfirmModal";
 import "./AdminQuotes.css";
 
 const getEventTypeBadgeClass = (tipo) => {
@@ -35,11 +36,25 @@ function AdminQuotes() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [calendarQuote, setCalendarQuote] = useState(null);
   const [translatedText, setTranslatedText] = useState("");
   const [translating, setTranslating] = useState(false);
   const [visibleCount, setVisibleCount] = useState(10);
+
+  // Stato per il Modale Custom di Conferma / Avviso Admin
+  const [confirmModalConfig, setConfirmModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    confirmText: "Conferma",
+    variant: "success",
+    icon: "bi-check-circle-fill",
+    onConfirm: null,
+  });
+
+  const closeConfirmModal = () => {
+    setConfirmModalConfig((prev) => ({ ...prev, isOpen: false }));
+  };
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
@@ -64,8 +79,8 @@ function AdminQuotes() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
-        if (deleteConfirmId) {
-          setDeleteConfirmId(null);
+        if (confirmModalConfig.isOpen) {
+          closeConfirmModal();
         } else if (showDetailModal) {
           setShowDetailModal(false);
         }
@@ -74,29 +89,10 @@ function AdminQuotes() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [deleteConfirmId, showDetailModal]);
+  }, [confirmModalConfig.isOpen, showDetailModal]);
 
-  const handleUpdateStatus = async (id, newStatus) => {
+  const executeStatusUpdate = async (id, newStatus) => {
     setActionError("");
-
-    const targetQuote = allQuotes.find((q) => q.id === id);
-    const oldStatus = targetQuote?.stato;
-
-    // Modali di conferma per l'Agenda Contabile
-    if (newStatus === "PROCESSED") {
-      const clientName = targetQuote ? `${targetQuote.nome} ${targetQuote.cognome}` : "il cliente";
-      const eventDate = targetQuote?.dataEvento || "la data concordata";
-      const confirmProceed = window.confirm(
-        `Il preventivo di ${clientName} (${eventDate}) è stato confermato?\n\nImpostando lo stato su GESTITO, l'evento verrà automaticamente inserito nell'Agenda Contabile.`
-      );
-      if (!confirmProceed) return;
-    } else if (oldStatus === "PROCESSED" && newStatus !== "PROCESSED") {
-      const confirmWarning = window.confirm(
-        `ATTENZIONE: Questo preventivo è attualmente inserito nell'Agenda Contabile.\n\nCambiando lo stato da GESTITO a ${newStatus}, l'evento verrà rimosso dall'Agenda Contabile. Vuoi proseguire?`
-      );
-      if (!confirmWarning) return;
-    }
-
     try {
       const updated = await authApiFetch(
         `${API_BASE_URL}/api/admin/quotes/${id}/status`,
@@ -118,17 +114,46 @@ function AdminQuotes() {
     }
   };
 
-  const handleDeleteQuote = async (id) => {
-    setActionError("");
-
+  const handleUpdateStatus = (id, newStatus) => {
     const targetQuote = allQuotes.find((q) => q.id === id);
-    if (targetQuote?.stato === "PROCESSED") {
-      const confirmDelete = window.confirm(
-        `ATTENZIONE: Questo preventivo è in stato GESTITO e presente nell'Agenda Contabile.\n\nEliminando definitivamente la pratica, verrà rimosso anche l'evento associato dall'Agenda Contabile. Vuoi proseguire?`
-      );
-      if (!confirmDelete) return;
-    }
+    const oldStatus = targetQuote?.stato;
 
+    if (newStatus === "PROCESSED") {
+      const clientName = targetQuote ? `${targetQuote.nome} ${targetQuote.cognome}` : "il cliente";
+      const eventDate = targetQuote?.dataEvento || "la data concordata";
+      setConfirmModalConfig({
+        isOpen: true,
+        title: "Conferma Evento Gestito",
+        message: `Il preventivo di ${clientName} (${eventDate}) è stato confermato? Impostando lo stato su GESTITO, l'evento verrà inserito automaticamente nell'Agenda Contabile.`,
+        confirmText: "Conferma e Inserisci in Agenda",
+        variant: "success",
+        icon: "bi-calendar-check-fill",
+        onConfirm: () => {
+          closeConfirmModal();
+          executeStatusUpdate(id, newStatus);
+        },
+      });
+    } else if (oldStatus === "PROCESSED" && newStatus !== "PROCESSED") {
+      const statusLabel = newStatus === "PENDING" ? "IN ATTESA" : "LETTO";
+      setConfirmModalConfig({
+        isOpen: true,
+        title: "Rimozione dall'Agenda Contabile",
+        message: `ATTENZIONE: Questo preventivo è attualmente inserito nell'Agenda Contabile. Cambiando lo stato da GESTITO a ${statusLabel}, l'evento verrà rimosso dall'Agenda. Vuoi proseguire?`,
+        confirmText: "Rimuovi e Cambia Stato",
+        variant: "warning",
+        icon: "bi-exclamation-triangle-fill",
+        onConfirm: () => {
+          closeConfirmModal();
+          executeStatusUpdate(id, newStatus);
+        },
+      });
+    } else {
+      executeStatusUpdate(id, newStatus);
+    }
+  };
+
+  const executeDeleteQuote = async (id) => {
+    setActionError("");
     try {
       await authApiFetch(
         `${API_BASE_URL}/api/admin/quotes/${id}`,
@@ -142,10 +167,29 @@ function AdminQuotes() {
         setShowDetailModal(false);
         setSelectedQuote(null);
       }
-      setDeleteConfirmId(null);
     } catch (err) {
       setActionError(err.message);
     }
+  };
+
+  const handleDeleteQuote = (id) => {
+    const targetQuote = allQuotes.find((q) => q.id === id);
+    const isProcessed = targetQuote?.stato === "PROCESSED";
+
+    setConfirmModalConfig({
+      isOpen: true,
+      title: isProcessed ? "Attenzione: Eliminazione Preventivo Gestito" : "Conferma Eliminazione",
+      message: isProcessed
+        ? `ATTENZIONE: Il preventivo di ${targetQuote?.nome || ""} ${targetQuote?.cognome || ""} è in stato GESTITO e presente nell'Agenda Contabile. Eliminando la pratica, verrà rimosso anche l'evento associato dall'Agenda. Vuoi proseguire?`
+        : `Sei sicuro di voler eliminare definitivamente la richiesta di preventivo di ${targetQuote?.nome || ""} ${targetQuote?.cognome || ""}? L'azione non può essere annullata.`,
+      confirmText: "Elimina Definitivamente",
+      variant: "danger",
+      icon: "bi-trash-fill",
+      onConfirm: () => {
+        closeConfirmModal();
+        executeDeleteQuote(id);
+      },
+    });
   };
 
   const openDetail = async (quote) => {
@@ -928,55 +972,17 @@ function AdminQuotes() {
         </div>
       )}
 
-      {/* Modale Conferma Eliminazione */}
-      {deleteConfirmId && (
-        <div
-          className="modal fade show d-block"
-          tabIndex={-1}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="deleteConfirmModalTitle"
-          onClick={() => setDeleteConfirmId(null)}
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-          <div
-            className="modal-dialog modal-dialog-centered"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-content shadow-lg">
-              <div className="modal-header bg-danger text-white">
-                <h5 className="modal-title font-heading fw-bold" id="deleteConfirmModalTitle">
-                  <i className="bi bi-exclamation-triangle-fill me-2"></i> Conferma Eliminazione
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close btn-close-white"
-                  onClick={() => setDeleteConfirmId(null)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                Sei sicuro di voler eliminare definitivamente questa richiesta di preventivo? L'azione non può essere annullata.
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary btn-sm"
-                  onClick={() => setDeleteConfirmId(null)}
-                >
-                  Annulla
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger btn-sm fw-bold"
-                  onClick={() => handleDeleteQuote(deleteConfirmId)}
-                >
-                  Elimina Definitivamente
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modale Custom di Conferma / Avviso Admin */}
+      <AdminConfirmModal
+        isOpen={confirmModalConfig.isOpen}
+        title={confirmModalConfig.title}
+        message={confirmModalConfig.message}
+        confirmText={confirmModalConfig.confirmText}
+        variant={confirmModalConfig.variant}
+        icon={confirmModalConfig.icon}
+        onConfirm={confirmModalConfig.onConfirm}
+        onCancel={closeConfirmModal}
+      />
 
       {/* Modale Scelta Calendario (Google, Apple iCal, Outlook) */}
       {calendarQuote && (

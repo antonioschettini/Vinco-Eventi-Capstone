@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 import { authApiFetch } from "../utils/apiClient";
-import { logout } from "../redux/slices/authSlice";
 import { setGlobalError } from "../redux/slices/uiSlice";
+import AdminConfirmModal from "../components/Admin/AdminConfirmModal";
 import "./AdminAccounting.css";
 
 const MONTH_NAMES = [
@@ -16,7 +16,6 @@ const WEEKDAY_NAMES = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
 
 export default function AdminAccounting() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
 
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -25,7 +24,19 @@ export default function AdminAccounting() {
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [report, setReport] = useState({
+
+  // Report Finanziario Annuale (1 Gennaio - 31 Dicembre dell'anno selezionato)
+  const [annualReport, setAnnualReport] = useState({
+    totaleLordo: 0,
+    totaleSpese: 0,
+    totaleNetto: 0,
+    stimaTasse: 0,
+    nettoPostTasse: 0,
+    numeroEventi: 0
+  });
+
+  // Report Finanziario Mensile (per il mese selezionato)
+  const [monthlyReport, setMonthlyReport] = useState({
     totaleLordo: 0,
     totaleSpese: 0,
     totaleNetto: 0,
@@ -62,31 +73,59 @@ export default function AdminAccounting() {
   const [speseList, setSpeseList] = useState([]);
   const [uploadingPdf, setUploadingPdf] = useState(false);
 
+  // Stato per il Modale Custom di Conferma Admin
+  const [confirmModalConfig, setConfirmModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    confirmText: "Conferma",
+    variant: "danger",
+    icon: "bi-trash-fill",
+    onConfirm: null,
+  });
+
+  const closeConfirmModal = () => {
+    setConfirmModalConfig((prev) => ({ ...prev, isOpen: false }));
+  };
+
   const fetchEventsAndReport = useCallback(async () => {
     if (!token) return;
     setLoading(true);
     try {
       let urlEvents = `${API_BASE_URL}/api/admin/agenda?year=${currentYear}`;
-      let urlReport = `${API_BASE_URL}/api/admin/agenda/report?year=${currentYear}`;
       if (selectedMonth !== 0) {
         urlEvents += `&month=${selectedMonth}`;
-        urlReport += `&month=${selectedMonth}`;
       }
 
-      const [eventsData, reportData] = await Promise.all([
+      const urlAnnualReport = `${API_BASE_URL}/api/admin/agenda/report?year=${currentYear}`;
+      const promises = [
         authApiFetch(urlEvents, {}, token, dispatch),
-        authApiFetch(urlReport, {}, token, dispatch)
-      ]);
+        authApiFetch(urlAnnualReport, {}, token, dispatch)
+      ];
 
-      setEvents(eventsData || []);
-      setReport(reportData || {
+      if (selectedMonth !== 0) {
+        const urlMonthlyReport = `${API_BASE_URL}/api/admin/agenda/report?year=${currentYear}&month=${selectedMonth}`;
+        promises.push(authApiFetch(urlMonthlyReport, {}, token, dispatch));
+      }
+
+      const results = await Promise.all(promises);
+
+      setEvents(results[0] || []);
+      const annualData = results[1] || {
         totaleLordo: 0,
         totaleSpese: 0,
         totaleNetto: 0,
         stimaTasse: 0,
         nettoPostTasse: 0,
         numeroEventi: 0
-      });
+      };
+      setAnnualReport(annualData);
+
+      if (selectedMonth !== 0 && results[2]) {
+        setMonthlyReport(results[2]);
+      } else {
+        setMonthlyReport(annualData);
+      }
     } catch (err) {
       dispatch(setGlobalError({ message: err.message || "Impossibile caricare i dati dell'agenda", type: "danger" }));
     } finally {
@@ -97,11 +136,6 @@ export default function AdminAccounting() {
   useEffect(() => {
     fetchEventsAndReport();
   }, [fetchEventsAndReport]);
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/admin-enzo");
-  };
 
   // Apertura modale per NUOVO evento
   const handleOpenNewModal = (defaultDate = "") => {
@@ -170,14 +204,13 @@ export default function AdminAccounting() {
       if (item.id === id) {
         return {
           ...item,
-          [field]: field === "importo" ? (parseFloat(value) || 0) : value
+          [field]: field === "importo" ? (value === "" ? 0 : parseFloat(value) || 0) : value
         };
       }
       return item;
     });
     setSpeseList(updated);
 
-    // Calcola e aggiorna automaticamente il totale spese nel form
     const sumSpese = updated.reduce((acc, curr) => acc + (parseFloat(curr.importo) || 0), 0);
     setFormData((prev) => ({ ...prev, totaleSpese: sumSpese }));
   };
@@ -225,9 +258,8 @@ export default function AdminAccounting() {
     }
   };
 
-  // Elimina evento
-  const handleDeleteEvent = async (eventId) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo evento dall'Agenda Contabile?")) return;
+  // Esecuzione eliminazione evento dopo conferma modale
+  const executeDeleteEvent = async (eventId) => {
     try {
       await authApiFetch(
         `${API_BASE_URL}/api/admin/agenda/${eventId}`,
@@ -243,12 +275,36 @@ export default function AdminAccounting() {
     }
   };
 
+  const handleDeleteEvent = (eventId) => {
+    setConfirmModalConfig({
+      isOpen: true,
+      title: "Elimina Evento Contabile",
+      message: "Sei sicuro di voler eliminare questo evento dall'Agenda Contabile? L'azione non può essere annullata.",
+      confirmText: "Elimina Evento",
+      variant: "danger",
+      icon: "bi-trash-fill",
+      onConfirm: () => {
+        closeConfirmModal();
+        executeDeleteEvent(eventId);
+      },
+    });
+  };
+
   // Upload Contratto PDF
   const handleUploadContract = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     if (!editingEvent?.id) {
-      alert("Salva prima l'evento per poter allegare il contratto PDF.");
+      setConfirmModalConfig({
+        isOpen: true,
+        title: "Salvataggio Evento Richiesto",
+        message: "Devi prima salvare l'evento per poter allegare il relativo contratto PDF.",
+        confirmText: "Ho Capito",
+        variant: "info",
+        icon: "bi-info-circle-fill",
+        onConfirm: () => closeConfirmModal(),
+      });
       return;
     }
 
@@ -276,9 +332,8 @@ export default function AdminAccounting() {
     }
   };
 
-  // Eliminazione Contratto PDF
-  const handleDeleteContract = async () => {
-    if (!window.confirm("Vuoi rimuovere il contratto PDF allegato?")) return;
+  // Esecuzione rimozione contratto PDF dopo conferma modale
+  const executeDeleteContract = async () => {
     try {
       const updatedEvent = await authApiFetch(
         `${API_BASE_URL}/api/admin/agenda/${editingEvent.id}/contratto`,
@@ -294,27 +349,39 @@ export default function AdminAccounting() {
     }
   };
 
+  const handleDeleteContract = () => {
+    setConfirmModalConfig({
+      isOpen: true,
+      title: "Rimuovi Contratto PDF",
+      message: "Sei sicuro di voler rimuovere il contratto PDF allegato a questo evento?",
+      confirmText: "Rimuovi PDF",
+      variant: "warning",
+      icon: "bi-file-earmark-x-fill",
+      onConfirm: () => {
+        closeConfirmModal();
+        executeDeleteContract();
+      },
+    });
+  };
+
   // Costruzione griglia calendario mensile
   const renderCalendarDays = () => {
     const monthIndex = selectedMonth === 0 ? 0 : selectedMonth - 1;
     const firstDayOfMonth = new Date(currentYear, monthIndex, 1);
     const lastDayOfMonth = new Date(currentYear, monthIndex + 1, 0);
 
-    // Giorno della settimana del 1° del mese (0 = Domenica -> convertito in 0 = Lunedì)
     let startDayOfWeek = firstDayOfMonth.getDay() - 1;
     if (startDayOfWeek === -1) startDayOfWeek = 6;
 
     const daysInMonth = lastDayOfMonth.getDate();
     const cells = [];
 
-    // Celle vuote mese precedente
     for (let i = 0; i < startDayOfWeek; i++) {
       cells.push(
         <div key={`empty-${i}`} className="calendar-day-cell other-month"></div>
       );
     }
 
-    // Celle del mese selezionato
     const todayStr = new Date().toISOString().split("T")[0];
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -343,7 +410,14 @@ export default function AdminAccounting() {
                 }}
                 title={`${ev.titolo} - Lordo: €${ev.importoLordo}`}
               >
-                <div className="text-truncate">{ev.titolo}</div>
+                <div className="event-chip-header">
+                  <span className="event-chip-title">{ev.titolo}</span>
+                  {ev.contrattoUrl ? (
+                    <i className="bi bi-check-circle-fill contract-badge-icon ok" title="Contratto allegato"></i>
+                  ) : (
+                    <i className="bi bi-exclamation-triangle-fill contract-badge-icon missing" title="Contratto mancante!"></i>
+                  )}
+                </div>
                 <span className="event-chip-amount">€ {ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
               </div>
             ))}
@@ -355,35 +429,33 @@ export default function AdminAccounting() {
     return cells;
   };
 
-  // Calcoli finanziari flessibili (Percentuale % oppure Importo Fissato €)
-  const lordoTot = report?.totaleLordo || 0;
-  const speseTot = report?.totaleSpese || 0;
-  const nettoOp = lordoTot - speseTot;
+  // Calcoli finanziari annuali (1 Gennaio - 31 Dicembre currentYear)
+  const lordoTotAnno = annualReport?.totaleLordo || 0;
+  const speseTotAnno = annualReport?.totaleSpese || 0;
+  const nettoOpAnno = lordoTotAnno - speseTotAnno;
 
-  let tasseCalcolate = 0;
+  let tasseCalcolateAnno = 0;
   if (taxMode === "percent") {
-    tasseCalcolate = (nettoOp * (parseFloat(taxPercent) || 0)) / 100;
+    tasseCalcolateAnno = (nettoOpAnno * (parseFloat(taxPercent) || 0)) / 100;
   } else {
-    tasseCalcolate = parseFloat(taxManualAmount) || 0;
+    tasseCalcolateAnno = parseFloat(taxManualAmount) || 0;
   }
 
-  const nettoPostTasse = nettoOp - tasseCalcolate;
+  const nettoPostTasseAnno = nettoOpAnno - tasseCalcolateAnno;
+
+  // Calcoli finanziari mensili
+  const lordoTotMese = monthlyReport?.totaleLordo || 0;
+  const speseTotMese = monthlyReport?.totaleSpese || 0;
+  const nettoOpMese = lordoTotMese - speseTotMese;
 
   return (
     <div className="admin-accounting-page container">
       {/* Intestazione Dashboard & Navigazione Tab */}
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-        <div>
-          <span className="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-2 rounded-pill mb-2">
-            VINCO EVENTI • AREA GESTIONALE
-          </span>
-          <h1 className="h2 fw-bold mb-0">Agenda Contabile & Eventi</h1>
-        </div>
-        <div className="d-flex align-items-center gap-2">
-          <button onClick={handleLogout} className="btn btn-outline-danger btn-sm rounded-pill px-3">
-            <i className="bi bi-box-arrow-right me-1"></i> Esci
-          </button>
-        </div>
+      <div className="mb-4">
+        <span className="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-2 rounded-pill mb-2">
+          VINCO EVENTI • AREA GESTIONALE
+        </span>
+        <h1 className="h2 fw-bold mb-0">Agenda Contabile & Eventi</h1>
       </div>
 
       {/* Sub-Navigazione per passare tra Preventivi e Agenda */}
@@ -461,7 +533,7 @@ export default function AdminAccounting() {
         </div>
       </div>
 
-      {/* KPI Report Finanziario */}
+      {/* KPI Report Finanziario Generale ANNUALE (1 Gennaio - 31 Dicembre) */}
       <div className="row g-3 mb-4">
         <div className="col-12 col-sm-6 col-lg-3">
           <div className="financial-kpi-card kpi-lordo">
@@ -469,8 +541,8 @@ export default function AdminAccounting() {
               <i className="bi bi-cash-stack"></i>
             </div>
             <div>
-              <span className="text-secondary small fw-bold text-uppercase d-block">Totale Lordo</span>
-              <span className="h4 fw-bold mb-0">€ {lordoTot.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
+              <span className="text-secondary small fw-bold text-uppercase d-block">Totale Lordo Anno {currentYear}</span>
+              <span className="h4 fw-bold mb-0">€ {lordoTotAnno.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
         </div>
@@ -481,8 +553,8 @@ export default function AdminAccounting() {
               <i className="bi bi-receipt-cutoff"></i>
             </div>
             <div>
-              <span className="text-secondary small fw-bold text-uppercase d-block">Spese Collaboratori</span>
-              <span className="h4 fw-bold mb-0 text-danger">- € {speseTot.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
+              <span className="text-secondary small fw-bold text-uppercase d-block">Spese Anno {currentYear}</span>
+              <span className="h4 fw-bold mb-0 text-danger">- € {speseTotAnno.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
         </div>
@@ -493,74 +565,75 @@ export default function AdminAccounting() {
               <i className="bi bi-wallet2"></i>
             </div>
             <div>
-              <span className="text-secondary small fw-bold text-uppercase d-block">Netto Operativo</span>
-              <span className="h4 fw-bold mb-0 text-primary">€ {nettoOp.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
+              <span className="text-secondary small fw-bold text-uppercase d-block">Netto Operativo Anno {currentYear}</span>
+              <span className="h4 fw-bold mb-0 text-primary">€ {nettoOpAnno.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
         </div>
 
+        {/* Card Netto Post-Tasse Anno */}
         <div className="col-12 col-sm-6 col-lg-3">
           <div className="financial-kpi-card kpi-tasse">
             <div className="financial-kpi-icon">
               <i className="bi bi-piggy-bank"></i>
             </div>
-            <div className="w-100">
+            <div className="w-100 overflow-hidden">
               <div className="d-flex justify-content-between align-items-center mb-1">
-                <span className="text-secondary small fw-bold text-uppercase">Netto Post-Tasse</span>
+                <span className="text-secondary small fw-bold text-uppercase me-1 text-truncate">Netto Post-Tasse Anno</span>
                 
-                {/* Switcher Modalità Tasse: Percentuale % vs Cifra Esatta € */}
-                <div className="btn-group btn-group-xs">
+                {/* Switcher Modalità Tasse % vs € */}
+                <div className="btn-group btn-group-xs flex-shrink-0">
                   <button
                     type="button"
-                    className={`btn btn-xs px-2 py-0 fw-bold ${taxMode === "percent" ? "btn-warning text-dark" : "btn-outline-secondary"}`}
+                    className={`btn ${taxMode === "percent" ? "btn-warning text-dark font-monospace" : "btn-outline-secondary font-monospace"}`}
                     onClick={() => setTaxMode("percent")}
-                    title="Imposta % Tasse"
+                    title="Calcolo in Percentuale %"
                   >
                     %
                   </button>
                   <button
                     type="button"
-                    className={`btn btn-xs px-2 py-0 fw-bold ${taxMode === "manual" ? "btn-warning text-dark" : "btn-outline-secondary"}`}
+                    className={`btn ${taxMode === "manual" ? "btn-warning text-dark font-monospace" : "btn-outline-secondary font-monospace"}`}
                     onClick={() => setTaxMode("manual")}
-                    title="Imposta € Importo Fissato Tasse"
+                    title="Calcolo in Importo Fisso €"
                   >
                     €
                   </button>
                 </div>
               </div>
 
-              <div className="d-flex align-items-center gap-1 mb-1">
+              <div className="h4 fw-bold mb-1 text-success text-truncate">
+                € {nettoPostTasseAnno.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+              </div>
+
+              <div className="d-flex align-items-center gap-1">
+                <span className="text-muted small">Tasse:</span>
                 {taxMode === "percent" ? (
-                  <div className="d-flex align-items-center gap-1 bg-warning bg-opacity-10 text-dark px-2 py-1 rounded">
-                    <span className="small fw-bold">Tasse:</span>
+                  <div className="input-group input-group-sm" style={{ maxWidth: "100px" }}>
                     <input
                       type="number"
-                      step="0.5"
-                      className="border-0 bg-transparent fw-bold text-dark text-end font-monospace"
-                      style={{ width: "45px" }}
+                      step="1"
+                      className="form-control form-control-sm text-end font-monospace fw-bold px-1 py-0"
                       value={taxPercent}
-                      onChange={(e) => setTaxPercent(e.target.value)}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => setTaxPercent(e.target.value === "" ? 0 : parseFloat(e.target.value) || 0)}
                     />
-                    <span className="small fw-bold">%</span>
+                    <span className="input-group-text px-1 py-0 font-monospace">%</span>
                   </div>
                 ) : (
-                  <div className="d-flex align-items-center gap-1 bg-warning bg-opacity-10 text-dark px-2 py-1 rounded">
-                    <span className="small fw-bold">€ Tasse:</span>
+                  <div className="input-group input-group-sm" style={{ maxWidth: "115px" }}>
+                    <span className="input-group-text px-1 py-0 font-monospace">€</span>
                     <input
                       type="number"
                       step="10"
-                      className="border-0 bg-transparent fw-bold text-dark text-end font-monospace"
-                      style={{ width: "70px" }}
+                      className="form-control form-control-sm text-end font-monospace fw-bold px-1 py-0"
                       value={taxManualAmount}
-                      onChange={(e) => setTaxManualAmount(e.target.value)}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => setTaxManualAmount(e.target.value === "" ? 0 : parseFloat(e.target.value) || 0)}
                     />
                   </div>
                 )}
               </div>
-
-              <span className="h4 fw-bold mb-0 text-success d-block">
-                € {nettoPostTasse.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
-              </span>
             </div>
           </div>
         </div>
@@ -569,12 +642,22 @@ export default function AdminAccounting() {
       {/* VISTA CALENDARIO */}
       {viewMode === "calendar" && (
         <div className="calendar-container">
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h5 className="fw-bold mb-0 text-success">
-              <i className="bi bi-calendar-event me-2"></i>
-              {selectedMonth === 0 ? `Anno ${currentYear} (Seleziona un mese per la griglia dettagliata)` : `${MONTH_NAMES[selectedMonth - 1]} ${currentYear}`}
-            </h5>
-            <span className="badge bg-secondary bg-opacity-10 text-secondary">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+            <div className="d-flex flex-wrap align-items-center gap-2">
+              <h5 className="fw-bold mb-0 text-success d-flex align-items-center">
+                <i className="bi bi-calendar-event me-2"></i>
+                {selectedMonth === 0 ? `Anno ${currentYear}` : `${MONTH_NAMES[selectedMonth - 1]} ${currentYear}`}
+              </h5>
+              
+              {/* Riepilogo Finanziario Mensile in piccolo accanto al nome del mese */}
+              {selectedMonth !== 0 && (
+                <span className="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 rounded-pill font-monospace small">
+                  Mese: Lordo €{lordoTotMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })} • Spese -€{speseTotMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })} • Netto €{nettoOpMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+                </span>
+              )}
+            </div>
+
+            <span className="badge bg-secondary bg-opacity-10 text-secondary align-self-start align-self-md-auto">
               {events.length} eventi in programma
             </span>
           </div>
@@ -605,6 +688,17 @@ export default function AdminAccounting() {
       {/* VISTA TABELLA EXCEL */}
       {viewMode === "table" && (
         <div className="excel-table-card">
+          <div className="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+            <h6 className="fw-bold text-secondary mb-0">
+              <i className="bi bi-table me-2"></i>
+              {selectedMonth === 0 ? `Elenco Completo Anno ${currentYear}` : `Elenco Eventi ${MONTH_NAMES[selectedMonth - 1]} ${currentYear}`}
+            </h6>
+            {selectedMonth !== 0 && (
+              <span className="badge bg-success bg-opacity-10 text-success font-monospace">
+                Netto Mese: € {nettoOpMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+              </span>
+            )}
+          </div>
           <div className="table-responsive">
             <table className="table excel-table align-middle">
               <thead>
@@ -663,12 +757,15 @@ export default function AdminAccounting() {
                             href={ev.contrattoUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn btn-sm btn-outline-success rounded-pill px-2 py-0"
+                            className="badge bg-success text-white border-0 px-2 py-1 text-decoration-none"
+                            title="Apri il contratto PDF"
                           >
-                            <i className="bi bi-file-earmark-pdf me-1"></i> Visualizza
+                            <i className="bi bi-check-circle-fill me-1"></i> Allegato
                           </a>
                         ) : (
-                          <span className="text-muted small">Nessuno</span>
+                          <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">
+                            <i className="bi bi-exclamation-triangle-fill me-1"></i> Mancante
+                          </span>
                         )}
                       </td>
                       <td className="text-end">
@@ -806,8 +903,13 @@ export default function AdminAccounting() {
                           type="number"
                           step="0.01"
                           className="form-control form-control-lg fw-bold text-success"
-                          value={formData.importoLordo}
-                          onChange={(e) => setFormData({ ...formData, importoLordo: e.target.value })}
+                          value={formData.importoLordo === 0 || formData.importoLordo === "0" ? "" : formData.importoLordo}
+                          placeholder="0.00"
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setFormData({ ...formData, importoLordo: val === "" ? 0 : val });
+                          }}
                         />
                       </div>
                     </div>
@@ -878,7 +980,9 @@ export default function AdminAccounting() {
                                     type="number"
                                     step="0.01"
                                     className="form-control form-control-sm border-0 text-end fw-bold text-danger"
-                                    value={item.importo}
+                                    value={item.importo === 0 || item.importo === "0" ? "" : item.importo}
+                                    placeholder="0.00"
+                                    onFocus={(e) => e.target.select()}
                                     onChange={(e) => handleUpdateSpesaRow(item.id, "importo", e.target.value)}
                                   />
                                 </td>
@@ -988,6 +1092,18 @@ export default function AdminAccounting() {
           </div>
         </div>
       )}
+
+      {/* Modale Custom di Conferma / Avviso Admin */}
+      <AdminConfirmModal
+        isOpen={confirmModalConfig.isOpen}
+        title={confirmModalConfig.title}
+        message={confirmModalConfig.message}
+        confirmText={confirmModalConfig.confirmText}
+        variant={confirmModalConfig.variant}
+        icon={confirmModalConfig.icon}
+        onConfirm={confirmModalConfig.onConfirm}
+        onCancel={closeConfirmModal}
+      />
     </div>
   );
 }
