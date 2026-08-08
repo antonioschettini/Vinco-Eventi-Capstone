@@ -160,11 +160,13 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 }
 
 [data-bs-theme="light"] .hero-bio-overlay {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(240, 245, 242, 0.75) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 245, 242, 0.85) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* Al passaggio del mouse sullo sfondo (hover), viene ripristinato il colore nativo dell'immagine */
-.hero-bio-section:hover .hero-bio-overlay {
+/* Al passaggio del mouse sullo sfondo (hover) in Dark Mode */
+[data-bs-theme="dark"] .hero-bio-section:hover .hero-bio-overlay {
   opacity: 0.85;
   background: radial-gradient(
     ellipse at center,
@@ -193,13 +195,21 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 }
 
 [data-bs-theme="light"] .hero-bio-card {
-  background-color: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(32, 74, 53, 0.15);
-  box-shadow: 0 20px 40px rgba(32, 74, 53, 0.08);
+  background-color: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(32, 74, 53, 0.22);
+  box-shadow: 0 20px 40px rgba(32, 74, 53, 0.12);
 }
 
-/* Effetto al passaggio del mouse sulla Hero Section */
-.hero-bio-section:hover .hero-bio-card {
+[data-bs-theme="light"] .hero-bio-card h1 {
+  color: var(--primary-forest, #204a35) !important;
+}
+
+[data-bs-theme="light"] .hero-bio-card p {
+  color: #23382c !important;
+}
+
+/* Effetto al passaggio del mouse sulla Hero Section in Dark Mode */
+[data-bs-theme="dark"] .hero-bio-section:hover .hero-bio-card {
   background-color: rgba(10, 15, 12, 0.65) !important;
   border-color: rgba(255, 255, 255, 0.25) !important;
   backdrop-filter: blur(10px);
@@ -207,8 +217,8 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
 }
 
-.hero-bio-section:hover .hero-bio-card h1,
-.hero-bio-section:hover .hero-bio-card p {
+[data-bs-theme="dark"] .hero-bio-section:hover .hero-bio-card h1,
+[data-bs-theme="dark"] .hero-bio-section:hover .hero-bio-card p {
   color: #ffffff !important;
   text-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.95),
@@ -252,25 +262,17 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 }
 
 [data-bs-theme="light"] .hero-gallery-overlay {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(240, 245, 242, 0.70) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 245, 242, 0.85) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.hero-gallery-section:hover .hero-gallery-overlay,
-.hero-bio-section:hover .hero-bio-overlay {
+[data-bs-theme="dark"] .hero-gallery-section:hover .hero-gallery-overlay {
   opacity: 0.85;
   background: radial-gradient(
     ellipse at center,
     rgba(12, 18, 14, 0.65) 0%,
     rgba(8, 12, 10, 0.30) 60%,
-    rgba(0, 0, 0, 0.05) 100%
-  ) !important;
-}
-
-[data-bs-theme="light"] .hero-gallery-section:hover .hero-gallery-overlay {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0.60) 0%,
-    rgba(0, 0, 0, 0.25) 60%,
     rgba(0, 0, 0, 0.05) 100%
   ) !important;
 }
@@ -292,9 +294,9 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 }
 
 [data-bs-theme="light"] .hero-gallery-content {
-  background: rgba(255, 255, 255, 0.68);
-  border: 1px solid rgba(32, 74, 53, 0.18);
-  box-shadow: 0 16px 40px rgba(32, 74, 53, 0.1);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(32, 74, 53, 0.22);
+  box-shadow: 0 16px 40px rgba(32, 74, 53, 0.12);
 }
 
 .hero-gallery-section:hover .hero-gallery-content {
@@ -307,13 +309,32 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   transition: color 0.4s ease, text-shadow 0.4s ease, transform 0.4s ease;
 }
 
+[data-bs-theme="light"] .hero-gallery-title {
+  color: var(--primary-forest, #204a35) !important;
+}
+
+[data-bs-theme="dark"] .hero-gallery-title {
+  color: #ffffff !important;
+}
+
 .hero-gallery-subtitle {
   transition: color 0.4s ease, text-shadow 0.4s ease, transform 0.4s ease;
 }
 
-.hero-gallery-section:hover .hero-gallery-title,
-.hero-gallery-section:hover .hero-gallery-subtitle,
-.hero-gallery-section:hover .hero-gallery-subtitle p {
+[data-bs-theme="light"] .hero-gallery-subtitle,
+[data-bs-theme="light"] .hero-gallery-subtitle p {
+  color: #23382c !important;
+  font-weight: 500;
+}
+
+[data-bs-theme="dark"] .hero-gallery-subtitle,
+[data-bs-theme="dark"] .hero-gallery-subtitle p {
+  color: var(--dark-text, #e4ece7);
+}
+
+[data-bs-theme="dark"] .hero-gallery-section:hover .hero-gallery-title,
+[data-bs-theme="dark"] .hero-gallery-section:hover .hero-gallery-subtitle,
+[data-bs-theme="dark"] .hero-gallery-section:hover .hero-gallery-subtitle p {
   color: #ffffff !important;
   text-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.95),
@@ -322,7 +343,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
     0 0 50px rgba(0, 0, 0, 0.5);
 }
 
-/* Su mobile e touch screen, illuminazione dinamica durante lo scroll (is-in-view) senza richiedere l'hover */
+/* Su mobile e touch screen, illuminazione dinamica durante lo scroll (is-in-view) */
 @media (hover: none), (max-width: 991.98px) {
   .hero-gallery-overlay,
   .hero-bio-overlay {
@@ -330,8 +351,8 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
     transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.6s ease;
   }
 
-  .hero-gallery-section.is-in-view .hero-gallery-overlay,
-  .hero-bio-section.is-in-view .hero-bio-overlay {
+  [data-bs-theme="dark"] .hero-gallery-section.is-in-view .hero-gallery-overlay,
+  [data-bs-theme="dark"] .hero-bio-section.is-in-view .hero-bio-overlay {
     opacity: 0.85;
     background: radial-gradient(
       ellipse at center,
@@ -341,20 +362,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
     ) !important;
   }
 
-  [data-bs-theme="light"] .hero-gallery-section.is-in-view .hero-gallery-overlay {
-    background: radial-gradient(
-      ellipse at center,
-      rgba(0, 0, 0, 0.55) 0%,
-      rgba(0, 0, 0, 0.20) 60%,
-      rgba(0, 0, 0, 0.05) 100%
-    ) !important;
-  }
-
-  .hero-gallery-section.is-in-view .hero-gallery-title,
-  .hero-gallery-section.is-in-view .hero-gallery-subtitle,
-  .hero-gallery-section.is-in-view .hero-gallery-subtitle p,
-  .hero-bio-section.is-in-view .hero-bio-card h1,
-  .hero-bio-section.is-in-view .hero-bio-card p {
+  [data-bs-theme="dark"] .hero-gallery-section.is-in-view .hero-gallery-title,
+  [data-bs-theme="dark"] .hero-gallery-section.is-in-view .hero-gallery-subtitle,
+  [data-bs-theme="dark"] .hero-gallery-section.is-in-view .hero-gallery-subtitle p,
+  [data-bs-theme="dark"] .hero-bio-section.is-in-view .hero-bio-card h1,
+  [data-bs-theme="dark"] .hero-bio-section.is-in-view .hero-bio-card p {
     color: #ffffff !important;
     text-shadow: 
       0 2px 4px rgba(0, 0, 0, 0.95),

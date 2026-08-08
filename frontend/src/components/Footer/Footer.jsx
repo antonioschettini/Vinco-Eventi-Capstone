@@ -5,10 +5,7 @@ const footerBgImage = "https://res.cloudinary.com/ytjdxerb/image/upload/c_crop,g
 import "./Footer.css";
 
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
-import useScrollReveal from "../../utils/useScrollReveal";
-
 function Footer() {
-  useScrollReveal(".footer-section");
   const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].footer;

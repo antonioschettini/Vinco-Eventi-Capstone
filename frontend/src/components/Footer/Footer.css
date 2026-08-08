@@ -1,4 +1,4 @@
-/* Footer Styling */
+/* Footer Styling - Clean, High Contrast & Responsive across Light and Dark Themes */
 .footer-section {
   width: 100%;
   position: relative;
@@ -6,10 +6,10 @@
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
-  transition: background-position 0.5s ease, background-color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Footer Overlay (stessa logica di hero-gallery-overlay) */
+/* Footer Overlay */
 .footer-overlay {
   position: absolute;
   top: 0;
@@ -17,43 +17,30 @@
   width: 100%;
   height: 100%;
   z-index: 1;
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.6s ease;
+  transition: background 0.4s ease;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 [data-bs-theme="dark"] .footer-overlay {
-  background: linear-gradient(135deg, rgba(12, 18, 14, 0.85) 0%, rgba(8, 12, 10, 0.72) 100%);
+  background: linear-gradient(135deg, rgba(12, 18, 14, 0.90) 0%, rgba(8, 12, 10, 0.82) 100%);
 }
 
 [data-bs-theme="light"] .footer-overlay {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(240, 245, 242, 0.70) 100%);
-}
-
-/* Desktop Hover per Footer */
-@media (hover: hover) and (pointer: fine) {
-  .footer-section:hover .footer-overlay {
-    opacity: 0.08;
-  }
-}
-
-/* Dispositivi Touch & Mobile: Illuminazione dinamica allo scroll (is-in-view) */
-@media (hover: none), (max-width: 991.98px) {
-  .footer-section.is-in-view .footer-overlay {
-    opacity: 0.18 !important;
-  }
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 245, 242, 0.90) 100%);
 }
 
 .footer-content {
   position: relative;
   z-index: 2;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-bs-theme="dark"] .footer-section {
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 [data-bs-theme="light"] .footer-section {
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(32, 74, 53, 0.12);
 }
 
 /* Titolo Footer */
@@ -61,7 +48,7 @@
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  transition: color 0.4s ease, text-shadow 0.4s ease;
+  transition: color 0.3s ease;
 }
 
 [data-bs-theme="dark"] .footer-title {
@@ -69,71 +56,46 @@
 }
 
 [data-bs-theme="light"] .footer-title {
-  color: #1e2022;
+  color: var(--primary-forest, #204a35);
 }
 
 /* Dati Aziendali */
 .company-info {
   font-size: 0.95rem;
-  color: var(--bs-secondary-color);
-  transition: color 0.4s ease, text-shadow 0.4s ease;
+  transition: color 0.3s ease;
 }
 
-.company-info p,
-.company-info a {
-  transition: color 0.4s ease, text-shadow 0.4s ease;
+[data-bs-theme="dark"] .company-info {
+  color: var(--dark-text, #e4ece7);
+}
+
+[data-bs-theme="light"] .company-info {
+  color: var(--light-text, #1c2b22);
 }
 
 .text-forest {
-  color: #2b593f; /* Verde bosco */
-  transition: color 0.4s ease, text-shadow 0.4s ease;
+  color: #204a35; /* Verde bosco */
+  transition: color 0.3s ease;
 }
 
 [data-bs-theme="dark"] .text-forest {
-  color: #3b7a57;
+  color: #58bc82;
 }
 
 .info-link {
   color: inherit;
   text-decoration: none;
   cursor: pointer;
-  transition: color 0.2s ease, text-decoration-color 0.2s ease, text-shadow 0.4s ease;
-}
-
-.company-info p:has(.info-link) i {
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
 .info-link:hover {
-  color: #2b593f;
+  color: var(--primary-forest, #204a35);
   text-decoration: underline;
 }
 
-.company-info p:has(.info-link:hover) i {
-  color: #2b593f !important;
-}
-
 [data-bs-theme="dark"] .info-link:hover {
-  color: #3b7a57;
-}
-
-[data-bs-theme="dark"] .company-info p:has(.info-link:hover) i {
-  color: #3b7a57 !important;
-}
-
-/* Effetto Hover Sezione Footer (Stessa Logica delle Hero Sections) */
-.footer-section:hover .footer-title,
-.footer-section:hover .company-info,
-.footer-section:hover .company-info p,
-.footer-section:hover .company-info a,
-.footer-section:hover .copyright p {
-  color: #ffffff !important;
-  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.95);
-}
-
-.footer-section:hover .text-forest {
-  color: #52c285 !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  color: #58bc82;
 }
 
 /* Pulsanti Social Rotondi ed Eleganti */
@@ -141,9 +103,6 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 1px solid rgba(128, 128, 128, 0.3);
-  background-color: transparent;
-  color: var(--bs-secondary-color);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -156,10 +115,16 @@
               box-shadow 0.3s ease;
 }
 
-.footer-section:hover .social-btn {
-  border-color: rgba(255, 255, 255, 0.5);
-  color: #ffffff;
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+[data-bs-theme="dark"] .social-btn {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--dark-text, #e4ece7);
+}
+
+[data-bs-theme="light"] .social-btn {
+  border: 1px solid rgba(32, 74, 53, 0.25);
+  background-color: rgba(32, 74, 53, 0.04);
+  color: var(--primary-forest, #204a35);
 }
 
 /* Transizione specifica per l'icona SVG Mixcloud */
@@ -172,7 +137,7 @@
   transform: translateY(-4px);
   color: #ffffff !important;
   border-color: transparent !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
 /* Colori specifici al passaggio del mouse */
@@ -215,6 +180,11 @@
   letter-spacing: 0.05em;
 }
 
-.copyright p {
-  transition: color 0.4s ease, text-shadow 0.4s ease;
+[data-bs-theme="dark"] .copyright p {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-bs-theme="light"] .copyright p {
+  color: #2c3e35 !important;
+  font-weight: 500;
 }

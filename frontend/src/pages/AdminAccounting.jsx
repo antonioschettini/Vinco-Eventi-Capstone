@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 import { authApiFetch } from "../utils/apiClient";
-import { setGlobalError } from "../redux/slices/uiSlice";
+import { setGlobalError, setTaxSettings } from "../redux/slices/uiSlice";
+import { handleEmailClick, handlePhoneClick } from "../utils/contactHelpers";
 import AdminConfirmModal from "../components/Admin/AdminConfirmModal";
 import "./AdminAccounting.css";
 
@@ -31,6 +32,27 @@ const parseItalianNumber = (val) => {
 export default function AdminAccounting() {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
+  const taxSettings = useSelector((state) => state.ui.taxSettings) || {
+    taxMode: "percent",
+    taxPercent: "20",
+    taxManualAmount: "0"
+  };
+
+  const taxMode = taxSettings.taxMode;
+  const taxPercent = taxSettings.taxPercent;
+  const taxManualAmount = taxSettings.taxManualAmount;
+
+  const setTaxMode = (mode) => {
+    dispatch(setTaxSettings({ taxMode: mode }));
+  };
+
+  const setTaxPercent = (percent) => {
+    dispatch(setTaxSettings({ taxPercent: percent }));
+  };
+
+  const setTaxManualAmount = (amount) => {
+    dispatch(setTaxSettings({ taxManualAmount: amount }));
+  };
 
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // 1-12, 0 = tutti
@@ -63,23 +85,6 @@ export default function AdminAccounting() {
     numeroEventi: 0
   });
 
-  // Persistenza configurazione tasse in localStorage
-  const [taxMode, setTaxMode] = useState(() => {
-    return localStorage.getItem("vinco_admin_tax_mode") || "percent";
-  });
-  const [taxPercent, setTaxPercent] = useState(() => {
-    return localStorage.getItem("vinco_admin_tax_percent") || "20";
-  });
-  const [taxManualAmount, setTaxManualAmount] = useState(() => {
-    return localStorage.getItem("vinco_admin_tax_manual") || "0";
-  });
-
-  useEffect(() => {
-    localStorage.setItem("vinco_admin_tax_mode", taxMode);
-    localStorage.setItem("vinco_admin_tax_percent", taxPercent.toString());
-    localStorage.setItem("vinco_admin_tax_manual", taxManualAmount.toString());
-  }, [taxMode, taxPercent, taxManualAmount]);
-
   // Reset pagina al cambio filtri
   useEffect(() => {
     setCurrentPage(1);
@@ -109,6 +114,25 @@ export default function AdminAccounting() {
   // Lista spese collaboratori/fornitori per l'evento correntemente aperto
   const [speseList, setSpeseList] = useState([]);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+
+  // Stato per il Modale Riepilogo Eventi del Giorno
+  const [dayEventsModal, setDayEventsModal] = useState({
+    isOpen: false,
+    dateStr: "",
+    events: [],
+  });
+
+  const handleDayClick = (dateStr, dayEvents) => {
+    if (dayEvents && dayEvents.length > 0) {
+      setDayEventsModal({
+        isOpen: true,
+        dateStr,
+        events: dayEvents,
+      });
+    } else {
+      handleOpenNewModal(dateStr);
+    }
+  };
 
   // Stato per il Modale Custom di Conferma Admin
   const [confirmModalConfig, setConfirmModalConfig] = useState({
@@ -447,7 +471,7 @@ export default function AdminAccounting() {
         <div
           key={`day-${day}`}
           className={`calendar-day-cell ${isToday ? "today" : ""}`}
-          onClick={() => handleOpenNewModal(dateStr)}
+          onClick={() => handleDayClick(dateStr, dayEvents)}
         >
           <div className="day-number">
             <span>
@@ -458,7 +482,7 @@ export default function AdminAccounting() {
                 </span>
               )}
             </span>
-            <i className="bi bi-plus-circle-fill add-event-plus" title="Aggiungi evento"></i>
+            <i className="bi bi-plus-circle-fill add-event-plus" title="Aggiungi evento" onClick={(e) => { e.stopPropagation(); handleOpenNewModal(dateStr); }}></i>
           </div>
           <div className="events-wrapper">
             {dayEvents.map((ev) => {
@@ -472,7 +496,7 @@ export default function AdminAccounting() {
                   className={`event-chip ${ev.isManual ? "manual-event" : ""}`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleOpenEditModal(ev);
+                    handleDayClick(dateStr, dayEvents);
                   }}
                   title={`${ev.titolo} - Client: ${ev.clienteNome || ""} ${ev.clienteCognome || ""} - Location: ${ev.location || ""} - Lordo: €${ev.importoLordo}`}
                 >
@@ -1473,6 +1497,171 @@ export default function AdminAccounting() {
         onConfirm={confirmModalConfig.onConfirm}
         onCancel={closeConfirmModal}
       />
+
+      {/* MODALE RIEPILOGO EVENTI DEL GIORNO */}
+      {dayEventsModal.isOpen && (
+        <div
+          className="modal fade show d-block"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.65)" }}
+          onClick={() => setDayEventsModal({ isOpen: false, dateStr: "", events: [] })}
+        >
+          <div
+            className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+              <div className="modal-header bg-success text-white px-4 py-3">
+                <h5 className="modal-title fw-bold font-heading d-flex align-items-center gap-2 mb-0">
+                  <i className="bi bi-calendar-event-fill fs-4"></i>
+                  Riepilogo Eventi del {dayEventsModal.dateStr ? new Date(dayEventsModal.dateStr + "T00:00:00").toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" }) : ""}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setDayEventsModal({ isOpen: false, dateStr: "", events: [] })}
+                ></button>
+              </div>
+
+              <div className="modal-body p-4">
+                <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                  <span className="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-2 rounded-pill fs-7">
+                    {dayEventsModal.events.length} {dayEventsModal.events.length === 1 ? "evento registrato" : "eventi registrati"} in questa data
+                  </span>
+                  <button
+                    onClick={() => {
+                      const targetDate = dayEventsModal.dateStr;
+                      setDayEventsModal({ isOpen: false, dateStr: "", events: [] });
+                      handleOpenNewModal(targetDate);
+                    }}
+                    className="btn btn-success btn-sm rounded-pill fw-bold d-inline-flex align-items-center gap-1 shadow-sm"
+                  >
+                    <i className="bi bi-plus-lg"></i>
+                    <span>+ Nuovo Evento per Questa Data</span>
+                  </button>
+                </div>
+
+                <div className="d-flex flex-column gap-3">
+                  {dayEventsModal.events.map((ev) => (
+                    <div key={`day-modal-ev-${ev.id}`} className="card border shadow-sm rounded-3 p-3">
+                      <div className="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                          <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
+                            <span className="badge bg-success text-white fw-bold">
+                              {ev.tipoEvento || "Matrimonio"}
+                            </span>
+                            {ev.hasDjSet && (
+                              <span className="badge bg-warning text-dark font-monospace">
+                                <i className="bi bi-disc-fill me-1"></i> DJ Set Enzo
+                              </span>
+                            )}
+                            {ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento && (
+                              <span className="badge bg-info text-white font-monospace">
+                                Multi-Giorno (fino al {ev.dataFineEvento})
+                              </span>
+                            )}
+                          </div>
+                          <h5 className="fw-bold text-dark mb-1">{ev.titolo}</h5>
+                          {(ev.clienteNome || ev.clienteCognome) && (
+                            <p className="mb-1 text-muted small fw-semibold">
+                              <i className="bi bi-person me-1"></i>
+                              {ev.clienteNome} {ev.clienteCognome}
+                            </p>
+                          )}
+                          {ev.location && (
+                            <p className="mb-1 text-muted small">
+                              <i className="bi bi-geo-alt me-1"></i>
+                              {ev.location}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          {ev.contrattoUrl ? (
+                            <span className="badge bg-success text-white px-2 py-1">
+                              <i className="bi bi-check-circle-fill me-1"></i> PDF Ok
+                            </span>
+                          ) : (
+                            <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">
+                              <i className="bi bi-exclamation-triangle-fill me-1"></i> PDF Mancante
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Dettagli contatto rapido */}
+                      {(ev.clienteTelefono || ev.clienteEmail) && (
+                        <div className="d-flex flex-wrap gap-2 mb-3 pt-2 border-top">
+                          {ev.clienteTelefono && (
+                            <a
+                              href={`tel:${ev.clienteTelefono.replace(/[^\d+]/g, "")}`}
+                              onClick={(e) => handlePhoneClick(e, ev.clienteTelefono)}
+                              className="btn btn-outline-success btn-sm py-1 px-2 rounded-pill font-monospace"
+                              style={{ fontSize: "0.8rem" }}
+                            >
+                              <i className="bi bi-telephone-fill me-1"></i> {ev.clienteTelefono}
+                            </a>
+                          )}
+                          {ev.clienteEmail && (
+                            <a
+                              href={`mailto:${ev.clienteEmail}`}
+                              onClick={(e) => handleEmailClick(e, ev.clienteEmail, dispatch)}
+                              className="btn btn-outline-primary btn-sm py-1 px-2 rounded-pill font-monospace"
+                              style={{ fontSize: "0.8rem" }}
+                            >
+                              <i className="bi bi-envelope-fill me-1"></i> {ev.clienteEmail}
+                            </a>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Riepilogo Finanziario & Azioni */}
+                      <div className="d-flex flex-wrap justify-content-between align-items-center pt-2 border-top gap-2 bg-light p-2 rounded">
+                        <div className="d-flex flex-wrap align-items-center gap-3">
+                          <small className="text-muted">Lordo: <strong className="text-dark">€{ev.importoLordo?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
+                          <small className="text-muted">Spese: <strong className="text-danger">-€{ev.totaleSpese?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
+                          <small className="text-muted">Netto: <strong className="text-success">€{ev.totaleNetto?.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</strong></small>
+                        </div>
+                        <div className="btn-group btn-group-sm">
+                          <button
+                            onClick={() => {
+                              setDayEventsModal({ isOpen: false, dateStr: "", events: [] });
+                              handleOpenEditModal(ev);
+                            }}
+                            className="btn btn-success fw-bold d-inline-flex align-items-center gap-1"
+                          >
+                            <i className="bi bi-pencil-square"></i>
+                            <span>Modifica Evento</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setDayEventsModal({ isOpen: false, dateStr: "", events: [] });
+                              handleDeleteEvent(ev.id);
+                            }}
+                            className="btn btn-outline-danger d-inline-flex align-items-center gap-1"
+                          >
+                            <i className="bi bi-trash-fill"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="modal-footer bg-body-tertiary">
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setDayEventsModal({ isOpen: false, dateStr: "", events: [] })}
+                >
+                  Chiudi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

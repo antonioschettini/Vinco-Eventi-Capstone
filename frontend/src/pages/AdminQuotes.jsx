@@ -804,12 +804,12 @@ function AdminQuotes() {
               </div>
               <div className="modal-body p-4">
                 <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-semibold">Nome e Cognome</label>
-                    <p className="fs-5 fw-bold mb-0">{selectedQuote.nome} {selectedQuote.cognome}</p>
+                  <div className="col-12 col-md-6">
+                    <span className="text-muted small fw-semibold d-block mb-1">Nome e Cognome:</span>
+                    <p className="fs-5 fw-bold mb-0 text-dark">{selectedQuote.nome} {selectedQuote.cognome}</p>
                   </div>
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-semibold">Stato Attuale</label>
+                  <div className="col-12 col-md-6">
+                    <span className="text-muted small fw-semibold d-block mb-1">Stato Attuale:</span>
                     <div>
                       {selectedQuote.stato === "PENDING" && <span className="status-badge badge-pending">IN ATTESA</span>}
                       {selectedQuote.stato === "READ" && <span className="status-badge badge-read">LETTO</span>}
@@ -817,8 +817,8 @@ function AdminQuotes() {
                     </div>
                   </div>
 
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-semibold d-block mb-1">Email</label>
+                  <div className="col-12 col-md-6">
+                    <span className="text-muted small fw-semibold d-block mb-1">Email:</span>
                     <p className="mb-0 fw-semibold">
                       <a
                         href={`mailto:${selectedQuote.email}`}
@@ -830,8 +830,8 @@ function AdminQuotes() {
                       </a>
                     </p>
                   </div>
-                  <div className="col-md-6">
-                    <label className="text-muted small fw-semibold d-block mb-1">Telefono</label>
+                  <div className="col-12 col-md-6">
+                    <span className="text-muted small fw-semibold d-block mb-1">Telefono:</span>
                     <p className="mb-0 fw-semibold">
                       {selectedQuote.telefono ? (
                         <a
@@ -850,8 +850,8 @@ function AdminQuotes() {
 
                   <hr className="my-2" />
 
-                  <div className="col-md-4">
-                    <label className="text-muted small fw-semibold d-block">Data Evento</label>
+                  <div className="col-12 col-md-4">
+                    <span className="text-muted small fw-semibold d-block mb-1">Data Evento:</span>
                     <div className="d-flex align-items-center gap-2">
                       <p className="mb-0 fw-bold">{selectedQuote.dataEvento || "Non specificata"}</p>
                       {selectedQuote.dataEvento && (
@@ -867,45 +867,46 @@ function AdminQuotes() {
                       )}
                     </div>
                   </div>
-                  <div className="col-md-4">
-                    <label className="text-muted small fw-semibold d-block mb-1">Tipo Evento</label>
+                  <div className="col-12 col-md-4">
+                    <span className="text-muted small fw-semibold d-block mb-1">Tipo Evento:</span>
                     <div>
                       <span className={`badge ${getEventTypeBadgeClass(selectedQuote.tipoEvento)} fs-6`}>
                         {selectedQuote.tipoEvento || "Matrimonio"}
                       </span>
                     </div>
                   </div>
-                  <div className="col-md-4">
-                    <label className="text-muted small fw-semibold d-block">Location Evento</label>
-                    <p className="mb-0">{selectedQuote.location || "Non specificata"}</p>
+                  <div className="col-12 col-md-4">
+                    <span className="text-muted small fw-semibold d-block mb-1">Location Evento:</span>
+                    <p className="mb-0 fw-semibold">{selectedQuote.location || "Non specificata"}</p>
                   </div>
 
-                  <div className="col-md-4">
-                    <label className="text-muted small fw-semibold d-block">Numero Ospiti</label>
-                    <p className="mb-0">{selectedQuote.numeroOspiti || "Non specificato"}</p>
+                  <div className="col-12 col-md-4">
+                    <span className="text-muted small fw-semibold d-block mb-1">Numero Ospiti:</span>
+                    <p className="mb-0 fw-semibold">{selectedQuote.numeroOspiti || "Non specificato"}</p>
                   </div>
-                  <div className="col-md-4">
-                    <label className="text-muted small fw-semibold d-block">Orario Giornata</label>
-                    <p className="mb-0">{selectedQuote.orarioGiornata || "Non specificato"}</p>
+                  <div className="col-12 col-md-4">
+                    <span className="text-muted small fw-semibold d-block mb-1">Orario Giornata:</span>
+                    <p className="mb-0 fw-semibold">{selectedQuote.orarioGiornata || "Non specificato"}</p>
                   </div>
                   {selectedQuote.tipoCerimonia &&
                    selectedQuote.tipoEvento &&
                    selectedQuote.tipoEvento.toLowerCase().includes("matrimonio") && (
-                    <div className="col-md-4">
-                      <label className="text-muted small fw-semibold d-block">Tipo Cerimonia</label>
-                      <p className="mb-0">{selectedQuote.tipoCerimonia}</p>
+                    <div className="col-12 col-md-4">
+                      <span className="text-muted small fw-semibold d-block mb-1">Tipo Cerimonia:</span>
+                      <p className="mb-0 fw-semibold">{selectedQuote.tipoCerimonia}</p>
                     </div>
                   )}
 
                   {selectedQuote.budget && (
-                    <div className="col-md-12">
-                      <label className="text-muted small fw-semibold d-block mb-1">Idea di Budget</label>
-                      <span className="badge bg-secondary fs-6 mt-1">{selectedQuote.budget}</span>
+                    <div className="col-12">
+                      <span className="text-muted small fw-semibold d-block mb-1">Idea di Budget:</span>
+                      <span className="badge bg-secondary fs-6">{selectedQuote.budget}</span>
                     </div>
                   )}
 
-                  <div className="col-md-12 mt-3">
-                    <label className="text-muted small fw-semibold">Messaggio / Idea di Festa</label>
+                  {/* Textarea 1: Impilata verticalmente su col-12 */}
+                  <div className="col-12 mt-3">
+                    <span className="text-muted small fw-semibold d-block mb-1">Messaggio / Idea di Festa:</span>
                     <div className="p-3 rounded bg-body-tertiary border message-box-dark">
                       <p className="mb-0" style={{ whiteSpace: "pre-wrap" }}>
                         {selectedQuote.messaggio || "Nessun messaggio inserito."}
@@ -914,7 +915,7 @@ function AdminQuotes() {
                   </div>
 
                   {translating && (
-                    <div className="col-md-12 mt-2">
+                    <div className="col-12 mt-2">
                       <div className="text-muted small d-flex align-items-center gap-2">
                         <span className="spinner-border spinner-border-sm text-success" role="status"></span>
                         <span>Traduzione messaggio per Admin in corso...</span>
@@ -922,8 +923,10 @@ function AdminQuotes() {
                     </div>
                   )}
 
+                  {/* Textarea 2: Impilata verticalmente sotto in col-12 */}
                   {translatedText && !translating && (
-                    <div className="col-md-12 mt-3">
+                    <div className="col-12 mt-3">
+                      <span className="text-muted small fw-semibold d-block mb-1">Traduzione Messaggio:</span>
                       <div className="p-3 rounded bg-success bg-opacity-10 border border-success border-opacity-25">
                         <div className="fw-bold text-success mb-1 small d-flex align-items-center gap-1">
                           <i className="bi bi-translate"></i>

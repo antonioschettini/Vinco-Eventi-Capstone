@@ -12,6 +12,14 @@ const getInitialLanguage = () => {
   return savedLang === "en" ? "en" : "it";
 };
 
+const getInitialTaxSettings = () => {
+  return {
+    taxMode: localStorage.getItem("vinco_admin_tax_mode") || "percent",
+    taxPercent: localStorage.getItem("vinco_admin_tax_percent") || "20",
+    taxManualAmount: localStorage.getItem("vinco_admin_tax_manual") || "0",
+  };
+};
+
 const initialState = {
   theme: getInitialTheme(),
   language: getInitialLanguage(),
@@ -20,6 +28,7 @@ const initialState = {
     isOpen: false,
     email: "vincoeventi@gmail.com",
   },
+  taxSettings: getInitialTaxSettings(),
 };
 
 const uiSlice = createSlice({
@@ -55,6 +64,21 @@ const uiSlice = createSlice({
     closeEmailModal: (state) => {
       state.emailModal.isOpen = false;
     },
+    setTaxSettings: (state, action) => {
+      const { taxMode, taxPercent, taxManualAmount } = action.payload;
+      if (taxMode !== undefined) {
+        state.taxSettings.taxMode = taxMode;
+        localStorage.setItem("vinco_admin_tax_mode", taxMode);
+      }
+      if (taxPercent !== undefined) {
+        state.taxSettings.taxPercent = taxPercent.toString();
+        localStorage.setItem("vinco_admin_tax_percent", taxPercent.toString());
+      }
+      if (taxManualAmount !== undefined) {
+        state.taxSettings.taxManualAmount = taxManualAmount.toString();
+        localStorage.setItem("vinco_admin_tax_manual", taxManualAmount.toString());
+      }
+    },
   },
 });
 
@@ -65,5 +89,6 @@ export const {
   clearGlobalError,
   openEmailModal,
   closeEmailModal,
+  setTaxSettings,
 } = uiSlice.actions;
 export default uiSlice.reducer;
