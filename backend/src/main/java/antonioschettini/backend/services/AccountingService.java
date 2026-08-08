@@ -54,6 +54,9 @@ public class AccountingService {
         BigDecimal netto = lordo.subtract(spese);
         BigDecimal tasse = dto.tasseStimate() != null ? dto.tasseStimate() : BigDecimal.ZERO;
 
+        LocalDate startDate = dto.dataEvento() != null ? dto.dataEvento() : LocalDate.now();
+        LocalDate endDate = dto.dataFineEvento() != null && !dto.dataFineEvento().isBefore(startDate) ? dto.dataFineEvento() : startDate;
+
         AccountingEvent event = AccountingEvent.builder()
                 .quoteRequestId(dto.quoteRequestId())
                 .titolo(dto.titolo())
@@ -61,8 +64,8 @@ public class AccountingService {
                 .clienteCognome(dto.clienteCognome())
                 .clienteEmail(dto.clienteEmail())
                 .clienteTelefono(dto.clienteTelefono())
-                .dataEvento(dto.dataEvento())
-                .dataFineEvento(dto.dataFineEvento() != null ? dto.dataFineEvento() : dto.dataEvento())
+                .dataEvento(startDate)
+                .dataFineEvento(endDate)
                 .hasDjSet(dto.hasDjSet() != null ? dto.hasDjSet() : false)
                 .location(dto.location())
                 .tipoEvento(dto.tipoEvento())
@@ -92,7 +95,7 @@ public class AccountingService {
             ev.setClienteEmail(quote.getEmail());
             ev.setClienteTelefono(quote.getTelefono());
             ev.setDataEvento(quote.getDataEvento());
-            if (ev.getDataFineEvento() == null) {
+            if (ev.getDataFineEvento() == null || ev.getDataFineEvento().isBefore(quote.getDataEvento())) {
                 ev.setDataFineEvento(quote.getDataEvento());
             }
             ev.setLocation(quote.getLocation());
@@ -111,7 +114,7 @@ public class AccountingService {
                 .clienteTelefono(quote.getTelefono())
                 .dataEvento(quote.getDataEvento())
                 .dataFineEvento(quote.getDataEvento())
-                .hasDjSet(true) // Per default le richieste preventivo includono il DJ Set di Enzo
+                .hasDjSet(true)
                 .location(quote.getLocation())
                 .tipoEvento(quote.getTipoEvento())
                 .importoLordo(importoEstimato)
@@ -137,8 +140,12 @@ public class AccountingService {
         event.setClienteCognome(dto.clienteCognome());
         event.setClienteEmail(dto.clienteEmail());
         event.setClienteTelefono(dto.clienteTelefono());
-        event.setDataEvento(dto.dataEvento());
-        event.setDataFineEvento(dto.dataFineEvento() != null ? dto.dataFineEvento() : dto.dataEvento());
+        
+        LocalDate startDate = dto.dataEvento() != null ? dto.dataEvento() : event.getDataEvento();
+        LocalDate endDate = dto.dataFineEvento() != null && !dto.dataFineEvento().isBefore(startDate) ? dto.dataFineEvento() : startDate;
+
+        event.setDataEvento(startDate);
+        event.setDataFineEvento(endDate);
         event.setHasDjSet(dto.hasDjSet() != null ? dto.hasDjSet() : false);
         event.setLocation(dto.location());
         event.setTipoEvento(dto.tipoEvento());
@@ -185,7 +192,6 @@ public class AccountingService {
     public AccountingEvent uploadContractPdf(UUID id, MultipartFile file) {
         AccountingEvent event = getEventById(id);
         try {
-            // Rimuove il vecchio contratto se presente
             if (event.getContrattoPublicId() != null && !event.getContrattoPublicId().isBlank()) {
                 cloudinaryService.deleteMedia(event.getContrattoPublicId(), "raw", event.getContrattoUrl());
             }
@@ -219,6 +225,18 @@ public class AccountingService {
         BigDecimal stimaTasse = BigDecimal.ZERO;
 
         for (AccountingEvent ev : events) {
+            if (ev.getDataEvento() == null) continue;
+            // Se stiamo calcolando il report per un mese specifico, sommiamo gli importi solo per gli eventi che iniziano in quel mese
+            if (month != null && month > 0) {
+                if (ev.getDataEvento().getMonthValue() != month || ev.getDataEvento().getYear() != year) {
+                    continue;
+                }
+            } else if (year != null) {
+                if (ev.getDataEvento().getYear() != year) {
+                    continue;
+                }
+            }
+
             if (ev.getImportoLordo() != null) totaleLordo = totaleLordo.add(ev.getImportoLordo());
             if (ev.getTotaleSpese() != null) totaleSpese = totaleSpese.add(ev.getTotaleSpese());
             if (ev.getTasseStimate() != null) stimaTasse = stimaTasse.add(ev.getTasseStimate());
@@ -242,7 +260,6 @@ public class AccountingService {
     private BigDecimal parseBudgetToBigDecimal(String budgetStr) {
         if (budgetStr == null || budgetStr.isBlank()) return BigDecimal.ZERO;
         try {
-            // Estrae cifre numeriche es: "2000 €" -> "2000"
             String cleaned = budgetStr.replaceAll("[^0-9.,]", "").replace(",", ".");
             if (cleaned.isBlank()) return BigDecimal.ZERO;
             return new BigDecimal(cleaned);

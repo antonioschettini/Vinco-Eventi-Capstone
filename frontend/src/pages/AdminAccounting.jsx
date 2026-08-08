@@ -14,12 +14,17 @@ const MONTH_NAMES = [
 
 const WEEKDAY_NAMES = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
 
-// Helper per parsificare numeri in formato italiano con virgola o punto
+// Helper blindato per parsificare numeri in formato italiano (es. 2.500,50 oppure 2500,50 o 2500.50)
 const parseItalianNumber = (val) => {
   if (val === null || val === undefined || val === "") return 0;
   if (typeof val === "number") return isNaN(val) ? 0 : val;
-  const normalized = val.toString().replace(",", ".");
-  const num = parseFloat(normalized);
+  let str = val.toString().trim();
+  if (str.includes(",") && str.includes(".")) {
+    str = str.replace(/\./g, "").replace(",", ".");
+  } else if (str.includes(",")) {
+    str = str.replace(",", ".");
+  }
+  const num = parseFloat(str);
   return isNaN(num) ? 0 : num;
 };
 
@@ -265,13 +270,17 @@ export default function AdminAccounting() {
     try {
       const sumSpese = speseList.reduce((acc, curr) => acc + parseItalianNumber(curr.importo), 0);
       const parsedLordo = parseItalianNumber(formData.importoLordo);
+      const startDate = formData.dataEvento;
+      const endDate = formData.dataFineEvento && formData.dataFineEvento >= startDate ? formData.dataFineEvento : startDate;
+
       const payload = {
         ...formData,
         importoLordo: parsedLordo,
         totaleSpese: sumSpese,
         speseJson: JSON.stringify(speseList.map(item => ({ ...item, importo: parseItalianNumber(item.importo) }))),
         tasseStimate: parseItalianNumber(formData.tasseStimate),
-        dataFineEvento: formData.dataFineEvento || formData.dataEvento
+        dataEvento: startDate,
+        dataFineEvento: endDate
       };
 
       const isEdit = Boolean(editingEvent?.id);
@@ -524,6 +533,13 @@ export default function AdminAccounting() {
 
   // Paginazione Registro Contabile
   const totalPages = Math.ceil(events.length / EVENTS_PER_PAGE);
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [events.length, totalPages, currentPage]);
+
   const displayedEvents = events.slice(
     (currentPage - 1) * EVENTS_PER_PAGE,
     currentPage * EVENTS_PER_PAGE
