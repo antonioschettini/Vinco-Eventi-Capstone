@@ -1,22 +1,25 @@
 package antonioschettini.backend.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class TranslationService {
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
     public TranslationService() {
         this.restTemplate = new RestTemplate();
+        this.objectMapper = new ObjectMapper();
     }
 
     /**
@@ -75,18 +78,25 @@ public class TranslationService {
 
             String jsonResponse = restTemplate.getForObject(uri, String.class);
             if (jsonResponse != null) {
-                Pattern pattern = Pattern.compile("\"translatedText\"\\s*:\\s*\"([^\"]+)\"");
-                Matcher matcher = pattern.matcher(jsonResponse);
-                if (matcher.find()) {
-                    String translated = matcher.group(1);
-                    if (translated != null && !translated.isBlank() && isValidTranslationResponse(translated)) {
-                        String unescaped = unescapeJson(translated);
-                        if (!unescaped.equalsIgnoreCase(chunk.trim())) {
-                            return unescaped;
-                        }
+                JsonNode rootNode = objectMapper.readTree(jsonResponse);
+                JsonNode responseData = rootNode.path("responseData");
+                String translated = responseData.path("translatedText").asText("");
+
+                if (!translated.isBlank() && isValidTranslationResponse(translated)) {
+                    String clean = cleanTranslation(translated);
+                    if (!clean.equalsIgnoreCase(chunk.trim())) {
+                        return clean;
                     }
                 }
             }
+        } catch (HttpClientErrorException e) {
+            // Se MyMemory rileva che la lingua sorgente è già quella di destinazione (es. autodetect su testo italiano -> it|it)
+            // restituisce HTTP 403 "PLEASE SELECT TWO DISTINCT LANGUAGES", gestito qui senza inquinare i log di warning
+            String body = e.getResponseBodyAsString();
+            if (body != null && body.toUpperCase().contains("PLEASE SELECT TWO DISTINCT LANGUAGES")) {
+                return chunk;
+            }
+            System.err.println("[WARN TranslationService] Errore HTTP MyMemory API (" + e.getStatusCode() + "): " + e.getMessage());
         } catch (Exception e) {
             System.err.println("[WARN TranslationService] Errore durante la traduzione del chunk: " + e.getMessage());
         }
@@ -130,22 +140,14 @@ public class TranslationService {
         return false;
     }
 
-    private String unescapeJson(String input) {
+    private String cleanTranslation(String input) {
         if (input == null) return "";
-        String unescaped = input.replace("\\\"", "\"")
-                                .replace("\\n", "\n")
-                                .replace("\\r", "\r")
-                                .replace("\\t", "\t")
-                                .replace("\\/", "/");
-
-        Matcher matcher = Pattern.compile("\\\\u([0-9a-fA-F]{4})").matcher(unescaped);
-        StringBuilder sb = new StringBuilder();
-        while (matcher.find()) {
-            int codePoint = Integer.parseInt(matcher.group(1), 16);
-            matcher.appendReplacement(sb, Matcher.quoteReplacement(Character.toString(codePoint)));
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
+        return input.replace("&quot;", "\"")
+                    .replace("&#39;", "'")
+                    .replace("&amp;", "&")
+                    .replace("&lt;", "<")
+                    .replace("&gt;", ">")
+                    .replace("&deg;", "°");
     }
 
     public String translateItToEn(String text) {

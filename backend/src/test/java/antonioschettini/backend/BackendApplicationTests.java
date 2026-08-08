@@ -145,5 +145,60 @@ class BackendApplicationTests {
             System.setErr(originalErr);
         }
     }
+
+    @Test
+    void testTranslationServiceEnglishToItalian() {
+        antonioschettini.backend.services.TranslationService translationService = new antonioschettini.backend.services.TranslationService();
+        String englishText = "We would like to book a DJ set for our wedding in September.";
+        String translated = translationService.translate(englishText, "autodetect", "it");
+
+        assertNotNull(translated);
+        assertFalse(translated.isBlank());
+        assertNotEquals(englishText.trim().toLowerCase(), translated.trim().toLowerCase(), "La traduzione di un testo inglese in italiano non deve restituire il testo originale");
+        assertTrue(translated.toLowerCase().contains("dj") || translated.toLowerCase().contains("matrimonio") || translated.toLowerCase().contains("settembre"), "La traduzione in italiano deve contenere le parole chiave tradotte");
+    }
+
+    @Test
+    void testTranslationServiceFrenchToItalian() {
+        antonioschettini.backend.services.TranslationService translationService = new antonioschettini.backend.services.TranslationService();
+        String frenchText = "Nous aimerions réserver un DJ pour notre mariage.";
+        String translated = translationService.translate(frenchText, "autodetect", "it");
+
+        assertNotNull(translated);
+        assertFalse(translated.isBlank());
+        assertNotEquals(frenchText.trim().toLowerCase(), translated.trim().toLowerCase(), "La traduzione dal francese all'italiano deve avvenire con successo");
+    }
+
+    @Test
+    void testTranslationServiceItalianTextReturnsOriginalWithoutError() {
+        antonioschettini.backend.services.TranslationService translationService = new antonioschettini.backend.services.TranslationService();
+        String italianText = "Vorrei un preventivo per un matrimonio a settembre a Monopoli.";
+        String translated = translationService.translate(italianText, "autodetect", "it");
+
+        assertNotNull(translated);
+        assertEquals(italianText.trim(), translated.trim(), "Per un testo già in italiano, la traduzione deve restituire il testo originale senza errori o modifiche");
+    }
+
+    @Test
+    void testTranslationServiceNullOrEmpty() {
+        antonioschettini.backend.services.TranslationService translationService = new antonioschettini.backend.services.TranslationService();
+        assertEquals("", translationService.translate(null, "autodetect", "it"));
+        assertEquals("", translationService.translate("", "autodetect", "it"));
+        assertEquals("", translationService.translate("   ", "autodetect", "it"));
+    }
+
+    @Test
+    void testTranslationServiceWithQuotesAndMultiline() {
+        antonioschettini.backend.services.TranslationService translationService = new antonioschettini.backend.services.TranslationService();
+        String textWithQuotes = "Hello! We want a \"special\" wedding party.\nWe love live music & DJ performance.";
+        String translated = translationService.translate(textWithQuotes, "autodetect", "it");
+
+        assertNotNull(translated);
+        assertFalse(translated.isBlank());
+        assertTrue(translated.contains("\n"), "La traduzione di un testo multilinea deve preservare i ritorni a capo");
+        assertFalse(translated.contains("&quot;"), "La traduzione non deve contenere entità HTML unescaped come &quot;");
+        assertFalse(translated.contains("&#39;"), "La traduzione non deve contenere entità HTML unescaped come &#39;");
+        assertFalse(translated.contains("&amp;"), "La traduzione non deve contenere entità HTML unescaped come &amp;");
+    }
 }
 
