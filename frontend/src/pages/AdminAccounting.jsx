@@ -132,7 +132,7 @@ export default function AdminAccounting() {
     clienteTelefono: "",
     dataEvento: "",
     dataFineEvento: "",
-    hasDjSet: true,
+    hasDjSet: false,
     location: "",
     tipoEvento: "Matrimonio",
     importoLordo: "",
@@ -242,7 +242,7 @@ export default function AdminAccounting() {
       clienteTelefono: "",
       dataEvento: formattedDate,
       dataFineEvento: formattedDate,
-      hasDjSet: true,
+      hasDjSet: false,
       location: "",
       tipoEvento: "Matrimonio",
       importoLordo: "",
@@ -1120,13 +1120,28 @@ export default function AdminAccounting() {
                         )}
                       </div>
                       {ev.contrattoUrl ? (
-                        <span className="badge bg-success text-white px-2 py-1 flex-shrink-0">
-                          <i className="bi bi-check-circle-fill me-1"></i> PDF Ok
-                        </span>
+                        <a
+                          href={ev.contrattoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="badge bg-success text-white px-2 py-1 flex-shrink-0 text-decoration-none shadow-sm cursor-pointer d-inline-flex align-items-center gap-1"
+                          title="Apri e visualizza il contratto PDF"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <i className="bi bi-file-earmark-pdf-fill"></i> Apri PDF
+                        </a>
                       ) : (
-                        <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 flex-shrink-0">
-                          <i className="bi bi-exclamation-triangle-fill me-1"></i> PDF Mancante
-                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenEditModal(ev);
+                          }}
+                          className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 flex-shrink-0 cursor-pointer text-decoration-none border-0 d-inline-flex align-items-center gap-1"
+                          title="PDF Mancante! Clicca per caricare"
+                        >
+                          <i className="bi bi-exclamation-triangle-fill"></i> PDF Mancante (Carica)
+                        </button>
                       )}
                     </div>
 
@@ -1486,7 +1501,10 @@ export default function AdminAccounting() {
                         />
                         {uploadingPdf && <small className="text-success d-block mt-2 fw-bold">Caricamento su Cloudinary in corso...</small>}
                         {!editingEvent?.id && (
-                          <small className="text-warning d-block mt-2 font-monospace">Salva prima l'evento per poter aggiungere il PDF.</small>
+                          <div className="alert alert-warning border border-warning border-opacity-50 text-dark fw-bold rounded-3 py-2 px-3 mt-3 mb-0 d-inline-flex align-items-center gap-2 small">
+                            <i className="bi bi-exclamation-triangle-fill text-warning fs-6"></i>
+                            <span>Salva prima l'evento per poter caricare il contratto PDF.</span>
+                          </div>
                         )}
                       </div>
                     )}
@@ -1625,13 +1643,29 @@ export default function AdminAccounting() {
 
                         <div>
                           {ev.contrattoUrl ? (
-                            <span className="badge bg-success text-white px-2 py-1">
-                              <i className="bi bi-check-circle-fill me-1"></i> PDF Ok
-                            </span>
+                            <a
+                              href={ev.contrattoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="badge bg-success text-white px-2 py-1 text-decoration-none shadow-sm cursor-pointer d-inline-flex align-items-center gap-1"
+                              title="Apri e visualizza il contratto PDF"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <i className="bi bi-file-earmark-pdf-fill"></i> Apri PDF
+                            </a>
                           ) : (
-                            <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">
-                              <i className="bi bi-exclamation-triangle-fill me-1"></i> PDF Mancante
-                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDayEventsModal({ isOpen: false, dateStr: "", events: [] });
+                                handleOpenEditModal(ev);
+                              }}
+                              className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 cursor-pointer text-decoration-none border-0 d-inline-flex align-items-center gap-1"
+                              title="PDF Mancante! Clicca qui per caricare il contratto PDF"
+                            >
+                              <i className="bi bi-exclamation-triangle-fill"></i> PDF Mancante (Carica)
+                            </button>
                           )}
                         </div>
                       </div>
