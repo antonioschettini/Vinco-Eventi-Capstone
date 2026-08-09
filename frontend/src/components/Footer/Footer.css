@@ -1,4 +1,4 @@
-/* Footer Styling - High Contrast, Visible Background & Universal Illumination */
+/* Footer Styling - Luxury Dark-Glass & High Contrast Illumination */
 .footer-section {
   width: 100%;
   position: relative;
@@ -6,10 +6,11 @@
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
-  transition: background-color 0.4s ease, border-color 0.4s ease, filter 0.45s ease, box-shadow 0.45s ease;
+  transition: filter 0.45s ease, box-shadow 0.45s ease, border-color 0.4s ease;
+  border-top: 1px solid rgba(82, 203, 135, 0.2);
 }
 
-/* Footer Overlay con sfocatura leggera e trasparenza per rendere visibile lo sfondo prima dell'hover */
+/* Overlay per lo sfondo mani da DJ */
 .footer-overlay {
   position: absolute;
   top: 0;
@@ -17,95 +18,57 @@
   width: 100%;
   height: 100%;
   z-index: 1;
-  transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.45s ease, opacity 0.45s ease;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.45s ease;
 }
 
-[data-bs-theme="dark"] .footer-overlay {
-  background: linear-gradient(180deg, rgba(8, 14, 10, 0.52) 0%, rgba(4, 8, 6, 0.65) 100%);
-}
-
+[data-bs-theme="dark"] .footer-overlay,
 [data-bs-theme="light"] .footer-overlay {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.58) 0%, rgba(232, 243, 237, 0.68) 100%);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  background: linear-gradient(180deg, rgba(6, 14, 10, 0.72) 0%, rgba(3, 7, 5, 0.85) 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 
-/* RETROILLUMINAZIONE UNIVERSALE (Desktop Hover, Scroll into View Mobile, Touch, Focus) */
+/* Container Glass Card per il contenuto del footer - Risolve ogni problema di contrasto */
+.footer-glass-card {
+  position: relative;
+  z-index: 2;
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  background: rgba(10, 22, 16, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 0 20px rgba(255, 255, 255, 0.03);
+  transition: transform 0.4s ease, background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+@media (max-width: 576px) {
+  .footer-glass-card {
+    padding: 1.75rem 1.1rem;
+    border-radius: 18px;
+  }
+}
+
+/* RETROILLUMINAZIONE EFFETTO ACCESO (Desktop Hover & Mobile Scroll/Touch) */
 .footer-section:hover,
-.footer-section.illuminated,
-.footer-section:focus-within,
-.footer-section:active {
-  filter: brightness(1.24) contrast(1.14) !important;
-  box-shadow: inset 0 0 90px rgba(82, 203, 135, 0.32) !important;
+.footer-section.illuminated {
+  filter: brightness(1.22) contrast(1.12) saturate(1.15);
+  box-shadow: inset 0 0 100px rgba(82, 203, 135, 0.3);
 }
 
 .footer-section:hover .footer-overlay,
-.footer-section.illuminated .footer-overlay,
-.footer-section:focus-within .footer-overlay,
-.footer-section:active .footer-overlay {
-  backdrop-filter: blur(0px) !important;
-  -webkit-backdrop-filter: blur(0px) !important;
+.footer-section.illuminated .footer-overlay {
+  background: linear-gradient(180deg, rgba(6, 14, 10, 0.45) 0%, rgba(3, 7, 5, 0.60) 100%) !important;
+  backdrop-filter: blur(1px) !important;
+  -webkit-backdrop-filter: blur(1px) !important;
 }
 
-[data-bs-theme="dark"] .footer-section:hover .footer-overlay,
-[data-bs-theme="dark"] .footer-section.illuminated .footer-overlay,
-[data-bs-theme="dark"] .footer-section:focus-within .footer-overlay,
-[data-bs-theme="dark"] .footer-section:active .footer-overlay {
-  background: radial-gradient(circle at 50% 50%, rgba(32, 74, 53, 0.20) 0%, rgba(6, 10, 8, 0.42) 100%) !important;
-}
-
-[data-bs-theme="light"] .footer-section:hover .footer-overlay,
-[data-bs-theme="light"] .footer-section.illuminated .footer-overlay,
-[data-bs-theme="light"] .footer-section:focus-within .footer-overlay,
-[data-bs-theme="light"] .footer-section:active .footer-overlay {
-  background: radial-gradient(circle at 50% 50%, rgba(82, 203, 135, 0.22) 0%, rgba(232, 243, 237, 0.38) 100%) !important;
-}
-
-.footer-section:hover .footer-title,
-.footer-section.illuminated .footer-title,
-.footer-section:focus-within .footer-title,
-.footer-section:active .footer-title,
-.footer-section:hover .company-info,
-.footer-section.illuminated .company-info,
-.footer-section:focus-within .company-info,
-.footer-section:active .company-info,
-.footer-section:hover .company-info span,
-.footer-section.illuminated .company-info span,
-.footer-section:focus-within .company-info span,
-.footer-section:active .company-info span,
-.footer-section:hover .info-link,
-.footer-section.illuminated .info-link,
-.footer-section:focus-within .info-link,
-.footer-section:active .info-link,
-.footer-section:hover .copyright p,
-.footer-section.illuminated .copyright p,
-.footer-section:focus-within .copyright p,
-.footer-section:active .copyright p,
-.footer-section:hover .text-forest,
-.footer-section.illuminated .text-forest,
-.footer-section:focus-within .text-forest,
-.footer-section:active .text-forest {
-  color: #ffffff !important;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 0 20px rgba(82, 203, 135, 0.5) !important;
-}
-
-.footer-section:hover .social-btn,
-.footer-section.illuminated .social-btn,
-.footer-section:focus-within .social-btn,
-.footer-section:active .social-btn {
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  background-color: rgba(255, 255, 255, 0.25) !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
-}
-
-.footer-section:hover .social-btn .mixcloud-svg,
-.footer-section.illuminated .social-btn .mixcloud-svg,
-.footer-section:focus-within .social-btn .mixcloud-svg,
-.footer-section:active .social-btn .mixcloud-svg {
-  fill: #ffffff !important;
+.footer-section:hover .footer-glass-card,
+.footer-section.illuminated .footer-glass-card {
+  background: rgba(12, 30, 20, 0.78) !important;
+  border-color: rgba(82, 203, 135, 0.45) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 30px rgba(82, 203, 135, 0.3) !important;
+  transform: translateY(-2px);
 }
 
 .footer-content {
@@ -113,58 +76,37 @@
   z-index: 2;
 }
 
-[data-bs-theme="dark"] .footer-section {
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-[data-bs-theme="light"] .footer-section {
-  border-top: 1px solid rgba(26, 74, 50, 0.18);
-}
-
-/* Titolo Footer (Stato Iniziale) */
+/* Titolo Footer */
 .footer-title {
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 255, 255, 0.2);
   transition: color 0.35s ease, text-shadow 0.35s ease;
 }
 
-[data-bs-theme="dark"] .footer-title {
-  color: #ffffff;
+.footer-section:hover .footer-title,
+.footer-section.illuminated .footer-title {
+  color: #ffffff !important;
+  text-shadow: 0 0 18px rgba(82, 203, 135, 0.7), 0 2px 10px rgba(0, 0, 0, 0.9) !important;
 }
 
-[data-bs-theme="light"] .footer-title {
-  color: #0c2619;
-  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
-}
-
-/* Dati Aziendali (Stato Iniziale) */
+/* Dati Aziendali */
 .company-info {
   font-size: 0.98rem;
   font-weight: 600;
-  transition: color 0.35s ease, text-shadow 0.35s ease;
-}
-
-[data-bs-theme="dark"] .company-info {
-  color: #e6f0eb;
-}
-
-[data-bs-theme="light"] .company-info {
-  color: #091c13;
-  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
-}
-
-.text-forest {
-  color: #0d3822;
+  color: #e6f0eb !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
   transition: color 0.35s ease;
 }
 
-[data-bs-theme="dark"] .text-forest {
-  color: #52cb87;
+.text-forest {
+  color: #52cb87 !important;
 }
 
 .info-link {
-  color: inherit;
+  color: #ffffff !important;
   text-decoration: none;
   cursor: pointer;
   font-weight: 700;
@@ -172,15 +114,11 @@
 }
 
 .info-link:hover {
-  color: #198754;
+  color: #52cb87 !important;
   text-decoration: underline;
 }
 
-[data-bs-theme="dark"] .info-link:hover {
-  color: #52cb87;
-}
-
-/* Styling dei Pulsanti Social in Light & Dark Mode (Stato Iniziale) */
+/* Pulsanti Social con icone visibili ed effetti brand al passaggio del mouse */
 .social-btn {
   width: 44px;
   height: 44px;
@@ -190,6 +128,10 @@
   justify-content: center;
   font-size: 1.25rem;
   cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
               background-color 0.3s ease, 
               color 0.3s ease, 
@@ -199,40 +141,17 @@
   -webkit-backdrop-filter: blur(8px);
 }
 
-[data-bs-theme="dark"] .social-btn {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background-color: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-[data-bs-theme="light"] .social-btn {
-  border: 1px solid rgba(12, 38, 25, 0.4);
-  background-color: #ffffff;
-  color: #0c2619;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-}
-
-[data-bs-theme="light"] .social-btn .mixcloud-svg {
-  fill: #0c2619;
-}
-
-[data-bs-theme="dark"] .social-btn .mixcloud-svg {
-  fill: #ffffff;
-}
-
-/* Transizione specifica per l'icona SVG Mixcloud */
-.mixcloud-svg {
+.social-btn .mixcloud-svg {
+  fill: #ffffff !important;
   transition: fill 0.3s ease;
 }
 
-/* Effetti Hover & Active Singolo Pulsante Social con Colori Brand e Bagliore */
 .social-btn:hover,
 .social-btn:active {
   transform: translateY(-4px) scale(1.12) !important;
   color: #ffffff !important;
   border-color: transparent !important;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5) !important;
 }
 
 .social-btn.spotify:hover,
@@ -275,16 +194,8 @@
 .copyright {
   font-size: 0.82rem;
   letter-spacing: 0.05em;
-  transition: color 0.35s ease;
 }
 
-[data-bs-theme="dark"] .copyright p {
-  color: rgba(255, 255, 255, 0.7) !important;
+.copyright p {
+  color: rgba(255, 255, 255, 0.65) !important;
 }
-
-[data-bs-theme="light"] .copyright p {
-  color: #0a2116 !important;
-  font-weight: 700;
-  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
-}
-
