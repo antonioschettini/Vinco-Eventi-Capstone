@@ -49,17 +49,23 @@ public class CloudinaryService {
             throw new RuntimeException("Tipo file non supportato per i contratti. Caricare solo file PDF.");
         }
         try {
+            String cleanName = filename.replaceAll("[^a-zA-Z0-9._-]", "_");
+            if (!cleanName.toLowerCase().endsWith(".pdf")) {
+                cleanName += ".pdf";
+            }
+            String publicId = "vinco_eventi_contratti/contratto_" + UUID.randomUUID().toString().substring(0, 8) + "_" + cleanName;
+
             Map<String, Object> params = new HashMap<>();
-            params.put("folder", "vinco_eventi_contratti");
+            params.put("public_id", publicId);
             params.put("resource_type", "raw");
 
             Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), params);
             String secureUrl = uploadResult.get("secure_url") != null ? uploadResult.get("secure_url").toString() : uploadResult.get("url").toString();
-            String publicId = uploadResult.get("public_id") != null ? uploadResult.get("public_id").toString() : "";
+            String resPublicId = uploadResult.get("public_id") != null ? uploadResult.get("public_id").toString() : publicId;
 
             return Map.of(
                     "url", secureUrl,
-                    "publicId", publicId,
+                    "publicId", resPublicId,
                     "filename", filename
             );
         } catch (Exception e) {
@@ -186,10 +192,19 @@ public class CloudinaryService {
                 String type = (resourceType != null && !resourceType.isBlank()) ? resourceType : "image";
                 Map<?, ?> result = cloudinary.uploader().destroy(targetPublicId, ObjectUtils.asMap("resource_type", type));
                 
-                // Se la prima distruzione restituisce not_found (es. PDF salvato come raw invece di image or viceversa), tenta con il tipo alternativo
+                // Se la prima distruzione restituisce not_found, tenta con tipo alternativo e varianti con/senza estensione .pdf
                 if ("not_found".equalsIgnoreCase(String.valueOf(result.get("result")))) {
                     String altType = "raw".equalsIgnoreCase(type) ? "image" : ("image".equalsIgnoreCase(type) ? "raw" : "video");
-                    cloudinary.uploader().destroy(targetPublicId, ObjectUtils.asMap("resource_type", altType));
+                    Map<?, ?> altResult = cloudinary.uploader().destroy(targetPublicId, ObjectUtils.asMap("resource_type", altType));
+                    
+                    if ("not_found".equalsIgnoreCase(String.valueOf(altResult.get("result")))) {
+                        String targetWithExt = targetPublicId.toLowerCase().endsWith(".pdf") ? targetPublicId : (targetPublicId + ".pdf");
+                        String targetWithoutExt = targetPublicId.toLowerCase().endsWith(".pdf") ? targetPublicId.substring(0, targetPublicId.length() - 4) : targetPublicId;
+                        
+                        cloudinary.uploader().destroy(targetWithExt, ObjectUtils.asMap("resource_type", "raw"));
+                        cloudinary.uploader().destroy(targetWithoutExt, ObjectUtils.asMap("resource_type", "raw"));
+                        cloudinary.uploader().destroy(targetWithExt, ObjectUtils.asMap("resource_type", "image"));
+                    }
                 }
             }
         } catch (Exception e) {
@@ -214,11 +229,12 @@ public class CloudinaryService {
         int uploadIdx = url.indexOf("/upload/");
         if (uploadIdx == -1) return null;
 
+        boolean isRaw = url.contains("/raw/upload/");
         String rest = url.substring(uploadIdx + 8);
         String[] parts = rest.split("/");
         List<String> idParts = new ArrayList<>();
         for (String part : parts) {
-            if (part.contains(",") || (part.contains("_") && !part.startsWith("v1") && !part.startsWith("v2") && !part.startsWith("vinco_"))) {
+            if (part.contains(",") || (part.contains("_") && !part.startsWith("v1") && !part.startsWith("v2") && !part.startsWith("vinco_") && !part.startsWith("contratto_"))) {
                 continue;
             }
             if (part.matches("^v\\d+$")) {
@@ -227,6 +243,9 @@ public class CloudinaryService {
             idParts.add(part);
         }
         String joined = String.join("/", idParts);
+        if (isRaw || joined.toLowerCase().endsWith(".pdf")) {
+            return joined;
+        }
         return joined.replaceAll("\\.[^/.]+$", "");
     }
 }
