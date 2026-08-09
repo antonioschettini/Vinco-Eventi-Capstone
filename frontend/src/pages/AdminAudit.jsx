@@ -87,7 +87,7 @@ function KpiCard({ icon, iconClass, value, label }) {
       <div className={`audit-kpi-icon ${iconClass}`}>
         <i className={`bi ${icon}`} aria-hidden="true"></i>
       </div>
-      <div>
+      <div className="min-w-0 flex-grow-1">
         <div className="audit-kpi-value">{value ?? "—"}</div>
         <div className="audit-kpi-label">{label}</div>
       </div>

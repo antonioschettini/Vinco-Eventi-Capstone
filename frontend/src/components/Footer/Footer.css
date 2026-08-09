@@ -6,10 +6,10 @@
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
-  transition: background-color 0.4s ease, border-color 0.4s ease;
+  transition: background-color 0.4s ease, border-color 0.4s ease, filter 0.45s ease, box-shadow 0.45s ease;
 }
 
-/* Footer Overlay con sfocatura leggera e trasparenza per far risaltare l'immagine di sfondo prima dell'hover */
+/* Footer Overlay con sfocatura leggera e trasparenza per rendere visibile lo sfondo prima dell'hover */
 .footer-overlay {
   position: absolute;
   top: 0;
@@ -17,29 +17,50 @@
   width: 100%;
   height: 100%;
   z-index: 1;
-  transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.45s ease;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.45s ease, opacity 0.45s ease;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 [data-bs-theme="dark"] .footer-overlay {
-  background: linear-gradient(135deg, rgba(12, 18, 14, 0.72) 0%, rgba(8, 12, 10, 0.62) 100%);
+  background: linear-gradient(180deg, rgba(8, 14, 10, 0.52) 0%, rgba(4, 8, 6, 0.65) 100%);
 }
 
 [data-bs-theme="light"] .footer-overlay {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.58) 0%, rgba(232, 243, 237, 0.50) 100%);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.58) 0%, rgba(232, 243, 237, 0.68) 100%);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
-/* LOGICA ILLUMINAZIONE UNIVERSALE (Desktop Hover, Scroll into View, Touch, Focus) */
+/* RETROILLUMINAZIONE UNIVERSALE (Desktop Hover, Scroll into View Mobile, Touch, Focus) */
+.footer-section:hover,
+.footer-section.illuminated,
+.footer-section:focus-within,
+.footer-section:active {
+  filter: brightness(1.24) contrast(1.14) !important;
+  box-shadow: inset 0 0 90px rgba(82, 203, 135, 0.32) !important;
+}
+
 .footer-section:hover .footer-overlay,
 .footer-section.illuminated .footer-overlay,
 .footer-section:focus-within .footer-overlay,
 .footer-section:active .footer-overlay {
-  background: linear-gradient(135deg, rgba(10, 16, 12, 0.88) 0%, rgba(6, 10, 8, 0.78) 100%) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+}
+
+[data-bs-theme="dark"] .footer-section:hover .footer-overlay,
+[data-bs-theme="dark"] .footer-section.illuminated .footer-overlay,
+[data-bs-theme="dark"] .footer-section:focus-within .footer-overlay,
+[data-bs-theme="dark"] .footer-section:active .footer-overlay {
+  background: radial-gradient(circle at 50% 50%, rgba(32, 74, 53, 0.20) 0%, rgba(6, 10, 8, 0.42) 100%) !important;
+}
+
+[data-bs-theme="light"] .footer-section:hover .footer-overlay,
+[data-bs-theme="light"] .footer-section.illuminated .footer-overlay,
+[data-bs-theme="light"] .footer-section:focus-within .footer-overlay,
+[data-bs-theme="light"] .footer-section:active .footer-overlay {
+  background: radial-gradient(circle at 50% 50%, rgba(82, 203, 135, 0.22) 0%, rgba(232, 243, 237, 0.38) 100%) !important;
 }
 
 .footer-section:hover .footer-title,
@@ -67,17 +88,17 @@
 .footer-section:focus-within .text-forest,
 .footer-section:active .text-forest {
   color: #ffffff !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85), 0 0 16px rgba(255, 255, 255, 0.35) !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 0 20px rgba(82, 203, 135, 0.5) !important;
 }
 
 .footer-section:hover .social-btn,
 .footer-section.illuminated .social-btn,
 .footer-section:focus-within .social-btn,
 .footer-section:active .social-btn {
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
-  background-color: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  background-color: rgba(255, 255, 255, 0.25) !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 .footer-section:hover .social-btn .mixcloud-svg,

@@ -16,16 +16,16 @@ function Footer() {
   const [isIlluminated, setIsIlluminated] = useState(false);
 
   useEffect(() => {
-    // Illuminazione automatica allo scroll quando il footer entra nel viewport
+    // Illuminazione automatica allo scroll quando il footer entra nel viewport su mobile
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && entry.intersectionRatio > 0.35) {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
           setIsIlluminated(true);
         } else {
           setIsIlluminated(false);
         }
       },
-      { threshold: [0.1, 0.35, 0.6] }
+      { threshold: [0.05, 0.15, 0.4] }
     );
 
     if (footerRef.current) {
