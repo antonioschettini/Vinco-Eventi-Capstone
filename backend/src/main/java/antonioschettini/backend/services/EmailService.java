@@ -48,8 +48,8 @@ public class EmailService {
 
 
     private static final String URL_LOGO_VINCO = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263577/vinco_email_assets/g8xo3jtogac3rdr5kgfw.png";
-    private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263578/vinco_email_assets/kjvtkjym0ck5xxbwdusa.png";
-    private static final String URL_APPLE_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263578/vinco_email_assets/occz26polnlspmaqhfqk.png";
+    private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786265382/vinco_email_assets/google-official-v2.svg";
+    private static final String URL_APPLE_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786265381/vinco_email_assets/apple-official-v2.svg";
     private static final String URL_DASHBOARD_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263579/vinco_email_assets/rv8jkbcolykkaccvceie.png";
     private static final String URL_INSTAGRAM_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263579/vinco_email_assets/ppypfvmhxsgmynx4a8wl.png";
     private static final String URL_PHONE_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263580/vinco_email_assets/lkhurx9vaflldpam4hix.png";
