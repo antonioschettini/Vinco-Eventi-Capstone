@@ -139,7 +139,7 @@ function MatrimonioWidgets() {
                 {t.badge100Title || "100 Recensioni a 5 Stelle"}
               </h3>
               <p className="small text-body-secondary mb-0 font-body">
-                Suggerito e Raccomandato al 100% dalle nostre coppie.
+                {t.badge100Sub || "Suggerito e Raccomandato al 100% dalle nostre coppie."}
               </p>
             </div>
           </Col>
@@ -169,7 +169,7 @@ function MatrimonioWidgets() {
                 {t.award2023Title || "Wedding Awards 2023"}
               </h3>
               <p className="small text-body-secondary mb-0 font-body">
-                Vincitore del premio per la categoria Musica Matrimonio.
+                {t.award2023Sub || "Vincitore del premio per la categoria Musica Matrimonio."}
               </p>
             </div>
           </Col>
@@ -199,7 +199,7 @@ function MatrimonioWidgets() {
                 {t.award2024Title || "Wedding Awards 2024"}
               </h3>
               <p className="small text-body-secondary mb-0 font-body">
-                Riconferma tra i migliori fornitori per il secondo anno.
+                {t.award2024Sub || "Riconferma tra i migliori fornitori per il secondo anno."}
               </p>
             </div>
           </Col>
@@ -229,7 +229,7 @@ function MatrimonioWidgets() {
                 {t.award2025Title || "Wedding Awards 2025"}
               </h3>
               <p className="small text-body-secondary mb-0 font-body">
-                Prestigioso riconoscimento confermato per tre anni consecutivi.
+                {t.award2025Sub || "Prestigioso riconoscimento confermato per tre anni consecutivi."}
               </p>
             </div>
           </Col>
@@ -253,7 +253,7 @@ function MatrimonioWidgets() {
                   <i className="bi bi-star-fill text-warning"></i>
                 </div>
                 <span className="small text-body-secondary font-body ms-1">
-                  (123 recensioni)
+                  {t.reviewsCount || "(123 recensioni)"}
                 </span>
               </div>
             </div>
@@ -274,7 +274,7 @@ function MatrimonioWidgets() {
                           {rev.name}
                         </h4>
                         <span className="small text-body-secondary font-body">
-                          Data nozze: {rev.date}
+                          {t.weddingDateLabel || "Data nozze:"} {rev.date}
                         </span>
                       </div>
                     </div>
@@ -297,7 +297,7 @@ function MatrimonioWidgets() {
 
                 <div className="mt-3 pt-3 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
                   <span className="small text-success font-body fw-semibold d-inline-flex align-items-center gap-1">
-                    <i className="bi bi-check-circle-fill"></i> Recensione Verificata
+                    <i className="bi bi-check-circle-fill"></i> {t.verifiedReview || "Recensione Verificata"}
                   </span>
                   <img
                     src="https://cdn1.matrimonio.com/assets/img/logos/gen_logoHeader.svg"
@@ -319,7 +319,7 @@ function MatrimonioWidgets() {
               rel="nofollow noopener noreferrer"
               className="btn-matrimonio-all"
             >
-              <span>Leggi tutte le 123 recensioni su</span>
+              <span>{t.readAllReviews || "Leggi tutte le 123 recensioni su"}</span>
               <img
                 src="https://cdn1.matrimonio.com/assets/img/logos/gen_logoHeader.svg"
                 alt="Matrimonio.com"

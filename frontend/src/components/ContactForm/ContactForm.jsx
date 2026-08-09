@@ -466,7 +466,7 @@ function ContactForm() {
               tabIndex={1}
               value={formData.nome}
               onChange={handleChange}
-              placeholder="Es. Mario"
+              placeholder={t.firstNamePlaceholder || (lang === "en" ? "E.g. John" : "Es. Mario")}
               className={`form-control font-body ${
                 validated && !isValidPersonName(formData.nome) ? "is-invalid" : ""
               }`}
@@ -488,7 +488,7 @@ function ContactForm() {
               tabIndex={2}
               value={formData.cognome}
               onChange={handleChange}
-              placeholder="Es. Rossi"
+              placeholder={t.lastNamePlaceholder || (lang === "en" ? "E.g. Doe" : "Es. Rossi")}
               className={`form-control font-body ${
                 validated && !isValidPersonName(formData.cognome) ? "is-invalid" : ""
               }`}
@@ -513,7 +513,7 @@ function ContactForm() {
               tabIndex={3}
               value={formData.email}
               onChange={handleChange}
-              placeholder="mario.rossi@example.com"
+              placeholder={t.emailPlaceholder || (lang === "en" ? "john.doe@example.com" : "mario.rossi@example.com")}
               className={`form-control font-body ${
                 validated && !isValidEmail(formData.email) ? "is-invalid" : ""
               }`}
@@ -555,7 +555,7 @@ function ContactForm() {
                       <input
                         type="text"
                         className="form-control form-control-sm border-start-0 prefix-search-input"
-                        placeholder={lang === "en" ? "Search country or prefix..." : "Cerca paese o prefisso..."}
+                        placeholder={t.searchPrefixPlaceholder || (lang === "en" ? "Search country or prefix..." : "Cerca paese o prefisso...")}
                         value={prefixSearch}
                         onChange={(e) => setPrefixSearch(e.target.value)}
                         onClick={(e) => e.stopPropagation()}
@@ -866,7 +866,7 @@ function ContactForm() {
             rows="3"
             value={formData.ideaFesta}
             onChange={handleChange}
-            placeholder="Descrivi come immagini la musica e l'atmosfera per il tuo evento..."
+            placeholder={t.partyIdeaPlaceholder || (lang === "en" ? "Describe how you imagine the music and atmosphere for your event..." : "Descrivi come immagini la musica e l'atmosfera per il tuo evento...")}
             className="form-control font-body"
           ></textarea>
         </div>
@@ -883,7 +883,7 @@ function ContactForm() {
             rows="2"
             value={formData.ulterioriInfo}
             onChange={handleChange}
-            placeholder="Note aggiuntive, dettagli sulla location, esigenze particolari..."
+            placeholder={t.additionalInfoPlaceholder || (lang === "en" ? "Additional notes, location details, special requests..." : "Note aggiuntive, dettagli sulla location, esigenze particolari...")}
             className="form-control font-body"
           ></textarea>
         </div>

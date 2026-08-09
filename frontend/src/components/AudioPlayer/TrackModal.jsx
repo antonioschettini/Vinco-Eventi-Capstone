@@ -9,11 +9,14 @@ import {
   setIsModalOpen,
   setModalPosition,
 } from "../../redux/slices/audioSlice";
+import { translations } from "../../utils/translations";
 import tracks from "../../data/tracksData";
 import "./TrackModal.css";
 
 function TrackModal() {
   const dispatch = useDispatch();
+  const lang = useSelector((state) => state.ui.language);
+  const t = translations[lang]?.playerModal || translations.it.playerModal;
 
   const {
     isPlaying,
@@ -130,7 +133,7 @@ function TrackModal() {
           onTouchEnd={(e) => endDrag(e.currentTarget)}
         >
           <i className="bi bi-grip-horizontal text-secondary fs-6"></i>
-          <span className="fw-semibold track-header-title">VINCO EVENTI Player</span>
+          <span className="fw-semibold track-header-title">{t.title || "VINCO EVENTI Player"}</span>
         </div>
 
         {/* Pulsante Chiudi X con StopPropagation per risposta immediata */}
@@ -139,8 +142,8 @@ function TrackModal() {
           onPointerDown={(e) => e.stopPropagation()}
           onTouchStart={(e) => e.stopPropagation()}
           className="btn-close-modal"
-          aria-label="Chiudi"
-          title="Chiudi"
+          aria-label={t.close || "Chiudi"}
+          title={t.close || "Chiudi"}
         >
           <i className="bi bi-x-lg"></i>
         </button>
@@ -168,8 +171,8 @@ function TrackModal() {
           <button
             onClick={() => dispatch(prevTrack(tracks.length))}
             className="btn-modal-ctrl"
-            title="Traccia precedente"
-            aria-label="Traccia precedente"
+            title={t.prevTrack || "Traccia precedente"}
+            aria-label={t.prevTrack || "Traccia precedente"}
           >
             <i className="bi bi-skip-start-fill fs-5"></i>
           </button>
@@ -177,8 +180,8 @@ function TrackModal() {
           <button
             onClick={() => dispatch(togglePlay())}
             className="btn-modal-play shadow-sm"
-            title={isPlaying ? "Pausa" : "Riproduci"}
-            aria-label={isPlaying ? "Pausa" : "Riproduci"}
+            title={isPlaying ? (t.pause || "Pausa") : (t.play || "Riproduci")}
+            aria-label={isPlaying ? (t.pause || "Pausa") : (t.play || "Riproduci")}
           >
             <i
               className={`bi ${
@@ -190,8 +193,8 @@ function TrackModal() {
           <button
             onClick={() => dispatch(nextTrack(tracks.length))}
             className="btn-modal-ctrl"
-            title="Traccia successiva"
-            aria-label="Traccia successiva"
+            title={t.nextTrack || "Traccia successiva"}
+            aria-label={t.nextTrack || "Traccia successiva"}
           >
             <i className="bi bi-skip-end-fill fs-5"></i>
           </button>
@@ -202,8 +205,8 @@ function TrackModal() {
           <button
             onClick={() => dispatch(toggleMute())}
             className="btn-volume-icon p-0 border-0 bg-transparent text-secondary"
-            title={isMuted || volume === 0 ? "Attiva audio" : "Muto"}
-            aria-label="Disattiva/Attiva audio"
+            title={isMuted || volume === 0 ? (t.unmute || "Attiva audio") : (t.mute || "Muto")}
+            aria-label={t.toggleAudio || "Disattiva/Attiva audio"}
           >
             <i
               className={`bi ${

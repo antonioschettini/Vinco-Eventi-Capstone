@@ -78,6 +78,13 @@ function Navbar() {
   const isAdminRoute = location.pathname.startsWith("/admin-enzo");
   const showAdminButton = isAuthenticated || isAdminRoute;
 
+  // Enforce Italian language lock in Admin area
+  useEffect(() => {
+    if (isAdminRoute && lang !== "it") {
+      dispatch(setLanguage("it"));
+    }
+  }, [isAdminRoute, lang, dispatch]);
+
   // Redux audio state
   const { isPlaying, volume, currentTrackIndex, isMuted } = useSelector(
     (state) => state.audio
@@ -157,28 +164,29 @@ function Navbar() {
 
       {/* 1. Fascia Superiore (Top Banner) */}
       <div className="top-banner d-flex justify-content-between align-items-center px-3 px-md-4 py-2 border-bottom border-secondary border-opacity-10">
-        {/* Lato Sinistro: Lingua */}
+        {/* Lato Sinistro: Lingua (Nascosto in Sezione Admin per mantenere l'interfaccia Admin esclusivamente in Italiano) */}
         <div className="top-left d-flex align-items-center gap-2 gap-md-3">
-          {/* Switch Lingua con Bandiere */}
-          <div className="language-selector d-flex align-items-center gap-2">
-            <button
-              onClick={() => dispatch(setLanguage("it"))}
-              className={`flag-btn-wrapper ${lang === "it" ? "active" : ""}`}
-              aria-label="Lingua Italiana"
-              title="Italiano"
-            >
-              <ItalyFlag />
-            </button>
-            <span className="divider">|</span>
-            <button
-              onClick={() => dispatch(setLanguage("en"))}
-              className={`flag-btn-wrapper ${lang === "en" ? "active" : ""}`}
-              aria-label="English Language"
-              title="English"
-            >
-              <UKFlag />
-            </button>
-          </div>
+          {!isAdminRoute && (
+            <div className="language-selector d-flex align-items-center gap-2">
+              <button
+                onClick={() => dispatch(setLanguage("it"))}
+                className={`flag-btn-wrapper ${lang === "it" ? "active" : ""}`}
+                aria-label="Lingua Italiana"
+                title="Italiano"
+              >
+                <ItalyFlag />
+              </button>
+              <span className="divider">|</span>
+              <button
+                onClick={() => dispatch(setLanguage("en"))}
+                className={`flag-btn-wrapper ${lang === "en" ? "active" : ""}`}
+                aria-label="English Language"
+                title="English"
+              >
+                <UKFlag />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* CENTRO: CONTROLLI COMPATTI MINI PLAYER (Visibili solo da 820px in su) */}
