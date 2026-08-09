@@ -16,9 +16,13 @@ function Footer() {
   const [isIlluminated, setIsIlluminated] = useState(false);
 
   useEffect(() => {
+    // L'illuminazione automatica allo scroll si applica solo su dispositivi mobile/touch.
+    // Su Desktop (mouse pointer fine), il footer mantiene l'effetto hover interattivo al passaggio del mouse.
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    if (!isTouchDevice) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Illuminazione automatica allo scroll quando il footer entra nel viewport mobile/desktop
         if (entry.isIntersecting && entry.intersectionRatio > 0.25) {
           setIsIlluminated(true);
         } else {
@@ -40,7 +44,10 @@ function Footer() {
   }, []);
 
   const handleTouch = () => {
-    setIsIlluminated(true);
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    if (isTouchDevice) {
+      setIsIlluminated(true);
+    }
   };
 
   return (
