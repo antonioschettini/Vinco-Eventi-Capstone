@@ -412,60 +412,7 @@ function Services() {
                         <ul className="feature-list-custom">
                           {featuresList.map((feat, idx) => {
                             const cleanFeat = feat.replace(/\[BROCHURE\]/gi, "").trim();
-                            const featLower = feat.toLowerCase();
-
-                            // Se siamo nel pacchetto FULL e la caratteristica richiede Brochure, rendi il pulsante cliccabile
-                            if (isFull && (featLower.includes("live band") || featLower.includes("band"))) {
-                              return (
-                                <li key={idx}>
-                                  {cleanFeat}{" "}
-                                  <a
-                                    href={t.full.brochureLinks.liveBand}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn btn-danger btn-sm brochure-link-btn"
-                                    title={lang === "en" ? "Open Live Band Brochure on Google Drive" : "Apri Brochure Live Band su Google Drive"}
-                                  >
-                                    <i className="bi bi-file-earmark-pdf-fill"></i>
-                                    <span>{t.brochureBtn}</span>
-                                  </a>
-                                </li>
-                              );
-                            }
-                            if (isFull && (featLower.includes("photobooth") || featLower.includes("videobooth") || featLower.includes("telefono") || featLower.includes("guestbook"))) {
-                              return (
-                                <li key={idx}>
-                                  {cleanFeat}{" "}
-                                  <a
-                                    href={t.full.brochureLinks.photobooth}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn btn-danger btn-sm brochure-link-btn"
-                                    title={lang === "en" ? "Open Photobooth Brochure on Google Drive" : "Apri Brochure Photobooth su Google Drive"}
-                                  >
-                                    <i className="bi bi-file-earmark-pdf-fill"></i>
-                                    <span>{t.brochureBtn}</span>
-                                  </a>
-                                </li>
-                              );
-                            }
-                            if (isFull && !featLower.includes("audio") && (featLower.includes("illuminazioni") || featLower.includes("lighting") || featLower.includes("sparkular") || featLower.includes("fuochi"))) {
-                              return (
-                                <li key={idx}>
-                                  {cleanFeat}{" "}
-                                  <a
-                                    href={t.full.brochureLinks.lighting}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn btn-danger btn-sm brochure-link-btn"
-                                    title={lang === "en" ? "Open Lighting & Fireworks Brochure on Google Drive" : "Apri Brochure Scenografie Luminose su Google Drive"}
-                                  >
-                                    <i className="bi bi-file-earmark-pdf-fill"></i>
-                                    <span>{t.brochureBtn}</span>
-                                  </a>
-                                </li>
-                              );
-                            }
+                            if (!cleanFeat) return null;
                             return <li key={idx}>{cleanFeat}</li>;
                           })}
                         </ul>
