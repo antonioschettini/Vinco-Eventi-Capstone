@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
@@ -5,15 +6,50 @@ const footerBgImage = "https://res.cloudinary.com/ytjdxerb/image/upload/c_crop,g
 import "./Footer.css";
 
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
+
 function Footer() {
   const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
-  const t = translations[lang].footer;
+  const t = translations[lang]?.footer || translations.it.footer;
+  
+  const footerRef = useRef(null);
+  const [isIlluminated, setIsIlluminated] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Illuminazione automatica allo scroll quando il footer entra nel viewport mobile/desktop
+        if (entry.isIntersecting && entry.intersectionRatio > 0.25) {
+          setIsIlluminated(true);
+        } else {
+          setIsIlluminated(false);
+        }
+      },
+      { threshold: [0.1, 0.25, 0.5] }
+    );
+
+    if (footerRef.current) {
+      observer.observe(footerRef.current);
+    }
+
+    return () => {
+      if (footerRef.current) {
+        observer.unobserve(footerRef.current);
+      }
+    };
+  }, []);
+
+  const handleTouch = () => {
+    setIsIlluminated(true);
+  };
 
   return (
     <footer
-      className="footer-section py-5 mt-auto position-relative"
+      ref={footerRef}
+      className={`footer-section py-5 mt-auto position-relative ${isIlluminated ? "illuminated" : ""}`}
       style={{ backgroundImage: `url("${footerBgImage}")` }}
+      onTouchStart={handleTouch}
+      onClick={handleTouch}
     >
       <div className="footer-overlay"></div>
       <Container className="footer-content text-center position-relative">
@@ -52,7 +88,6 @@ function Footer() {
                   {t.email}
                 </a>
               </p>
-
             </div>
 
             {/* Icone Social con Deep Linking Nattivo App iOS/Android & Desktop */}

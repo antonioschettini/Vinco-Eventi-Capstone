@@ -56,7 +56,7 @@ export default function AdminAccounting() {
 
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // 1-12, 0 = tutti
-  const [viewMode, setViewMode] = useState("table"); // Default a "table" (Registro Contabile / Panoramica)
+  const [viewMode, setViewMode] = useState("calendar"); // Default a "calendar" (Vista Calendario Mese Corrente)
 
   // Gestione dinamica degli anni nel dropdown
   const baseYears = [2024, 2025, 2026, 2027, 2028, 2029, 2030];
@@ -499,6 +499,9 @@ export default function AdminAccounting() {
       });
 
       const isToday = dateStr === todayStr;
+      const MAX_VISIBLE_EVENTS = 2;
+      const visibleEvents = dayEvents.slice(0, MAX_VISIBLE_EVENTS);
+      const overflowCount = dayEvents.length - MAX_VISIBLE_EVENTS;
 
       cells.push(
         <div
@@ -518,7 +521,7 @@ export default function AdminAccounting() {
             <i className="bi bi-plus-circle-fill add-event-plus" title="Aggiungi evento" onClick={(e) => { e.stopPropagation(); handleOpenNewModal(dateStr); }}></i>
           </div>
           <div className="events-wrapper">
-            {dayEvents.map((ev) => {
+            {visibleEvents.map((ev) => {
               const isMultiDay = ev.dataFineEvento && ev.dataFineEvento !== ev.dataEvento;
               const displayName = ev.clienteCognome ? `${ev.clienteCognome}` : ev.titolo;
               const displayLoc = ev.location || ev.tipoEvento || "";
@@ -561,6 +564,20 @@ export default function AdminAccounting() {
                 </div>
               );
             })}
+            
+            {/* Badge interattivo + N Altri se presenti 3 o piu eventi */}
+            {overflowCount > 0 && (
+              <div
+                className="more-events-chip"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDayClick(dateStr, dayEvents);
+                }}
+                title={`Vedi tutti i ${dayEvents.length} eventi di questo giorno`}
+              >
+                + {overflowCount} altri
+              </div>
+            )}
           </div>
         </div>
       );
@@ -819,11 +836,19 @@ export default function AdminAccounting() {
                 {selectedMonth === 0 ? `Panoramica Annuale ${currentYear}` : `${MONTH_NAMES[selectedMonth - 1]} ${currentYear}`}
               </h5>
               
-              {/* Riepilogo Finanziario Mensile in piccolo accanto al nome del mese */}
+              {/* Riepilogo Finanziario Mensile Responsive con Micro-Chips Flex */}
               {selectedMonth !== 0 && (
-                <span className="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 rounded-pill font-monospace small">
-                  Mese: Lordo €{lordoTotMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })} • Spese -€{speseTotMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })} • Netto €{nettoOpMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
-                </span>
+                <div className="month-summary-chips d-flex flex-wrap align-items-center gap-1 my-1">
+                  <span className="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 rounded-pill font-monospace small">
+                    Lordo €{lordoTotMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+                  </span>
+                  <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 rounded-pill font-monospace small">
+                    Spese -€{speseTotMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+                  </span>
+                  <span className="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1 rounded-pill font-monospace small fw-bold">
+                    Netto €{nettoOpMese.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
               )}
             </div>
 
