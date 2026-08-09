@@ -175,14 +175,16 @@
 .calendar-days-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-auto-rows: 1fr;
+  grid-auto-rows: 115px;
   gap: 6px;
   margin-top: 0.5rem;
 }
 
 .calendar-day-cell {
   height: 115px;
+  min-height: 115px;
   max-height: 115px;
+  box-sizing: border-box;
   border-radius: 10px;
   border: 1px solid rgba(128, 128, 128, 0.12);
   background: rgba(128, 128, 128, 0.02);
@@ -513,15 +515,19 @@
   }
 
   .calendar-days-grid {
-    gap: 2px;
+    gap: 3px;
     margin-top: 0.25rem;
+    grid-auto-rows: 72px !important;
   }
 
   .calendar-day-cell {
-    height: 72px;
-    max-height: 72px;
-    padding: 0.15rem;
+    height: 72px !important;
+    min-height: 72px !important;
+    max-height: 72px !important;
+    padding: 0.15rem 0.2rem;
     border-radius: 6px;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
   .day-number {

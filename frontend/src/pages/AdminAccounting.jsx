@@ -57,6 +57,15 @@ export default function AdminAccounting() {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // 1-12, 0 = tutti
   const [viewMode, setViewMode] = useState("calendar"); // Default a "calendar" (Vista Calendario Mese Corrente)
+  const [isMobileView, setIsMobileView] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Gestione dinamica degli anni nel dropdown
   const baseYears = [2024, 2025, 2026, 2027, 2028, 2029, 2030];
@@ -499,7 +508,11 @@ export default function AdminAccounting() {
       });
 
       const isToday = dateStr === todayStr;
-      const MAX_VISIBLE_EVENTS = 2;
+      // Su mobile (<768px), con 2+ eventi mostriamo 1 chip + badge "+ N altri" per garantire 0 deformazioni nella griglia da 72px.
+      // Su desktop (>=768px), con 3+ eventi mostriamo 2 chip + badge "+ N altri" nella griglia da 115px.
+      const MAX_VISIBLE_EVENTS = isMobileView
+        ? (dayEvents.length > 1 ? 1 : 1)
+        : (dayEvents.length > 2 ? 2 : 2);
       const visibleEvents = dayEvents.slice(0, MAX_VISIBLE_EVENTS);
       const overflowCount = dayEvents.length - MAX_VISIBLE_EVENTS;
 
@@ -510,11 +523,15 @@ export default function AdminAccounting() {
           onClick={() => handleDayClick(dateStr, dayEvents)}
         >
           <div className="day-number">
-            <span>
-              {day}
-              {dayEvents.length > 2 && (
-                <span className="badge bg-success bg-opacity-10 text-success ms-1 px-1 py-0 font-monospace" style={{ fontSize: "0.65rem" }} title={`${dayEvents.length} eventi in questo giorno`}>
-                  {dayEvents.length} ev
+            <span className="d-inline-flex align-items-center gap-1">
+              <span>{day}</span>
+              {dayEvents.length > (isMobileView ? 1 : 2) && (
+                <span
+                  className="badge bg-success bg-opacity-10 text-success px-1 py-0 font-monospace border border-success border-opacity-25"
+                  style={{ fontSize: "0.62rem", lineHeight: 1.1 }}
+                  title={`${dayEvents.length} eventi in questo giorno`}
+                >
+                  {dayEvents.length}<span className="d-none d-sm-inline ms-1">ev</span>
                 </span>
               )}
             </span>
@@ -565,7 +582,7 @@ export default function AdminAccounting() {
               );
             })}
             
-            {/* Badge interattivo + N Altri se presenti 3 o piu eventi */}
+            {/* Badge interattivo + N Altri se presenti eventi in overflow */}
             {overflowCount > 0 && (
               <div
                 className="more-events-chip"
