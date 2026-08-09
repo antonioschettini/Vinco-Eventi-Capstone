@@ -184,7 +184,13 @@ public class CloudinaryService {
             }
             if (targetPublicId != null && !targetPublicId.isBlank()) {
                 String type = (resourceType != null && !resourceType.isBlank()) ? resourceType : "image";
-                cloudinary.uploader().destroy(targetPublicId, ObjectUtils.asMap("resource_type", type));
+                Map<?, ?> result = cloudinary.uploader().destroy(targetPublicId, ObjectUtils.asMap("resource_type", type));
+                
+                // Se la prima distruzione restituisce not_found (es. PDF salvato come raw invece di image or viceversa), tenta con il tipo alternativo
+                if ("not_found".equalsIgnoreCase(String.valueOf(result.get("result")))) {
+                    String altType = "raw".equalsIgnoreCase(type) ? "image" : ("image".equalsIgnoreCase(type) ? "raw" : "video");
+                    cloudinary.uploader().destroy(targetPublicId, ObjectUtils.asMap("resource_type", altType));
+                }
             }
         } catch (Exception e) {
             System.err.println("Impossibile eliminare la risorsa da Cloudinary: " + e.getMessage());
