@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
-const footerBgImage = "https://res.cloudinary.com/ytjdxerb/image/upload/c_crop,g_center,y_0,h_0.92/v1786087542/vinco_eventi_assets/grx32y3fmenjhcwk1god.webp";
+const footerBgImage = "https://res.cloudinary.com/oe1bztwb/image/upload/c_crop,g_center,y_0,h_0.92/v1786265141/vinco_eventi_assets/bzgnb1lhn2ok8bnuzcgs.jpg";
 import "./Footer.css";
 
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";

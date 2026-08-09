@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
-const heroBgImage = "https://res.cloudinary.com/ytjdxerb/image/upload/v1786087803/vinco_eventi_assets/nipwxdbvbrw5oeinqcqt.webp";
+const heroBgImage = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786265143/vinco_eventi_assets/jduafvl0hcqgjhcyzoxb.jpg";
 import GallerySection from "../components/GallerySection/GallerySection";
 import useScrollReveal from "../utils/useScrollReveal";
 

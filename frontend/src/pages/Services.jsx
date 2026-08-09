@@ -80,20 +80,20 @@ function Services() {
     switch (badge) {
       case "BASIC":
         return isEng
-          ? "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png"
-          : "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png";
+          ? "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263063/vinco_eventi_servizi/svlioqxv0xes6fumwpnl.jpg"
+          : "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263061/vinco_eventi_servizi/wjtchgjbcxvyl8q6bick.jpg";
       case "PLUS":
         return isEng
-          ? "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738606/vinco_eventi_servizi/oppbybtrbqttfi2aprnz.png"
-          : "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738603/vinco_eventi_servizi/qev9reiqlzxtmpsiulsz.png";
+          ? "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263088/vinco_eventi_servizi/wprtcafdwgjkadlgrgkk.jpg"
+          : "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263086/vinco_eventi_servizi/keyrbiqbz8v6i6funxo1.jpg";
       case "FULL":
         return isEng
-          ? "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738611/vinco_eventi_servizi/ckjzq11sbrvaojf5iskt.png"
-          : "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738608/vinco_eventi_servizi/ii4efs143kbixn2n2wnb.png";
+          ? "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263093/vinco_eventi_servizi/wygm59zynjvldm1gj4pj.jpg"
+          : "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263091/vinco_eventi_servizi/c9e0i6zst7e3zuyawbwe.jpg";
       default:
         return isEng
-          ? "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png"
-          : "https://res.cloudinary.com/ytjdxerb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png";
+          ? "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263063/vinco_eventi_servizi/svlioqxv0xes6fumwpnl.jpg"
+          : "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263061/vinco_eventi_servizi/wjtchgjbcxvyl8q6bick.jpg";
     }
   };
 
