@@ -51,7 +51,7 @@ public class CloudinaryService {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("folder", "vinco_eventi_contratti");
-            params.put("resource_type", "auto");
+            params.put("resource_type", "raw");
 
             Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), params);
             String secureUrl = uploadResult.get("secure_url") != null ? uploadResult.get("secure_url").toString() : uploadResult.get("url").toString();
