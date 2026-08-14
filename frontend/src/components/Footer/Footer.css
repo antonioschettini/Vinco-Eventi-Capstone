@@ -7,8 +7,8 @@
   background-repeat: no-repeat;
   overflow: hidden;
   border-top: 1px solid rgba(82, 203, 135, 0.3);
-  filter: brightness(1.05) contrast(1.02);
-  transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease, border-color 0.4s ease;
+  filter: brightness(1.02) contrast(1.02);
+  transition: filter 0.8s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.5s ease, border-color 0.4s ease;
 }
 
 /* Overlay trasparente ed etereo in stato di default */
@@ -19,23 +19,23 @@
   width: 100%;
   height: 100%;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(6, 14, 10, 0.50) 0%, rgba(3, 7, 5, 0.65) 100%);
+  background: linear-gradient(180deg, rgba(6, 14, 10, 0.45) 0%, rgba(3, 7, 5, 0.58) 100%);
   opacity: 0.7;
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.6s ease;
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), background 0.8s ease;
 }
 
-/* Container del contenuto del footer: 100% Trasparente Etereo (NESSUNA BOX INGOMBRANTE) */
+/* Container del contenuto del footer: 100% Trasparente Etereo */
 .footer-glass-card {
   position: relative;
   z-index: 2;
   border-radius: 24px;
   padding: 2.5rem 2rem;
   background: transparent !important;
-  border: none !important;
+  border: 1px solid transparent !important;
   box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), backdrop-filter 0.8s ease;
 }
 
 @media (max-width: 576px) {
@@ -44,53 +44,67 @@
   }
 }
 
-/* LOGICA DESKTOP HOVER (Solo schermi desktop con mouse) */
+/* LOGICA DESKTOP HOVER (Veloce, minima e delicata) */
 @media (hover: hover) and (pointer: fine) {
   .footer-section:hover {
-    filter: brightness(0.72) contrast(1.10) !important;
+    filter: brightness(0.86) contrast(1.05) !important;
   }
 
   .footer-section:hover .footer-overlay {
-    opacity: 0.92 !important;
-    background: linear-gradient(180deg, rgba(4, 10, 7, 0.75) 0%, rgba(2, 6, 4, 0.88) 100%) !important;
+    opacity: 0.85 !important;
   }
 
   .footer-section:hover .footer-glass-card {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
   }
 
   .footer-section:hover .footer-title {
     text-shadow: 
       0 2px 12px rgba(0, 0, 0, 0.98),
-      0 0 30px rgba(82, 203, 135, 0.9),
-      0 0 60px rgba(82, 203, 135, 0.5) !important;
+      0 0 25px rgba(82, 203, 135, 0.85),
+      0 0 50px rgba(82, 203, 135, 0.4) !important;
   }
 }
 
-/* LOGICA MOBILE & TOUCH DEVICE (Solo dispositivi touch via scroll .is-in-view) */
+/* LOGICA MOBILE & TOUCH DEVICE (Con Delay di 0.4s e Transizione Morbida di 1.2s che avviene sotto gli occhi dell'utente) */
 @media (hover: none), (max-width: 991.98px) {
+  .footer-section {
+    transition: filter 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s !important;
+  }
+
+  .footer-overlay {
+    transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s, background 1.2s ease 0.4s !important;
+  }
+
+  .footer-glass-card {
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s, backdrop-filter 1.2s ease 0.4s !important;
+  }
+
   .footer-section.is-in-view,
   .footer-section.illuminated {
-    filter: brightness(0.72) contrast(1.10) !important;
+    filter: brightness(0.86) contrast(1.05) !important;
   }
 
   .footer-section.is-in-view .footer-overlay,
   .footer-section.illuminated .footer-overlay {
-    opacity: 0.92 !important;
-    background: linear-gradient(180deg, rgba(4, 10, 7, 0.75) 0%, rgba(2, 6, 4, 0.88) 100%) !important;
+    opacity: 0.85 !important;
   }
 
   .footer-section.is-in-view .footer-glass-card,
   .footer-section.illuminated .footer-glass-card {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
   }
 
   .footer-section.is-in-view .footer-title,
   .footer-section.illuminated .footer-title {
     text-shadow: 
       0 2px 12px rgba(0, 0, 0, 0.98),
-      0 0 30px rgba(82, 203, 135, 0.9),
-      0 0 60px rgba(82, 203, 135, 0.5) !important;
+      0 0 25px rgba(82, 203, 135, 0.85),
+      0 0 50px rgba(82, 203, 135, 0.4) !important;
   }
 }
 
