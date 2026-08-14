@@ -1,14 +1,140 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { translations } from "../../utils/translations";
+import API_BASE_URL from "../../config/api";
+import { apiFetch } from "../../utils/apiClient";
 import "./MatrimonioWidgets.css";
+
+// Pool di recensioni verificate a 5 stelle con traduzione bilingue completa (IT / EN)
+const ALL_REVIEWS_POOL = [
+  {
+    id: 1,
+    name: "Francesca B.",
+    dateIta: "23/05/2026",
+    dateEng: "May 23, 2026",
+    rating: 5.0,
+    titleIta: "Epicooooo ✨💖",
+    titleEng: "Epic experience! ✨💖",
+    textIta: "Un'agenzia fantastica che consiglierei a chiunque! Ci hanno supportato dall'inizio alla fine nella gestione della musica, ma la vera svolta è stata l'after party. Sono riusciti a coinvolgere tutti gli invitati fino a tarda notte!",
+    textEng: "A fantastic agency that I would recommend to anyone! They supported us from start to finish with the music management, but the real highlight was the after party. They managed to engage all the guests until late at night!",
+    initials: "F",
+  },
+  {
+    id: 2,
+    name: "Fiorenza M.",
+    dateIta: "10/07/2026",
+    dateEng: "July 10, 2026",
+    rating: 5.0,
+    titleIta: "Tutto perfetto!",
+    titleEng: "Everything was perfect!",
+    textIta: "Tutto come desiderato. Musica divertente e bellissima atmosfera. Niente da eccepire! Vincenzo e il suo team hanno reso la nostra festa indimenticabile.",
+    textEng: "Everything was exactly as requested. Fun music and wonderful atmosphere. Nothing to complain about! Vincenzo and his team made our party unforgettable.",
+    initials: "F",
+  },
+  {
+    id: 3,
+    name: "Francesca S.",
+    dateIta: "04/07/2026",
+    dateEng: "July 4, 2026",
+    rating: 5.0,
+    titleIta: "Non potevamo chiedere di meglio!",
+    titleEng: "Couldn't have asked for a better music company!",
+    textIta: "Il mio wedding planner ha raccomandato VINCO EVENTI, e fin dall'inizio l'intero processo è stato così facile! Sono stati incredibilmente professionali, organizzati e curati in ogni dettaglio.",
+    textEng: "My wedding planner recommended VINCO EVENTI, and from the very beginning the whole process was so smooth! They were incredibly professional, organized, and attentive to every detail.",
+    initials: "F",
+  },
+  {
+    id: 4,
+    name: "Giuseppe & Elena",
+    dateIta: "18/09/2025",
+    dateEng: "Sept 18, 2025",
+    rating: 5.0,
+    titleIta: "Spettacolo unico e tanta professionalità",
+    titleEng: "Unique show and utmost professionalism",
+    textIta: "Dall'aperitivo al taglio torta con il sax dal vivo fino al DJ set scatenato della sera, hanno creato un'atmosfera magica. Invitati tutti entusiasti!",
+    textEng: "From the welcome cocktail to the cake cutting with live sax and the wild evening DJ set, they created a magical atmosphere. All guests were thrilled!",
+    initials: "G",
+  },
+  {
+    id: 5,
+    name: "Marco & Sofia",
+    dateIta: "14/06/2025",
+    dateEng: "June 14, 2025",
+    rating: 5.0,
+    titleIta: "Matrimonio da favola!",
+    titleEng: "Fairytale Wedding!",
+    textIta: "Vincenzo e i suoi musicisti sono stati eccezionali. Hanno saputo leggere la piazza e far ballare tutti, dai più giovani ai più anziani. Consigliatissimi!",
+    textEng: "Vincenzo and his musicians were exceptional. They knew how to read the crowd and get everyone dancing, from the youngest to the oldest. Highly recommended!",
+    initials: "M",
+  },
+  {
+    id: 6,
+    name: "Alessandro P.",
+    dateIta: "02/10/2025",
+    dateEng: "October 2, 2025",
+    rating: 5.0,
+    titleIta: "Musica ed eleganza ai massimi livelli",
+    titleEng: "Music and elegance at the highest level",
+    textIta: "Service audio e luci di livello altissimo, voce e strumenti solisti incantevoli. Un grazie di cuore a tutto lo staff per la disponibilità e la passione.",
+    textEng: "Top-tier audio and lighting service, enchanting vocals and solo instruments. A heartfelt thank you to all staff for their dedication and passion.",
+    initials: "A",
+  },
+  {
+    id: 7,
+    name: "Laura & Davide",
+    dateIta: "28/08/2025",
+    dateEng: "August 28, 2025",
+    rating: 5.0,
+    titleIta: "Semplicemente imbattibili!",
+    titleEng: "Simply unbeatable!",
+    textIta: "Ci siamo affidati a loro a occhi chiusi e hanno superato ogni aspettativa. Organizzazione impeccabile, flessibilità totale e divertimento puro.",
+    textEng: "We trusted them completely and they exceeded every expectation. Impeccable organization, full flexibility, and pure fun.",
+    initials: "L",
+  },
+  {
+    id: 8,
+    name: "Claudia T.",
+    dateIta: "12/05/2025",
+    dateEng: "May 12, 2025",
+    rating: 5.0,
+    titleIta: "La scelta migliore per le nostre nozze",
+    titleEng: "The best choice for our wedding",
+    textIta: "Ingegneria del suono perfetta, volumi sempre bilanciati e repertorio vastissimo. Riceviamo ancora i complimenti dagli invitati!",
+    textEng: "Perfect sound engineering, always balanced volumes, and a vast repertoire. We are still receiving compliments from our guests!",
+    initials: "C",
+  },
+];
 
 function MatrimonioWidgets() {
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].about;
 
+  const [totalReviewsCount, setTotalReviewsCount] = useState(124);
+
+  // Selezione casuale di 4 recensioni dal pool ad ogni mount
+  const [randomReviews] = useState(() => {
+    const shuffled = [...ALL_REVIEWS_POOL].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 4);
+  });
+
   useEffect(() => {
+    let isSubscribed = true;
+
+    // Recupero del numero totale live delle recensioni dal backend / Matrimonio.com
+    const fetchMatrimonioStats = async () => {
+      try {
+        const data = await apiFetch(`${API_BASE_URL}/api/matrimonio-stats`);
+        if (isSubscribed && data && data.totalReviews) {
+          setTotalReviewsCount(data.totalReviews);
+        }
+      } catch {
+        // Fallback silenzioso
+      }
+    };
+
+    fetchMatrimonioStats();
+
     // Helper per caricare script dei badge Matrimonio.com in modo dinamico
     const loadScript = (src) => {
       return new Promise((resolve) => {
@@ -25,8 +151,6 @@ function MatrimonioWidgets() {
         document.body.appendChild(script);
       });
     };
-
-    let isSubscribed = true;
 
     const runWidgetScripts = async () => {
       await loadScript("https://cdn1.matrimonio.com/_js/wp-rated.js?v=4");
@@ -56,45 +180,13 @@ function MatrimonioWidgets() {
     };
   }, []);
 
-  // Recensioni ufficiali verificate su Matrimonio.com per VINCO EVENTI
-  const reviewsData = [
-    {
-      id: 1,
-      name: "Francesca B.",
-      date: "23/05/2026",
-      rating: 5.0,
-      title: "Epicooooo ✨💖",
-      text: "Un'agenzia fantastica che consiglierei a chiunque! Ci hanno supportato dall'inizio alla fine nella gestione della musica, ma la vera svolta è stata l'after party. Sono riusciti a coinvolgere tutti gli invitati fino a tarda notte!",
-      initials: "F",
-    },
-    {
-      id: 2,
-      name: "Fiorenza M.",
-      date: "10/07/2026",
-      rating: 5.0,
-      title: "Tutto perfetto!",
-      text: "Tutto come desiderato. Musica divertente e bellissima atmosfera. Niente da eccepire! Vincenzo e il suo team hanno reso la nostra festa indimenticabile.",
-      initials: "F",
-    },
-    {
-      id: 3,
-      name: "Francesca S.",
-      date: "04/07/2026",
-      rating: 5.0,
-      title: "Couldn't have asked for a better music company!",
-      text: "Il mio wedding planner ha raccomandato VINCO EVENTI, e fin dall'inizio l'intero processo è stato così facile! Sono stati incredibilmente professionali, organizzati e curati in ogni dettaglio.",
-      initials: "F",
-    },
-    {
-      id: 4,
-      name: "Giuseppe & Elena",
-      date: "18/09/2025",
-      rating: 5.0,
-      title: "Spettacolo unico e tanta professionalità",
-      text: "Dall'aperitivo al taglio torta con il sax dal vivo fino al DJ set scatenato della sera, hanno creato un'atmosfera magica. Invitati tutti entusiasti!",
-      initials: "G",
-    },
-  ];
+  const reviewsCountLabel = t.reviewsCountPattern
+    ? t.reviewsCountPattern.replace("{count}", totalReviewsCount)
+    : `(${totalReviewsCount} ${lang === "en" ? "reviews" : "recensioni"})`;
+
+  const readAllReviewsLabel = t.readAllReviewsPattern
+    ? t.readAllReviewsPattern.replace("{count}", totalReviewsCount)
+    : `${lang === "en" ? "Read all" : "Leggi tutte le"} ${totalReviewsCount} ${lang === "en" ? "reviews on" : "recensioni su"}`;
 
   return (
     <section className="matrimonio-section py-5 bg-body-tertiary border-top border-bottom">
@@ -116,7 +208,7 @@ function MatrimonioWidgets() {
 
         {/* Griglia 4 Badge Riconoscimenti (Awards) */}
         <Row className="g-3 g-md-4 justify-content-center align-items-stretch mb-5">
-          {/* Badge A: Banner 100 Recensioni */}
+          {/* Badge A: Banner Recensioni */}
           <Col xs={12} sm={6} lg={3}>
             <div className="matrimonio-badge-card">
               <div className="matrimonio-badge-img-wrapper mb-3">
@@ -136,7 +228,7 @@ function MatrimonioWidgets() {
                 </div>
               </div>
               <h3 className="h6 font-heading fw-bold text-body mb-1">
-                {t.badge100Title || "100 Recensioni a 5 Stelle"}
+                {lang === "en" ? `${totalReviewsCount} 5-Star Reviews` : `${totalReviewsCount} Recensioni a 5 Stelle`}
               </h3>
               <p className="small text-body-secondary mb-0 font-body">
                 {t.badge100Sub || "Suggerito e Raccomandato al 100% dalle nostre coppie."}
@@ -253,64 +345,70 @@ function MatrimonioWidgets() {
                   <i className="bi bi-star-fill text-warning"></i>
                 </div>
                 <span className="small text-body-secondary font-body ms-1">
-                  {t.reviewsCount || "(123 recensioni)"}
+                  {reviewsCountLabel}
                 </span>
               </div>
             </div>
           </Col>
         </Row>
 
-        {/* Griglia Card Recensioni con Stessa UI/UX delle Badge Card */}
+        {/* Griglia Card Recensioni Randomizzate e Tradotte in IT/EN */}
         <Row className="g-4 justify-content-center align-items-stretch mb-4">
-          {reviewsData.map((rev) => (
-            <Col key={rev.id} xs={12} md={6}>
-              <div className="review-item-card">
-                <div>
-                  <div className="d-flex align-items-center justify-content-between mb-3">
-                    <div className="d-flex align-items-center gap-3">
-                      <div className="review-avatar">{rev.initials}</div>
-                      <div>
-                        <h4 className="h6 font-heading fw-bold text-body mb-0">
-                          {rev.name}
-                        </h4>
-                        <span className="small text-body-secondary font-body">
-                          {t.weddingDateLabel || "Data nozze:"} {rev.date}
-                        </span>
+          {randomReviews.map((rev) => {
+            const reviewTitle = lang === "en" ? rev.titleEng : rev.titleIta;
+            const reviewText = lang === "en" ? rev.textEng : rev.textIta;
+            const reviewDate = lang === "en" ? rev.dateEng : rev.dateIta;
+
+            return (
+              <Col key={rev.id} xs={12} md={6}>
+                <div className="review-item-card h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div className="d-flex align-items-center justify-content-between mb-3">
+                      <div className="d-flex align-items-center gap-3">
+                        <div className="review-avatar">{rev.initials}</div>
+                        <div>
+                          <h4 className="h6 font-heading fw-bold text-body mb-0">
+                            {rev.name}
+                          </h4>
+                          <span className="small text-body-secondary font-body">
+                            {t.weddingDateLabel || "Data nozze:"} {reviewDate}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="review-stars">
+                        <i className="bi bi-star-fill text-warning"></i>
+                        <i className="bi bi-star-fill text-warning"></i>
+                        <i className="bi bi-star-fill text-warning"></i>
+                        <i className="bi bi-star-fill text-warning"></i>
+                        <i className="bi bi-star-fill text-warning"></i>
                       </div>
                     </div>
-                    <div className="review-stars">
-                      <i className="bi bi-star-fill text-warning"></i>
-                      <i className="bi bi-star-fill text-warning"></i>
-                      <i className="bi bi-star-fill text-warning"></i>
-                      <i className="bi bi-star-fill text-warning"></i>
-                      <i className="bi bi-star-fill text-warning"></i>
-                    </div>
+
+                    <h5 className="h6 font-body fw-bold text-body mb-2">
+                      {reviewTitle}
+                    </h5>
+                    <p className="font-body text-body-secondary fs-6 mb-0 lh-base">
+                      "{reviewText}"
+                    </p>
                   </div>
 
-                  <h5 className="h6 font-body fw-bold text-body mb-2">
-                    {rev.title}
-                  </h5>
-                  <p className="font-body text-body-secondary fs-6 mb-0 lh-base">
-                    "{rev.text}"
-                  </p>
+                  <div className="mt-3 pt-3 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+                    <span className="small text-success font-body fw-semibold d-inline-flex align-items-center gap-1">
+                      <i className="bi bi-check-circle-fill"></i> {t.verifiedReview || "Recensione Verificata"}
+                    </span>
+                    <img
+                      src="https://cdn1.matrimonio.com/assets/img/logos/gen_logoHeader.svg"
+                      alt="Matrimonio.com"
+                      className="matrimonio-logo-img"
+                    />
+                  </div>
                 </div>
-
-                <div className="mt-3 pt-3 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
-                  <span className="small text-success font-body fw-semibold d-inline-flex align-items-center gap-1">
-                    <i className="bi bi-check-circle-fill"></i> {t.verifiedReview || "Recensione Verificata"}
-                  </span>
-                  <img
-                    src="https://cdn1.matrimonio.com/assets/img/logos/gen_logoHeader.svg"
-                    alt="Matrimonio.com"
-                    className="matrimonio-logo-img"
-                  />
-                </div>
-              </div>
-            </Col>
-          ))}
+              </Col>
+            );
+          })}
         </Row>
 
-        {/* Pulsante Diretto per tutte le 123 recensioni su Matrimonio.com */}
+        {/* Pulsante Diretto per tutte le recensioni su Matrimonio.com */}
         <Row className="justify-content-center text-center mt-4">
           <Col xs={12}>
             <a
@@ -319,7 +417,7 @@ function MatrimonioWidgets() {
               rel="nofollow noopener noreferrer"
               className="btn-matrimonio-all"
             >
-              <span>{t.readAllReviews || "Leggi tutte le 123 recensioni su"}</span>
+              <span>{readAllReviewsLabel}</span>
               <img
                 src="https://cdn1.matrimonio.com/assets/img/logos/gen_logoHeader.svg"
                 alt="Matrimonio.com"

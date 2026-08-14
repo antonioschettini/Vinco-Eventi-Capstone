@@ -64,7 +64,7 @@ public class SecurityConfig {
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/quotes").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/quotes/*/calendar.ics").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/services", "/api/services/**", "/api/gallery", "/api/gallery/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/services", "/api/services/**", "/api/gallery", "/api/gallery/**", "/api/matrimonio-stats").permitAll()
                 .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
             )
