@@ -99,6 +99,7 @@
   z-index: 2;
 }
 
+.badge-essential,
 .badge-basic {
   background: linear-gradient(135deg, #cd7f32, #a05a2c);
   color: #fff;

@@ -76,8 +76,9 @@ function Services() {
     }
 
     // Fallback statico per i 3 badge standard, quando l'immagine non è nel DB
-    const badge = service.badge ? service.badge.toUpperCase() : "BASIC";
+    const badge = service.badge ? service.badge.toUpperCase() : "ESSENTIAL";
     switch (badge) {
+      case "ESSENTIAL":
       case "BASIC":
         return isEng
           ? "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263063/vinco_eventi_servizi/svlioqxv0xes6fumwpnl.jpg"
@@ -105,7 +106,7 @@ function Services() {
       subtitleIta: service.subtitleIta || "",
       subtitleEng: service.subtitleEng || "",
       category: service.category || "PACKAGE",
-      badge: service.badge || "BASIC",
+      badge: service.badge || "ESSENTIAL",
       imageUrlIta: service.imageUrlIta || "",
       imageUrlEng: service.imageUrlEng || "",
       featuresIta: service.featuresIta || "",
@@ -239,8 +240,8 @@ function Services() {
   // Fallback per rendering iniziale o se DB in caricamento
   const defaultStaticPackages = [
     {
-      id: "static-basic",
-      badge: "BASIC",
+      id: "static-essential",
+      badge: "ESSENTIAL",
       titleIta: t.basic.title,
       titleEng: t.basic.title,
       subtitleIta: t.basic.subtitle,

@@ -77,14 +77,21 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedDefaultServices() {
+        try {
+            jdbcTemplate.execute("UPDATE services SET title_ita = 'ESSENTIAL BOX', title_eng = 'ESSENTIAL BOX', badge = 'ESSENTIAL' WHERE badge = 'BASIC' OR UPPER(badge) = 'BASIC' OR UPPER(title_ita) LIKE '%BASIC%' OR UPPER(title_eng) LIKE '%BASIC%';");
+            System.out.println(">>> Tabella services migrata con successo a DB (BASIC -> ESSENTIAL BOX).");
+        } catch (Exception e) {
+            System.err.println(">>> Avviso durante la migrazione del servizio ESSENTIAL BOX: " + e.getMessage());
+        }
+
         if (serviceRepository.count() == 0) {
-            ServiceEntity basic = ServiceEntity.builder()
-                    .titleIta("BASIC")
-                    .titleEng("BASIC")
+            ServiceEntity essential = ServiceEntity.builder()
+                    .titleIta("ESSENTIAL BOX")
+                    .titleEng("ESSENTIAL BOX")
                     .subtitleIta("Pacchetto essenziale per intrattenimento e service audio/luci professionale")
                     .subtitleEng("Essential package for entertainment and professional audio/lighting service")
                     .category("PACKAGE")
-                    .badge("BASIC")
+                    .badge("ESSENTIAL")
                     .imageUrlIta("https://res.cloudinary.com/oe1bztwb/image/upload/v1785738598/vinco_eventi_servizi/vvzgi7pa99ubd9np2fmy.png")
                     .imageUrlEng("https://res.cloudinary.com/oe1bztwb/image/upload/v1785738601/vinco_eventi_servizi/fnrxkp5mpmdk8dcfz8mf.png")
                     .featuresIta("Service audio e luci;DJ (a scelta dal team VINCO EVENTI)")
@@ -93,8 +100,8 @@ public class DataInitializer implements CommandLineRunner {
                     .build();
 
             ServiceEntity plus = ServiceEntity.builder()
-                    .titleIta("PLUS")
-                    .titleEng("PLUS")
+                    .titleIta("PLUS BOX")
+                    .titleEng("PLUS BOX")
                     .subtitleIta("Soluzione completa con sottofondo musicale e strumenti solisti dal vivo")
                     .subtitleEng("Complete solution with background music and live solo instruments")
                     .category("PACKAGE")
@@ -107,8 +114,8 @@ public class DataInitializer implements CommandLineRunner {
                     .build();
 
             ServiceEntity full = ServiceEntity.builder()
-                    .titleIta("FULL")
-                    .titleEng("FULL")
+                    .titleIta("FULL BOX")
+                    .titleEng("FULL BOX")
                     .subtitleIta("L'esperienza totale di intrattenimento con band dal vivo, attrazioni speciali e scenografie luminose")
                     .subtitleEng("The total entertainment experience with live band, special attractions and scenic lighting")
                     .category("PACKAGE")
@@ -122,10 +129,9 @@ public class DataInitializer implements CommandLineRunner {
                     .displayOrder(3)
                     .build();
 
-            serviceRepository.saveAll(List.of(basic, plus, full));
-            System.out.println(">>> Seed Servizi eseguito con successo con URL Cloudinary corretti per BASIC, PLUS e FULL.");
+            serviceRepository.saveAll(List.of(essential, plus, full));
+            System.out.println(">>> Seed Servizi eseguito con successo con URL Cloudinary corretti per ESSENTIAL BOX, PLUS BOX e FULL BOX.");
         }
-        // Se il DB è già popolato, non toccare nulla: le modifiche dell'admin sono preservate.
     }
 
     private String getPoster(String videoUrl) {

@@ -1,4 +1,4 @@
-/* Footer Styling - Luxury Translucent Glass & High Contrast Illumination */
+/* Footer Styling - Luxury Transparent Background & High Contrast Illumination */
 .footer-section {
   width: 100%;
   position: relative;
@@ -11,7 +11,7 @@
   transition: filter 0.5s ease, box-shadow 0.5s ease, border-color 0.4s ease;
 }
 
-/* Overlay per lo sfondo della console DJ */
+/* Overlay trasparente ed etereo per far risaltare la console DJ sullo sfondo */
 .footer-overlay {
   position: absolute;
   top: 0;
@@ -19,22 +19,15 @@
   width: 100%;
   height: 100%;
   z-index: 1;
+  background: linear-gradient(180deg, rgba(6, 14, 10, 0.65) 0%, rgba(3, 7, 5, 0.80) 100%);
   transition: opacity 0.5s ease, background 0.5s ease;
-}
-
-[data-bs-theme="dark"] .footer-overlay {
-  background: linear-gradient(180deg, rgba(6, 14, 10, 0.65) 0%, rgba(3, 7, 5, 0.78) 100%);
-}
-
-[data-bs-theme="light"] .footer-overlay {
-  background: linear-gradient(180deg, rgba(12, 25, 18, 0.55) 0%, rgba(6, 15, 10, 0.68) 100%);
 }
 
 /* EFFETTO ACCESO E EVIDENZIAZIONE DELLO SFONDO ALL'HOVER E IN SCROLL */
 .footer-section:hover,
 .footer-section.illuminated,
 .footer-section.is-in-view {
-  filter: brightness(1.2) contrast(1.12) saturate(1.22);
+  filter: brightness(1.22) contrast(1.12) saturate(1.25);
   box-shadow: inset 0 0 100px rgba(82, 203, 135, 0.25);
 }
 
@@ -44,33 +37,22 @@
   opacity: 0.45;
 }
 
-/* Container Glass Card per il contenuto del footer */
+/* Container del contenuto del footer - Senza Box ingombrante (Sfondo 100% Visibile) */
 .footer-glass-card {
   position: relative;
   z-index: 2;
   border-radius: 24px;
   padding: 2.5rem 2rem;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-}
-
-[data-bs-theme="dark"] .footer-glass-card {
-  background: rgba(10, 22, 16, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 0 20px rgba(255, 255, 255, 0.03);
-}
-
-[data-bs-theme="light"] .footer-glass-card {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(32, 74, 53, 0.25);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.5);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (max-width: 576px) {
   .footer-glass-card {
     padding: 1.75rem 1.1rem;
-    border-radius: 18px;
   }
 }
 
@@ -78,22 +60,6 @@
 .footer-section.illuminated .footer-glass-card,
 .footer-section.is-in-view .footer-glass-card {
   transform: translateY(-4px);
-}
-
-[data-bs-theme="dark"] .footer-section:hover .footer-glass-card,
-[data-bs-theme="dark"] .footer-section.illuminated .footer-glass-card,
-[data-bs-theme="dark"] .footer-section.is-in-view .footer-glass-card {
-  background: rgba(14, 34, 24, 0.85) !important;
-  border-color: rgba(82, 203, 135, 0.6) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(82, 203, 135, 0.35) !important;
-}
-
-[data-bs-theme="light"] .footer-section:hover .footer-glass-card,
-[data-bs-theme="light"] .footer-section.illuminated .footer-glass-card,
-[data-bs-theme="light"] .footer-section.is-in-view .footer-glass-card {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-color: rgba(32, 74, 53, 0.5) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25), 0 0 30px rgba(88, 188, 130, 0.3) !important;
 }
 
 .footer-content {
@@ -106,65 +72,54 @@
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: #ffffff !important;
+  text-shadow: 
+    0 2px 10px rgba(0, 0, 0, 0.95),
+    0 4px 20px rgba(0, 0, 0, 0.85),
+    0 0 30px rgba(0, 0, 0, 0.7);
   transition: color 0.35s ease, text-shadow 0.35s ease;
 }
 
-[data-bs-theme="dark"] .footer-title {
-  color: #ffffff !important;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9), 0 0 20px rgba(82, 203, 135, 0.3);
-}
-
-[data-bs-theme="light"] .footer-title {
-  color: #143524 !important;
-  text-shadow: none;
+.footer-section:hover .footer-title,
+.footer-section.illuminated .footer-title,
+.footer-section.is-in-view .footer-title {
+  text-shadow: 
+    0 2px 12px rgba(0, 0, 0, 0.98),
+    0 0 25px rgba(82, 203, 135, 0.85),
+    0 0 50px rgba(82, 203, 135, 0.45) !important;
 }
 
 /* Dati Aziendali */
 .company-info {
   font-size: 0.98rem;
   font-weight: 600;
+  color: #f0f7f3 !important;
+  text-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.95),
+    0 4px 14px rgba(0, 0, 0, 0.85);
   transition: color 0.35s ease;
-}
-
-[data-bs-theme="dark"] .company-info {
-  color: #e6f0eb !important;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-}
-
-[data-bs-theme="light"] .company-info {
-  color: #1b3829 !important;
-  text-shadow: none;
 }
 
 .text-forest {
   color: #52cb87 !important;
 }
 
-[data-bs-theme="light"] .text-forest {
-  color: #204a35 !important;
-}
-
 .info-link {
+  color: #ffffff !important;
   text-decoration: none;
   cursor: pointer;
   font-weight: 700;
-  transition: color 0.25s ease, text-decoration-color 0.25s ease;
-}
-
-[data-bs-theme="dark"] .info-link {
-  color: #ffffff !important;
-}
-
-[data-bs-theme="light"] .info-link {
-  color: #204a35 !important;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+  transition: color 0.25s ease, text-shadow 0.25s ease;
 }
 
 .info-link:hover {
   color: #52cb87 !important;
+  text-shadow: 0 0 15px rgba(82, 203, 135, 0.8) !important;
   text-decoration: underline;
 }
 
-/* Pulsanti Social */
+/* Pulsanti Social con icone ad alto contrasto */
 .social-btn {
   width: 44px;
   height: 44px;
@@ -177,7 +132,7 @@
   border: 1px solid rgba(255, 255, 255, 0.25);
   background-color: rgba(255, 255, 255, 0.15);
   color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
               background-color 0.3s ease, 
               color 0.3s ease, 
@@ -187,14 +142,8 @@
   -webkit-backdrop-filter: blur(8px);
 }
 
-[data-bs-theme="light"] .social-btn {
-  background-color: rgba(32, 74, 53, 0.1);
-  border-color: rgba(32, 74, 53, 0.3);
-  color: #204a35 !important;
-}
-
 .social-btn .mixcloud-svg {
-  fill: currentColor !important;
+  fill: #ffffff !important;
   transition: fill 0.3s ease;
 }
 
@@ -204,7 +153,7 @@
     transform: translateY(-4px) scale(1.12) !important;
     color: #ffffff !important;
     border-color: transparent !important;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6) !important;
   }
 
   .social-btn.spotify:hover { background-color: #1db954 !important; }
@@ -219,11 +168,11 @@
   }
 }
 
-/* MOBILE & TOUCH DEVICE UX */
+/* MOBILE & TOUCH DEVICE UX: Icone sempre a colori nativi, zero pulsanti bloccati su tap */
 @media (hover: none), (max-width: 991.98px) {
   .social-btn {
     border-color: transparent !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
     color: #ffffff !important;
   }
 
@@ -242,25 +191,16 @@
 
 /* Copyright Section */
 .footer-copyright-divider {
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-[data-bs-theme="light"] .footer-copyright-divider {
-  border-top: 1px solid rgba(32, 74, 53, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .footer-copyright-text {
   font-size: 0.85rem;
   letter-spacing: 0.05em;
   font-weight: 500;
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 
-[data-bs-theme="dark"] .footer-copyright-text {
-  color: rgba(255, 255, 255, 0.75) !important;
-}
-
-[data-bs-theme="light"] .footer-copyright-text {
-  color: #204a35 !important;
-}
 
 

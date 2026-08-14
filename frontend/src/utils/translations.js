@@ -63,8 +63,8 @@ export const translations = {
       contactUs: "Richiedi Informazioni",
       sendEmail: "Invia Email",
       basic: {
-        title: "BASIC BOX",
-        badge: "BASIC",
+        title: "ESSENTIAL BOX",
+        badge: "ESSENTIAL",
         subtitle:
           "Pacchetto essenziale per intrattenimento e service audio/luci professionale.",
         features: [
@@ -460,8 +460,8 @@ export const translations = {
       contactUs: "Request Information",
       sendEmail: "Send Email",
       basic: {
-        title: "BASIC BOX",
-        badge: "BASIC",
+        title: "ESSENTIAL BOX",
+        badge: "ESSENTIAL",
         subtitle:
           "Essential package for entertainment and professional audio/lighting service.",
         features: [
