@@ -298,7 +298,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   box-shadow: none !important;
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
-  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), backdrop-filter 0.8s ease;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), 
+              backdrop-filter 0.8s ease, 
+              background-color 0.8s ease, 
+              border-color 0.8s ease, 
+              box-shadow 0.8s ease;
 }
 
 .hero-gallery-title {
@@ -335,8 +339,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
   .hero-gallery-section:hover .hero-gallery-content {
     transform: translateY(-3px);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
   }
 
   .hero-gallery-section:hover .hero-gallery-title {
@@ -367,7 +374,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   }
 
   .hero-gallery-content {
-    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s, backdrop-filter 1.2s ease 0.4s !important;
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s, 
+                backdrop-filter 1.2s ease 0.4s, 
+                background-color 1.2s ease 0.4s, 
+                border-color 1.2s ease 0.4s, 
+                box-shadow 1.2s ease 0.4s !important;
   }
 
   .hero-gallery-section.is-in-view {
@@ -380,8 +391,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
   .hero-gallery-section.is-in-view .hero-gallery-content {
     transform: translateY(-3px);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
   }
 
   .hero-gallery-section.is-in-view .hero-gallery-title {
@@ -408,15 +422,13 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 }
 
 .entertainment-title {
-  position: relative;
-  display: inline-block;
+  color: var(--bs-body-color);
+  letter-spacing: -0.5px;
 }
 
-.entertainment-title::after {
-  content: "";
-  display: block;
+.entertainment-title-bar {
   width: 60px;
-  height: 3px;
+  height: 4px;
   background-color: var(--primary-forest, #204a35);
   margin: 12px auto 0 auto;
   border-radius: 2px;
@@ -429,7 +441,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   overflow: hidden;
   /* Le card sono SEMPRE verticali — nessun layout orizzontale */
   flex-direction: column !important;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   height: 100%;
 }
 
@@ -465,6 +477,8 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   /* Ancoraggio esplicito al centro — mantiene il soggetto centrato su qualsiasi larghezza/altezza del wrapper */
   object-position: center center;
   transform-origin: center center;
+  filter: grayscale(85%);
+  opacity: 0.88;
   transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
               opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -472,11 +486,6 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
 /* Hover esclusivo per DESKTOP: partenza da grayscale(85%) e colore vivo + glow all'hover */
 @media (hover: hover) and (pointer: fine) {
-  .entertainment-card-img {
-    filter: grayscale(85%);
-    opacity: 0.88;
-  }
-
   .entertainment-card:hover {
     transform: translateY(-6px);
   }
@@ -496,16 +505,37 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   }
 }
 
-/* Dispositivi Touch & Mobile: card sempre a colori vivaci nativi */
+/* Dispositivi Touch & Mobile: Con Delay di 0.4s e Transizione Morbida di 1.2s che anima il passaggio sotto gli occhi dell'utente al scroll .is-in-view */
 @media (hover: none), (max-width: 991.98px) {
+  .entertainment-card {
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s, 
+                box-shadow 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s !important;
+  }
+
   .entertainment-card-img {
-    filter: none !important;
-    opacity: 1 !important;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: grayscale(85%);
+    opacity: 0.88;
+    transition: filter 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s,
+                transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s,
+                opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s !important;
+  }
+
+  .entertainment-card.is-in-view {
+    transform: translateY(-3px);
+  }
+
+  [data-bs-theme="dark"] .entertainment-card.is-in-view {
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), 0 0 20px rgba(76, 166, 121, 0.2) !important;
+  }
+
+  [data-bs-theme="light"] .entertainment-card.is-in-view {
+    box-shadow: 0 14px 32px rgba(32, 74, 53, 0.14) !important;
   }
 
   .entertainment-card.is-in-view .entertainment-card-img {
-    transform: scale(1.02);
+    filter: grayscale(0%) !important;
+    opacity: 1 !important;
+    transform: scale(1.03);
   }
 
   .entertainment-card:active {
