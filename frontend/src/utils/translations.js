@@ -61,6 +61,7 @@ export const translations = {
       packagesTitle: "I Nostri Pacchetti Esclusivi",
       brochureBtn: "BROCHURE",
       contactUs: "Richiedi Informazioni",
+      sendEmail: "Invia Email",
       basic: {
         title: "BASIC BOX",
         badge: "BASIC",
@@ -455,6 +456,7 @@ export const translations = {
       packagesTitle: "Our Exclusive Packages",
       brochureBtn: "BROCHURE",
       contactUs: "Request Information",
+      sendEmail: "Send Email",
       basic: {
         title: "BASIC BOX",
         badge: "BASIC",

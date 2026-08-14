@@ -184,7 +184,7 @@ public class EmailService {
                         <tr>
                           <td>
                             <a href="%s/admin-enzo/preventivi" target="_blank" style="text-decoration: none; display: inline-block;">
-                              <img src="%s" alt="VINCO EVENTI Logo" width="68" height="68" style="display: block; margin: 0 auto 10px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                              <img src="%s" alt="VINCO EVENTI Logo" width="95" height="95" style="display: block; margin: 0 auto 10px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                             </a>
                             <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h2>
                             <span style="display: inline-block; margin-top: 6px; background-color: #dcfce7; color: #15803d; font-size: 13px; font-weight: 600; padding: 4px 14px; border-radius: 20px; border: 1px solid #bbf7d0;">
@@ -530,7 +530,7 @@ public class EmailService {
                             <tr>
                               <td>
                                 <a href="%s" target="_blank" style="text-decoration: none; display: inline-block;">
-                                  <img src="%s" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                                  <img src="%s" alt="VINCO EVENTI Logo" width="95" height="95" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                                 </a>
                                 <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h1>
                                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #059669; font-weight: 600;">Exclusive Events & Musical Entertainment</p>
@@ -683,7 +683,7 @@ public class EmailService {
                             <tr>
                               <td>
                                 <a href="%s" target="_blank" style="text-decoration: none; display: inline-block;">
-                                  <img src="%s" alt="VINCO EVENTI Logo" width="70" height="70" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
+                                  <img src="%s" alt="VINCO EVENTI Logo" width="95" height="95" style="display: block; margin: 0 auto 12px auto; border-radius: 50%%; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" />
                                 </a>
                                 <h1 style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1.5px; color: #064e3b;">VINCO EVENTI</h1>
                                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #059669; font-weight: 600;">Organizzazione Eventi & Intrattenimento Musicale</p>

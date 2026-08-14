@@ -7,7 +7,7 @@ import API_BASE_URL from "../config/api";
 import { apiFetch, authApiFetch } from "../utils/apiClient";
 import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
-import { handlePhoneClick } from "../utils/contactHelpers";
+import { handlePhoneClick, handleEmailClick } from "../utils/contactHelpers";
 import imageCompression from "browser-image-compression";
 import useScrollReveal from "../utils/useScrollReveal";
 import "./Services.css";
@@ -294,14 +294,22 @@ function Services() {
               <p className="lead fs-4 font-body text-body-secondary mb-4 hero-gallery-subtitle max-w-800 mx-auto">
                 {t.heroSubtitle}
               </p>
-              <div className="d-flex justify-content-center">
+              <div className="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-3">
                 <a
                   href="tel:+393492949669"
                   onClick={(e) => handlePhoneClick(e, "+393492949669")}
-                  className="btn btn-forest-submit btn-lg px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2"
+                  className="btn btn-forest-submit btn-lg px-4 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2"
                 >
                   <i className="bi bi-telephone-fill"></i>
                   <span>(+39) 349 2949669</span>
+                </a>
+                <a
+                  href="mailto:vincoeventi@gmail.com"
+                  onClick={(e) => handleEmailClick(e, "vincoeventi@gmail.com", dispatch)}
+                  className="btn btn-forest-submit btn-lg px-4 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2"
+                >
+                  <i className="bi bi-envelope-fill"></i>
+                  <span>{t.sendEmail}</span>
                 </a>
               </div>
             </Col>
@@ -360,7 +368,6 @@ function Services() {
           <div className="row g-4 justify-content-center align-items-stretch">
             {packagesToRender.map((pkg) => {
               const badgeUpper = pkg.badge ? pkg.badge.toUpperCase() : "BASIC";
-              const isFull = badgeUpper === "FULL";
               const title = lang === "en" ? pkg.titleEng || pkg.titleIta : pkg.titleIta;
               const subtitle = lang === "en" ? pkg.subtitleEng || pkg.subtitleIta : pkg.subtitleIta;
               const rawFeatures = lang === "en" ? pkg.featuresEng || pkg.featuresIta : pkg.featuresIta;
@@ -418,7 +425,7 @@ function Services() {
                         </ul>
                       </div>
 
-                      <div className="mt-3">
+                      <div className="mt-3 d-flex flex-column gap-2">
                         <a
                           href="tel:+393492949669"
                           onClick={(e) => handlePhoneClick(e, "+393492949669")}
@@ -426,6 +433,14 @@ function Services() {
                         >
                           <i className="bi bi-telephone-fill"></i>
                           <span>{t.contactUs}</span>
+                        </a>
+                        <a
+                          href="mailto:vincoeventi@gmail.com"
+                          onClick={(e) => handleEmailClick(e, "vincoeventi@gmail.com", dispatch)}
+                          className="btn btn-forest-submit w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
+                        >
+                          <i className="bi bi-envelope-fill"></i>
+                          <span>{t.sendEmail}</span>
                         </a>
                       </div>
                     </div>

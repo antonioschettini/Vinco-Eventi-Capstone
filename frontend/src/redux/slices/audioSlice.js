@@ -2,12 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isPlaying: false,
-  volume: 0.05, // Default 5%
+  volume: 0.20, // Default 20%
   currentTrackIndex: 0,
   isModalOpen: false,
   autoplayBlocked: true,
   isMuted: false,
-  prevVolume: 0.05,
+  prevVolume: 0.20,
   modalPosition: null, // { x: number, y: number } per persistere la posizione del modale trascinabile
 };
 
@@ -31,7 +31,7 @@ export const audioSlice = createSlice({
     toggleMute: (state) => {
       if (state.isMuted) {
         state.isMuted = false;
-        state.volume = state.prevVolume || 0.05;
+        state.volume = state.prevVolume || 0.20;
       } else {
         state.prevVolume = state.volume;
         state.isMuted = true;
