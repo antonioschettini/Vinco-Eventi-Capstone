@@ -6,7 +6,7 @@ import API_BASE_URL from "../../config/api";
 import { apiFetch } from "../../utils/apiClient";
 import "./MatrimonioWidgets.css";
 
-// Pool di recensioni verificate a 5 stelle con traduzione bilingue completa (IT / EN)
+// Pool di recensioni verificate a 5 stelle da Matrimonio.com con traduzione bilingue completa (IT / EN)
 const ALL_REVIEWS_POOL = [
   {
     id: 1,
@@ -104,19 +104,107 @@ const ALL_REVIEWS_POOL = [
     textEng: "Perfect sound engineering, always balanced volumes, and a vast repertoire. We are still receiving compliments from our guests!",
     initials: "C",
   },
+  {
+    id: 9,
+    name: "Stefano & Valentina",
+    dateIta: "21/09/2025",
+    dateEng: "Sept 21, 2025",
+    rating: 5.0,
+    titleIta: "Festa indimenticabile e coinvolgimento massimo",
+    titleEng: "Unforgettable party and incredible energy",
+    textIta: "Musica travolgente e scaletta perfetta. Hanno saputo interpretare esattamente i nostri gusti rendendo unico ogni momento della giornata.",
+    textEng: "Overwhelming music and perfect playlist. They interpreted our tastes to perfection, making every moment of our wedding unique.",
+    initials: "S",
+  },
+  {
+    id: 10,
+    name: "Martina & Riccardo",
+    dateIta: "15/07/2025",
+    dateEng: "July 15, 2025",
+    rating: 5.0,
+    titleIta: "Servizio impeccabile sotto ogni punto di vista",
+    titleEng: "Impeccable service from start to finish",
+    textIta: "Professionalità straordinaria, impianti luci mozzafiato e acustica perfetta in ogni angolo della location. Grazie di tutto!",
+    textEng: "Extraordinary professionalism, breathtaking light setups, and crystal-clear sound across the whole venue. Thank you so much!",
+    initials: "M",
+  },
+  {
+    id: 11,
+    name: "Andrea & Giada",
+    dateIta: "03/06/2025",
+    dateEng: "June 3, 2025",
+    rating: 5.0,
+    titleIta: "Sax e DJ set da brividi!",
+    titleEng: "Chills from the live Sax and DJ set!",
+    textIta: "L'abbinamento sax dal vivo e DJ set durante l'aperitivo e l'after party ha fatto ballare letteralmente tutti. Super consigliati!",
+    textEng: "Combining live sax with the DJ set for the cocktail hour and after-party got literally everyone dancing. Highly recommended!",
+    initials: "A",
+  },
+  {
+    id: 12,
+    name: "Maria Chiara F.",
+    dateIta: "19/10/2024",
+    dateEng: "October 19, 2024",
+    rating: 5.0,
+    titleIta: "Raffinatezza e divertimento assicurati",
+    titleEng: "Elegance and guaranteed fun",
+    textIta: "Dalla cerimonia elegante con violino al DJ set serale, una classe e una carica musicale senza pari. Matrimonio perfetto!",
+    textEng: "From the elegant violin ceremony to the evening DJ set, unrivaled class and musical energy. A perfect wedding!",
+    initials: "M",
+  },
+  {
+    id: 13,
+    name: "Gianluca & Serena",
+    dateIta: "27/05/2024",
+    dateEng: "May 27, 2024",
+    rating: 5.0,
+    titleIta: "Organizzazione svizzera e musica al top",
+    titleEng: "Flawless organization and top quality music",
+    textIta: "Puntuali, disponibili ad ogni nostra richiesta e capaci di creare un'energia travolgente. Vincenzo è un vero professionista del settore.",
+    textEng: "Punctual, responsive to all our requests, and capable of generating incredible crowd energy. Vincenzo is a true industry professional.",
+    initials: "G",
+  },
+  {
+    id: 14,
+    name: "Domenico & Elisa",
+    dateIta: "09/09/2024",
+    dateEng: "September 9, 2024",
+    rating: 5.0,
+    titleIta: "Tutti gli invitati hanno ballato senza sosta",
+    titleEng: "All guests danced non-stop all night",
+    textIta: "Non potevamo fare scelta migliore per la nostra festa. Musica di qualità e atmosfera da sogno fino a tarda notte!",
+    textEng: "We couldn't have made a better choice for our wedding party. Premium music and dream atmosphere late into the night!",
+    initials: "D",
+  },
 ];
+
+// Algoritmo di Shuffle Fisher-Yates per un'effettiva distribuzione casuale uniforme
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
 
 function MatrimonioWidgets() {
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang].about;
 
   const [totalReviewsCount, setTotalReviewsCount] = useState(124);
+  const [randomReviews, setRandomReviews] = useState(() =>
+    shuffleArray(ALL_REVIEWS_POOL).slice(0, 4)
+  );
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Selezione casuale di 4 recensioni dal pool ad ogni mount
-  const [randomReviews] = useState(() => {
-    const shuffled = [...ALL_REVIEWS_POOL].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 4);
-  });
+  const handleRefreshReviews = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setRandomReviews(shuffleArray(ALL_REVIEWS_POOL).slice(0, 4));
+      setIsRefreshing(false);
+    }, 250);
+  };
 
   useEffect(() => {
     let isSubscribed = true;
@@ -129,7 +217,7 @@ function MatrimonioWidgets() {
           setTotalReviewsCount(data.totalReviews);
         }
       } catch {
-        // Fallback silenzioso
+        // Fallback silenzioso su 124
       }
     };
 
@@ -361,7 +449,7 @@ function MatrimonioWidgets() {
 
             return (
               <Col key={rev.id} xs={12} md={6}>
-                <div className="review-item-card h-100 d-flex flex-column justify-content-between">
+                <div className={`review-item-card h-100 d-flex flex-column justify-content-between ${isRefreshing ? "refreshing" : ""}`}>
                   <div>
                     <div className="d-flex align-items-center justify-content-between mb-3">
                       <div className="d-flex align-items-center gap-3">
@@ -408,9 +496,19 @@ function MatrimonioWidgets() {
           })}
         </Row>
 
-        {/* Pulsante Diretto per tutte le recensioni su Matrimonio.com */}
+        {/* Pulsanti di Azione: Refresh Recensioni e Link a Matrimonio.com */}
         <Row className="justify-content-center text-center mt-4">
-          <Col xs={12}>
+          <Col xs={12} className="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-3">
+            <button
+              type="button"
+              onClick={handleRefreshReviews}
+              className="btn-matrimonio-refresh"
+              aria-label={t.refreshReviews || "Mostra altre recensioni"}
+            >
+              <i className={`bi bi-arrow-clockwise fs-5 ${isRefreshing ? "spin-icon" : ""}`}></i>
+              <span>{t.refreshReviews || "Mostra altre recensioni"}</span>
+            </button>
+
             <a
               href="https://www.matrimonio.com/musica-matrimonio/vinco-eventi--e283893/opinioni"
               target="_blank"

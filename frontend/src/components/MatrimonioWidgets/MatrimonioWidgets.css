@@ -187,3 +187,54 @@
     padding: 1.25rem 1rem;
   }
 }
+
+/* Animazione e pulsante di Refresh recensioni */
+.review-item-card {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, opacity 0.3s ease;
+}
+
+.review-item-card.refreshing {
+  opacity: 0.3;
+  transform: scale(0.98);
+}
+
+.btn-matrimonio-refresh {
+  background-color: transparent;
+  border: 1px solid var(--primary-forest, #204a35);
+  color: var(--bs-body-color);
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 0.85rem 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-matrimonio-refresh:hover {
+  background-color: rgba(32, 74, 53, 0.08);
+  border-color: var(--primary-forest, #204a35);
+  transform: translateY(-2px);
+}
+
+[data-bs-theme="dark"] .btn-matrimonio-refresh {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+[data-bs-theme="dark"] .btn-matrimonio-refresh:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.spin-icon {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+

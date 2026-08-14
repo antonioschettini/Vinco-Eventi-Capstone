@@ -244,6 +244,7 @@ export const translations = {
       verifiedReview: "Recensione Verificata",
       readAllReviews: "Leggi tutte le recensioni su",
       readAllReviewsPattern: "Leggi tutte le {count} recensioni su",
+      refreshReviews: "Mostra altre recensioni",
       ctaTitle: "Vuoi trasformare il tuo matrimonio in un evento unico?",
       ctaSub:
         "Raccontaci la tua idea e richiedi un preventivo gratuito e personalizzato.",
@@ -639,6 +640,7 @@ export const translations = {
       verifiedReview: "Verified Review",
       readAllReviews: "Read all reviews on",
       readAllReviewsPattern: "Read all {count} reviews on",
+      refreshReviews: "Show other reviews",
       ctaTitle: "Want to turn your wedding into an unforgettable event?",
       ctaSub: "Tell us your vision and request a free, personalized quote.",
       ctaBtn: "Request a Quote",
