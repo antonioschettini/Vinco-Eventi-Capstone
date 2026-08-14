@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
+import useScrollReveal from "../../utils/useScrollReveal";
 const footerBgImage = "https://res.cloudinary.com/oe1bztwb/image/upload/c_crop,g_center,y_0,h_0.92/v1786265141/vinco_eventi_assets/bzgnb1lhn2ok8bnuzcgs.jpg";
 import "./Footer.css";
 
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
 
 function Footer() {
+  useScrollReveal(".footer-section, .footer-glass-card");
   const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang]?.footer || translations.it.footer;
@@ -16,19 +18,15 @@ function Footer() {
   const [isIlluminated, setIsIlluminated] = useState(false);
 
   useEffect(() => {
-    // Esegui l'IntersectionObserver solo su dispositivi mobile / touch (pointer: coarse)
-    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
-    if (!isTouchDevice) return;
-
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
           setIsIlluminated(true);
         } else {
           setIsIlluminated(false);
         }
       },
-      { threshold: [0.05, 0.15, 0.4] }
+      { threshold: [0.05, 0.1, 0.3] }
     );
 
     const node = footerRef.current;
@@ -43,20 +41,11 @@ function Footer() {
     };
   }, []);
 
-  const handleTouch = () => {
-    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
-    if (isTouchDevice) {
-      setIsIlluminated(true);
-    }
-  };
-
   return (
     <footer
       ref={footerRef}
       className={`footer-section py-5 mt-auto position-relative ${isIlluminated ? "illuminated" : ""}`}
       style={{ backgroundImage: `url("${footerBgImage}")` }}
-      onTouchStart={handleTouch}
-      onClick={handleTouch}
     >
       <div className="footer-overlay"></div>
       <Container className="footer-content text-center position-relative">
