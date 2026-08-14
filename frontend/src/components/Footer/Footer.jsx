@@ -172,8 +172,8 @@ function Footer() {
               </div>
 
               {/* Diritti Riservati */}
-              <div className="copyright border-top border-white border-opacity-10 pt-4 mt-2">
-                <p className="text-white-50 small mb-0">{t.rights}</p>
+              <div className="copyright footer-copyright-divider pt-4 mt-2">
+                <p className="footer-copyright-text small mb-0">{t.rights}</p>
               </div>
             </div>
           </Col>
