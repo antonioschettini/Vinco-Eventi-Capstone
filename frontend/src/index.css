@@ -253,7 +253,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   text-shadow: 0 2px 12px rgba(255, 255, 255, 0.9);
 }
 
-/* Stili Hero Section (Testo Sovrapposto Direttamente allo Sfondo senza Box ingombrante) */
+/* Stili Hero Section (Contrasto Accentato di Default + Glass Etereo & Sfondo Sfumato all'Hover e Scroll) */
 .hero-gallery-section {
   position: relative;
   background-size: cover;
@@ -265,8 +265,8 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   justify-content: center;
   overflow: hidden;
   margin-top: 0;
-  filter: brightness(0.92) contrast(1.02);
-  transition: filter 0.5s ease, background-position 0.5s ease;
+  filter: brightness(0.95) contrast(1.04);
+  transition: filter 0.7s cubic-bezier(0.16, 1, 0.3, 1), background-position 0.5s ease;
 }
 
 /* Override specifico per la posizione dello sfondo Hero solo nella Home Page */
@@ -274,12 +274,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   background-position: center 5% !important;
 }
 
-/* Evidenziazione brillante dello sfondo photo all'hover da desktop o in view da mobile */
-.hero-gallery-section:hover,
-.hero-gallery-section.is-in-view {
-  filter: brightness(1.22) contrast(1.12) saturate(1.25);
-}
-
+/* Overlay di sottofondo per massimo contrasto in stato di default */
 .hero-gallery-overlay {
   position: absolute;
   top: 0;
@@ -287,30 +282,67 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   width: 100%;
   height: 100%;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(6, 14, 10, 0.62) 0%, rgba(3, 7, 5, 0.78) 100%);
-  transition: opacity 0.5s ease, background 0.5s ease;
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), background 0.7s ease;
+}
+
+[data-bs-theme="dark"] .hero-gallery-overlay {
+  background: linear-gradient(180deg, rgba(4, 10, 7, 0.68) 0%, rgba(2, 6, 4, 0.82) 100%);
+}
+
+[data-bs-theme="light"] .hero-gallery-overlay {
+  background: linear-gradient(180deg, rgba(8, 20, 14, 0.60) 0%, rgba(4, 12, 8, 0.74) 100%);
+}
+
+/* All'hover da desktop o al campo visivo da mobile, lo sfondo si spegne leggermente per enfatizzare il testo */
+.hero-gallery-section:hover,
+.hero-gallery-section.is-in-view {
+  filter: brightness(0.82) contrast(1.08);
 }
 
 .hero-gallery-section:hover .hero-gallery-overlay,
 .hero-gallery-section.is-in-view .hero-gallery-overlay {
-  opacity: 0.45;
+  opacity: 0.88;
 }
 
-/* Container di testo Etereo e Senza Box ingombrante (100% Sfondo Visibile) */
+/* Container del testo: Trasparente di default, trasforma in elegante vetro glassato all'hover/scroll con delay */
 .hero-gallery-content {
   position: relative;
   z-index: 2;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 2.25rem 1.75rem;
-  background: transparent !important;
-  border: none !important;
+  padding: 2.5rem 2rem;
+  border-radius: 1.75rem;
+  background: rgba(0, 0, 0, 0) !important;
+  border: 1px solid rgba(255, 255, 255, 0) !important;
   box-shadow: none !important;
-  backdrop-filter: none !important;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), 
+              background-color 0.7s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.7s ease, 
+              box-shadow 0.7s ease, 
+              backdrop-filter 0.7s ease;
 }
 
+/* Animazione fluida con leggero delay durante lo scroll su mobile e all'hover su desktop */
 .hero-gallery-section:hover .hero-gallery-content,
 .hero-gallery-section.is-in-view .hero-gallery-content {
   transform: translateY(-4px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition-delay: 0.18s;
+}
+
+[data-bs-theme="dark"] .hero-gallery-section:hover .hero-gallery-content,
+[data-bs-theme="dark"] .hero-gallery-section.is-in-view .hero-gallery-content {
+  background: rgba(10, 24, 16, 0.52) !important;
+  border: 1px solid rgba(82, 203, 135, 0.35) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55), 0 0 30px rgba(82, 203, 135, 0.25) !important;
+}
+
+[data-bs-theme="light"] .hero-gallery-section:hover .hero-gallery-content,
+[data-bs-theme="light"] .hero-gallery-section.is-in-view .hero-gallery-content {
+  background: rgba(255, 255, 255, 0.42) !important;
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25), inset 0 0 20px rgba(255, 255, 255, 0.4) !important;
 }
 
 .hero-gallery-title {
@@ -352,18 +384,6 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   text-shadow: 
     0 2px 10px rgba(0, 0, 0, 0.98),
     0 4px 16px rgba(0, 0, 0, 0.9);
-}
-
-/* Su mobile e touch screen, illuminazione dinamica durante lo scroll (is-in-view) */
-@media (hover: none), (max-width: 991.98px) {
-  .hero-gallery-overlay,
-  .hero-bio-overlay {
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.6s ease;
-  }
-
-  .hero-gallery-section.is-in-view .hero-gallery-overlay {
-    opacity: 0.45 !important;
-  }
 }
 
 /* Stili Sezione Intrattenimento su Misura e Artisti */
