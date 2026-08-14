@@ -253,7 +253,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   text-shadow: 0 2px 12px rgba(255, 255, 255, 0.9);
 }
 
-/* Stili Hero Section (Foto di Sfondo 100% Libera senza Box, con Illuminazione all'Hover e Scroll Reveal) */
+/* Stili Hero Section - 100% Foto Libera senza Box */
 .hero-gallery-section {
   position: relative;
   background-size: cover;
@@ -265,7 +265,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   justify-content: center;
   overflow: hidden;
   margin-top: 0;
-  filter: brightness(0.92) contrast(1.02);
+  filter: brightness(1.05) contrast(1.02);
   transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1), background-position 0.5s ease;
 }
 
@@ -282,19 +282,9 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   width: 100%;
   height: 100%;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(6, 14, 10, 0.65) 0%, rgba(3, 7, 5, 0.80) 100%);
+  background: linear-gradient(180deg, rgba(6, 14, 10, 0.50) 0%, rgba(3, 7, 5, 0.65) 100%);
+  opacity: 0.7;
   transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.6s ease;
-}
-
-/* EFFETTO HOVER DESKTOP E SCROLL REVEAL MOBILE: LO SFONDO FOTO SI ACCENDE E RISALTA */
-.hero-gallery-section:hover,
-.hero-gallery-section.is-in-view {
-  filter: brightness(1.25) contrast(1.15) saturate(1.30) !important;
-}
-
-.hero-gallery-section:hover .hero-gallery-overlay,
-.hero-gallery-section.is-in-view .hero-gallery-overlay {
-  opacity: 0.40 !important;
 }
 
 /* Container del testo: 100% Trasparente Etereo (NESSUNA BOX INGOMBRANTE) */
@@ -308,11 +298,6 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.hero-gallery-section:hover .hero-gallery-content,
-.hero-gallery-section.is-in-view .hero-gallery-content {
-  transform: translateY(-4px);
 }
 
 .hero-gallery-title {
@@ -337,23 +322,68 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   transition: color 0.4s ease, text-shadow 0.4s ease;
 }
 
-.hero-gallery-section:hover .hero-gallery-title,
-.hero-gallery-section.is-in-view .hero-gallery-title {
-  color: #ffffff !important;
-  text-shadow: 
-    0 2px 12px rgba(0, 0, 0, 0.98),
-    0 0 30px rgba(82, 203, 135, 0.9),
-    0 0 60px rgba(82, 203, 135, 0.5) !important;
+/* LOGICA DESKTOP HOVER (Solo schermi desktop con mouse) */
+@media (hover: hover) and (pointer: fine) {
+  .hero-gallery-section:hover {
+    filter: brightness(0.72) contrast(1.10) !important;
+  }
+
+  .hero-gallery-section:hover .hero-gallery-overlay {
+    opacity: 0.92 !important;
+    background: linear-gradient(180deg, rgba(4, 10, 7, 0.75) 0%, rgba(2, 6, 4, 0.88) 100%) !important;
+  }
+
+  .hero-gallery-section:hover .hero-gallery-content {
+    transform: translateY(-4px);
+  }
+
+  .hero-gallery-section:hover .hero-gallery-title {
+    color: #ffffff !important;
+    text-shadow: 
+      0 2px 12px rgba(0, 0, 0, 0.98),
+      0 0 30px rgba(82, 203, 135, 0.9),
+      0 0 60px rgba(82, 203, 135, 0.5) !important;
+  }
+
+  .hero-gallery-section:hover .hero-gallery-subtitle,
+  .hero-gallery-section:hover .hero-gallery-subtitle p {
+    color: #ffffff !important;
+    text-shadow: 
+      0 2px 10px rgba(0, 0, 0, 0.98),
+      0 4px 16px rgba(0, 0, 0, 0.9);
+  }
 }
 
-.hero-gallery-section:hover .hero-gallery-subtitle,
-.hero-gallery-section:hover .hero-gallery-subtitle p,
-.hero-gallery-section.is-in-view .hero-gallery-subtitle,
-.hero-gallery-section.is-in-view .hero-gallery-subtitle p {
-  color: #ffffff !important;
-  text-shadow: 
-    0 2px 10px rgba(0, 0, 0, 0.98),
-    0 4px 16px rgba(0, 0, 0, 0.9);
+/* LOGICA MOBILE & TOUCH DEVICE (Solo dispositivi touch via scroll .is-in-view) */
+@media (hover: none), (max-width: 991.98px) {
+  .hero-gallery-section.is-in-view {
+    filter: brightness(0.72) contrast(1.10) !important;
+  }
+
+  .hero-gallery-section.is-in-view .hero-gallery-overlay {
+    opacity: 0.92 !important;
+    background: linear-gradient(180deg, rgba(4, 10, 7, 0.75) 0%, rgba(2, 6, 4, 0.88) 100%) !important;
+  }
+
+  .hero-gallery-section.is-in-view .hero-gallery-content {
+    transform: translateY(-4px);
+  }
+
+  .hero-gallery-section.is-in-view .hero-gallery-title {
+    color: #ffffff !important;
+    text-shadow: 
+      0 2px 12px rgba(0, 0, 0, 0.98),
+      0 0 30px rgba(82, 203, 135, 0.9),
+      0 0 60px rgba(82, 203, 135, 0.5) !important;
+  }
+
+  .hero-gallery-section.is-in-view .hero-gallery-subtitle,
+  .hero-gallery-section.is-in-view .hero-gallery-subtitle p {
+    color: #ffffff !important;
+    text-shadow: 
+      0 2px 10px rgba(0, 0, 0, 0.98),
+      0 4px 16px rgba(0, 0, 0, 0.9);
+  }
 }
 
 /* Stili Sezione Intrattenimento su Misura e Artisti */
