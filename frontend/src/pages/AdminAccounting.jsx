@@ -1501,29 +1501,42 @@ export default function AdminAccounting() {
                   </h6>
                   <div className="mb-4">
                     {editingEvent?.contrattoUrl ? (
-                      <div className="pdf-badge-card">
-                        <div className="d-flex align-items-center gap-3">
-                          <i className="bi bi-file-earmark-pdf-fill text-danger display-6"></i>
-                          <div>
-                            <div className="fw-bold text-body">{editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}</div>
-                            <small className="text-success fw-bold"><i className="bi bi-check-circle-fill me-1"></i> Contratto Persistente Caricato</small>
+                      <div className="pdf-badge-card d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 p-3">
+                        <div className="d-flex align-items-center gap-3 min-w-0 flex-grow-1 overflow-hidden">
+                          <div className="pdf-icon-wrapper flex-shrink-0 text-danger d-flex align-items-center justify-content-center">
+                            <i className="bi bi-file-earmark-pdf-fill fs-3"></i>
+                          </div>
+                          <div className="min-w-0 flex-grow-1 overflow-hidden">
+                            <div
+                              className="fw-bold text-body text-truncate"
+                              title={editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}
+                            >
+                              {editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}
+                            </div>
+                            <small className="text-success fw-bold d-flex align-items-center gap-1 mt-1">
+                              <i className="bi bi-check-circle-fill"></i> Contratto Persistente Caricato
+                            </small>
                           </div>
                         </div>
-                        <div className="d-flex align-items-center gap-2">
+                        <div className="pdf-action-buttons d-flex align-items-center gap-2 flex-shrink-0 align-self-end align-self-sm-center">
                           <a
                             href={editingEvent.contrattoUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn btn-sm btn-success rounded-pill px-3"
+                            className="btn btn-sm btn-success d-inline-flex align-items-center gap-1 px-3 py-1 fw-semibold text-nowrap"
+                            title="Apri PDF in nuova scheda"
                           >
-                            <i className="bi bi-eye me-1"></i> Apri PDF
+                            <i className="bi bi-eye-fill"></i>
+                            <span>Apri PDF</span>
                           </a>
                           <button
                             type="button"
                             onClick={handleDeleteContract}
-                            className="btn btn-sm btn-outline-danger rounded-pill px-3"
+                            className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 px-3 py-1 fw-semibold text-nowrap"
+                            title="Elimina contratto"
                           >
-                            <i className="bi bi-trash me-1"></i> Elimina
+                            <i className="bi bi-trash-fill"></i>
+                            <span>Elimina</span>
                           </button>
                         </div>
                       </div>
@@ -1543,7 +1556,7 @@ export default function AdminAccounting() {
                         </div>
                         {uploadingPdf && <small className="text-success d-block mt-2 fw-bold">Caricamento su Cloudinary in corso...</small>}
                         {!editingEvent?.id && (
-                          <div className="alert alert-warning border border-warning border-opacity-50 text-dark fw-bold rounded-3 py-2 px-3 mt-3 mb-0 d-inline-flex align-items-center gap-2 small">
+                          <div className="pdf-save-warning-alert fw-bold rounded-3 py-2 px-3 mt-3 mb-0 d-inline-flex align-items-center gap-2 small">
                             <i className="bi bi-exclamation-triangle-fill text-warning fs-6"></i>
                             <span>Salva prima l'evento per poter caricare il contratto PDF.</span>
                           </div>
