@@ -30,9 +30,6 @@ public class DataInitializer implements CommandLineRunner {
     private GalleryRepository galleryRepository;
 
     @Autowired
-    private antonioschettini.backend.repositories.QuoteRequestRepository quoteRequestRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
