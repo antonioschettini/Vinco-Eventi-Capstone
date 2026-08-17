@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Navbar from "./components/Navbar/Navbar";
@@ -10,18 +10,20 @@ import EmailChoiceModal from "./components/EmailModal/EmailChoiceModal";
 import MobileFloatingBar from "./components/MobileFloatingBar/MobileFloatingBar";
 import ProtectedRoute from "./components/Admin/ProtectedRoute";
 import ErrorBanner from "./components/ErrorBanner/ErrorBanner";
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 import { clearGlobalError } from "./redux/slices/uiSlice";
 import { useSEO } from "./utils/useSEO";
 import "./App.css";
 
-import Home from "./pages/Home";
-import Services from "./pages/Services";
-import Gallery from "./pages/Gallery";
-import About from "./pages/About";
-import AdminLogin from "./pages/AdminLogin";
-import AdminQuotes from "./pages/AdminQuotes";
-import AdminAccounting from "./pages/AdminAccounting";
-import AdminAudit from "./pages/AdminAudit";
+// Lazy loading modulare delle pagine per massimizzare la velocità di caricamento e azzerare il First Contentful Paint
+const Home = lazy(() => import("./pages/Home"));
+const Services = lazy(() => import("./pages/Services"));
+const Gallery = lazy(() => import("./pages/Gallery"));
+const About = lazy(() => import("./pages/About"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminQuotes = lazy(() => import("./pages/AdminQuotes"));
+const AdminAccounting = lazy(() => import("./pages/AdminAccounting"));
+const AdminAudit = lazy(() => import("./pages/AdminAudit"));
 
 // Layout base condiviso da tutte le pagine
 function Layout() {
@@ -57,7 +59,9 @@ function Layout() {
       )}
 
       <main className="flex-grow-1 d-flex flex-column">
-        <Outlet />
+        <Suspense fallback={<LoadingSpinner variant="fullPage" size="lg" message="Caricamento in corso..." />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
     </div>
