@@ -164,4 +164,64 @@ class QuoteServiceTest {
         assertTrue(ics.contains("DTEND;VALUE=DATE:20260821"));
         assertTrue(ics.contains("END:VCALENDAR"));
     }
+
+    @Test
+    void testCreateQuotePreservesMultilineNewlines() {
+        QuoteRequestDTO dto = new QuoteRequestDTO(
+                "Giuseppe",
+                "Verdi",
+                "giuseppe.verdi@test.it",
+                "+39 3491234567",
+                LocalDate.of(2026, 10, 12),
+                "Festa Privata",
+                "Bari",
+                "80",
+                "Cena",
+                "",
+                "Raccontaci la tua idea di festa: Musica live e sax all'aperitivo\n\nInfo aggiuntive: Location fronte mare con giardino",
+                "3.000€-5.000€",
+                "it"
+        );
+
+        when(quoteRepository.save(any(QuoteRequest.class))).thenAnswer(inv -> {
+            QuoteRequest q = inv.getArgument(0);
+            q.setId(UUID.randomUUID());
+            return q;
+        });
+
+        QuoteRequest result = quoteService.createQuote(dto);
+
+        assertNotNull(result);
+        assertEquals("Raccontaci la tua idea di festa: Musica live e sax all'aperitivo\n\nInfo aggiuntive: Location fronte mare con giardino", result.getMessaggio());
+    }
+
+    @Test
+    void testCreateQuoteWithSingleFieldMessage() {
+        QuoteRequestDTO dto = new QuoteRequestDTO(
+                "Anna",
+                "Neri",
+                "anna.neri@test.it",
+                "+39 3497654321",
+                LocalDate.of(2026, 11, 5),
+                "Compleanno",
+                "Monopoli",
+                "50",
+                "Pranzo",
+                "",
+                "Raccontaci la tua idea di festa: DJ set e luci architetturali",
+                "1.500€-3.000€",
+                "it"
+        );
+
+        when(quoteRepository.save(any(QuoteRequest.class))).thenAnswer(inv -> {
+            QuoteRequest q = inv.getArgument(0);
+            q.setId(UUID.randomUUID());
+            return q;
+        });
+
+        QuoteRequest result = quoteService.createQuote(dto);
+
+        assertNotNull(result);
+        assertEquals("Raccontaci la tua idea di festa: DJ set e luci architetturali", result.getMessaggio());
+    }
 }

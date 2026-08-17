@@ -25,10 +25,12 @@ const getEventTypeBadgeClass = (tipo) => {
   return "event-badge-altro";
 };
 
-// Helper per garantire la corretta formattazione dei messaggi con 'Info aggiuntive:' a capo
+// Helper per garantire la corretta formattazione dei messaggi con campi opzionali a capo
 const formatQuoteMessage = (msg) => {
   if (!msg) return "";
-  return msg.replace(/([^\n])\s*(Info aggiuntive:)/gi, "$1\n\n$2");
+  return msg
+    .replace(/([^\n])\s*(Info aggiuntive:|Ulteriori informazioni:|Additional information:|Additional info:)/gi, "$1\n\n$2")
+    .trim();
 };
 
 function AdminQuotes() {
@@ -679,9 +681,13 @@ function AdminQuotes() {
                           )}
                         </div>
 
-                        {q.messaggio && (
-                          <div className="small text-muted bg-body-tertiary p-2 rounded border line-clamp-2">
+                        {q.messaggio && q.messaggio.trim() && q.messaggio.trim() !== "-" ? (
+                          <div className="small text-muted bg-body-tertiary p-2 rounded border line-clamp-2" title={formatQuoteMessage(q.messaggio)}>
                             "{formatQuoteMessage(q.messaggio)}"
+                          </div>
+                        ) : (
+                          <div className="small text-muted fst-italic bg-body-tertiary p-2 rounded border">
+                            Nessun messaggio o nota opzionale inserita.
                           </div>
                         )}
                       </div>
@@ -907,9 +913,15 @@ function AdminQuotes() {
                   <div className="col-12 mt-3">
                     <span className="text-muted small fw-semibold d-block mb-1">Messaggio / Idea di Festa:</span>
                     <div className="p-3 rounded bg-body-tertiary border message-box-dark">
-                      <p className="mb-0 text-body" style={{ whiteSpace: "pre-wrap" }}>
-                        {selectedQuote.messaggio ? formatQuoteMessage(selectedQuote.messaggio) : "Nessun messaggio inserito."}
-                      </p>
+                      {selectedQuote.messaggio && selectedQuote.messaggio.trim() && selectedQuote.messaggio.trim() !== "-" ? (
+                        <p className="mb-0 text-body" style={{ whiteSpace: "pre-wrap" }}>
+                          {formatQuoteMessage(selectedQuote.messaggio)}
+                        </p>
+                      ) : (
+                        <p className="mb-0 text-muted fst-italic">
+                          Nessun messaggio o nota aggiuntiva fornita dal cliente.
+                        </p>
+                      )}
                     </div>
                   </div>
 

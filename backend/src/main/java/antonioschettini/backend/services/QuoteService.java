@@ -25,19 +25,19 @@ public class QuoteService {
 
     public QuoteRequest createQuote(QuoteRequestDTO dto) {
         QuoteRequest quote = QuoteRequest.builder()
-                .nome(sanitizeText(dto.nome()))
-                .cognome(sanitizeText(dto.cognome()))
-                .email(dto.email() != null ? sanitizeText(dto.email()).toLowerCase() : null)
-                .telefono(sanitizeText(dto.telefono()))
+                .nome(sanitizeSingleLineText(dto.nome()))
+                .cognome(sanitizeSingleLineText(dto.cognome()))
+                .email(dto.email() != null ? sanitizeSingleLineText(dto.email()).toLowerCase() : null)
+                .telefono(sanitizeSingleLineText(dto.telefono()))
                 .dataEvento(dto.dataEvento())
-                .tipoEvento(sanitizeText(dto.tipoEvento()))
-                .location(sanitizeText(dto.location()))
-                .numeroOspiti(sanitizeText(dto.numeroOspiti()))
-                .orarioGiornata(sanitizeText(dto.orarioGiornata()))
-                .tipoCerimonia(sanitizeText(dto.tipoCerimonia()))
-                .messaggio(sanitizeText(dto.messaggio()))
-                .budget(sanitizeText(dto.budget()))
-                .lingua(dto.lingua() != null && !dto.lingua().isBlank() ? sanitizeText(dto.lingua()) : "it")
+                .tipoEvento(sanitizeSingleLineText(dto.tipoEvento()))
+                .location(sanitizeSingleLineText(dto.location()))
+                .numeroOspiti(sanitizeSingleLineText(dto.numeroOspiti()))
+                .orarioGiornata(sanitizeSingleLineText(dto.orarioGiornata()))
+                .tipoCerimonia(sanitizeSingleLineText(dto.tipoCerimonia()))
+                .messaggio(sanitizeMultilineText(dto.messaggio()))
+                .budget(sanitizeSingleLineText(dto.budget()))
+                .lingua(dto.lingua() != null && !dto.lingua().isBlank() ? sanitizeSingleLineText(dto.lingua()) : "it")
                 .stato(QuoteStatus.PENDING)
                 .build();
 
@@ -50,13 +50,31 @@ public class QuoteService {
         return saved;
     }
 
-    private String sanitizeText(String input) {
+    private String sanitizeSingleLineText(String input) {
         if (input == null) return null;
         String s = input.trim();
         // Rimuove eventuali tag HTML/Script e caratteri di controllo non stampabili
         s = s.replaceAll("<[^>]*>", "").replaceAll("[\\p{C}]", "");
         // Normalizza spazi multipli
-        return s.replaceAll("\\s+", " ");
+        return s.replaceAll("\\s+", " ").trim();
+    }
+
+    private String sanitizeMultilineText(String input) {
+        if (input == null) return null;
+        String s = input.trim();
+        // Rimuove eventuali tag HTML/Script
+        s = s.replaceAll("<[^>]*>", "");
+        // Rimuove caratteri di controllo non stampabili eccetto tab e ritorni a capo
+        s = s.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "");
+        // Normalizza line breaks a \n
+        s = s.replace("\r\n", "\n").replace("\r", "\n");
+        // Normalizza spazi e tab multipli orizzontali
+        s = s.replaceAll("[ \\t]+", " ");
+        // Rimuove spazi bianchi all'inizio o alla fine di ciascuna riga
+        s = s.replaceAll("(?m)^[ \\t]+|[ \\t]+$", "");
+        // Massimo 2 newlines consecutive
+        s = s.replaceAll("\n{3,}", "\n\n");
+        return s.trim();
     }
 
     public List<QuoteRequest> getAllQuotes(QuoteStatus status) {

@@ -87,10 +87,10 @@ public class EmailService {
             boolean hasTipoCerimonia = isMatrimonio && quote.getTipoCerimonia() != null && !quote.getTipoCerimonia().isBlank();
 
             // Traduzione messaggi/textarea per l'admin se il messaggio dell'utente è in lingua straniera (con autodetect)
-            String messaggioOriginale = quote.getMessaggio() != null && !quote.getMessaggio().isBlank() ? quote.getMessaggio() : "-";
+            String messaggioOriginale = quote.getMessaggio() != null ? quote.getMessaggio().trim() : "";
             String messaggioTradotto = "";
 
-            if (!messaggioOriginale.equals("-")) {
+            if (!messaggioOriginale.isEmpty() && !messaggioOriginale.equals("-")) {
                 try {
                     String tr = translationService.translate(messaggioOriginale, "autodetect", "it");
                     if (tr != null && !tr.isBlank() && !tr.trim().equalsIgnoreCase(messaggioOriginale.trim())) {
@@ -140,7 +140,7 @@ public class EmailService {
                 %s
                 """,
                     quote.getBudget() != null ? quote.getBudget() : "Non specificato",
-                    messaggioOriginale
+                    formatMessageForAdminPlainText(messaggioOriginale)
             ));
 
             if (!messaggioTradotto.isBlank()) {
@@ -148,7 +148,7 @@ public class EmailService {
                 
                 Traduzione Messaggio per Admin (in Italiano):
                 %s
-                """, messaggioTradotto));
+                """, formatMessageForAdminPlainText(messaggioTradotto)));
             }
 
             plainTextBuilder.append(String.format("""
@@ -280,19 +280,19 @@ public class EmailService {
                         💬 Messaggio / Note Aggiuntive
                       </h3>
                       <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 14px 16px; margin-bottom: 16px; border-radius: 6px; font-size: 14px;">
-                        <strong style="color: #064e3b;">Testo Originale dall'Utente:</strong><br/>
-                        <span style="white-space: pre-wrap; color: #334155;">%s</span>
+                        <strong style="color: #064e3b; display: block; margin-bottom: 8px;">Testo Originale dall'Utente:</strong>
+                        %s
                       </div>
-                """.formatted(messaggioOriginale));
+                """.formatted(formatMessageForAdminHtml(messaggioOriginale)));
 
             if (!messaggioTradotto.isBlank()) {
                 String translationTitle = "🇮🇹 Traduzione in Italiano per Admin (Italian Translation):";
                 htmlBuilder.append("""
                       <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 14px 16px; margin-bottom: 16px; border-radius: 6px; font-size: 14px;">
-                        <strong style="color: #166534;">%s</strong><br/>
-                        <span style="white-space: pre-wrap; color: #15803d;">%s</span>
+                        <strong style="color: #166534; display: block; margin-bottom: 8px;">%s</strong>
+                        %s
                       </div>
-                """.formatted(translationTitle, messaggioTradotto));
+                """.formatted(translationTitle, formatMessageForAdminHtml(messaggioTradotto)));
             }
 
             // Direct CTA Dashboard & Calendar Links Buttons for Admin
@@ -936,6 +936,67 @@ public class EmailService {
             System.err.println("[WARN EmailService] Eccezione invio Brevo HTTPS API: " + e.getMessage());
         }
         return false;
+    }
+
+    private String escapeHtml(String text) {
+        if (text == null) return "";
+        return text.replace("&", "&amp;")
+                   .replace("<", "&lt;")
+                   .replace(">", "&gt;")
+                   .replace("\"", "&quot;")
+                   .replace("'", "&#39;");
+    }
+
+    private String formatMessageForAdminPlainText(String rawMessage) {
+        if (rawMessage == null || rawMessage.trim().isEmpty() || rawMessage.trim().equals("-")) {
+            return "Nessun messaggio o nota aggiuntiva fornita dal cliente.";
+        }
+        return rawMessage.trim().replaceAll("(?i)([^\\n])\\s*(Info aggiuntive:|Ulteriori informazioni:|Additional information:|Additional info:)", "$1\n\n$2");
+    }
+
+    private String formatMessageForAdminHtml(String rawMessage) {
+        if (rawMessage == null || rawMessage.trim().isEmpty() || rawMessage.trim().equals("-")) {
+            return "<span style=\"color: #64748b; font-style: italic;\">Nessun messaggio o nota aggiuntiva fornita dal cliente.</span>";
+        }
+
+        // Separa eventuali campi incollati per retrocompatibilità
+        String normalized = rawMessage.trim().replaceAll("(?i)([^\\n])\\s*(Info aggiuntive:|Ulteriori informazioni:|Additional information:|Additional info:)", "$1\n\n$2");
+
+        String[] paragraphs = normalized.split("\n\n");
+        StringBuilder sb = new StringBuilder();
+
+        java.util.regex.Pattern labelPattern = java.util.regex.Pattern.compile(
+            "^(Raccontaci la tua idea di festa:|Tell us your party idea:|Info aggiuntive:|Ulteriori informazioni:|Additional information:|Additional info:)\\s*(.*)$",
+            java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.DOTALL
+        );
+
+        for (int i = 0; i < paragraphs.length; i++) {
+            String p = paragraphs[i].trim();
+            if (p.isEmpty()) continue;
+
+            String marginBottom = (i == paragraphs.length - 1) ? "0" : "10px";
+
+            java.util.regex.Matcher matcher = labelPattern.matcher(p);
+            if (matcher.find()) {
+                String label = escapeHtml(matcher.group(1).trim());
+                String value = escapeHtml(matcher.group(2).trim()).replace("\r\n", "<br/>").replace("\n", "<br/>").replace("\r", "<br/>");
+                sb.append(String.format(
+                    "<div style=\"margin-bottom: %s; line-height: 1.5;\">" +
+                    "<span style=\"color: #064e3b; font-weight: 700; display: inline-block; margin-bottom: 2px;\">%s</span><br/>" +
+                    "<span style=\"color: #334155;\">%s</span>" +
+                    "</div>",
+                    marginBottom, label, value.isEmpty() ? "<span style=\"color: #64748b; font-style: italic;\">-</span>" : value
+                ));
+            } else {
+                String formattedText = escapeHtml(p).replace("\r\n", "<br/>").replace("\n", "<br/>").replace("\r", "<br/>");
+                sb.append(String.format(
+                    "<div style=\"margin-bottom: %s; line-height: 1.5; color: #334155;\">%s</div>",
+                    marginBottom, formattedText
+                ));
+            }
+        }
+
+        return sb.toString();
     }
 
     private String escapeJson(String text) {

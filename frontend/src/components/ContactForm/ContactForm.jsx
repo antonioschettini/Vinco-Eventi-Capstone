@@ -336,6 +336,20 @@ function ContactForm() {
 
     const combinedLocation = `${formData.nomeLocation.trim()}, ${formData.cittaLocation.trim()}`;
 
+    const ideaFestaVal = formData.ideaFesta ? formData.ideaFesta.trim() : "";
+    const ulterioriInfoVal = formData.ulterioriInfo ? formData.ulterioriInfo.trim() : "";
+
+    const labelIdeaFesta = lang === "en" ? "Tell us your party idea:" : "Raccontaci la tua idea di festa:";
+    const labelUlterioriInfo = lang === "en" ? "Additional information:" : "Info aggiuntive:";
+
+    const messageParts = [];
+    if (ideaFestaVal) {
+      messageParts.push(`${labelIdeaFesta} ${ideaFestaVal}`);
+    }
+    if (ulterioriInfoVal) {
+      messageParts.push(`${labelUlterioriInfo} ${ulterioriInfoVal}`);
+    }
+
     const payload = {
       nome: formData.nome.trim(),
       cognome: formData.cognome.trim(),
@@ -347,9 +361,7 @@ function ContactForm() {
       numeroOspiti: formData.numeroOspiti && formData.numeroOspiti.trim() ? formData.numeroOspiti.trim() : null,
       orarioGiornata: formData.momentoGiornata,
       tipoCerimonia: finalTipoCerimonia,
-      messaggio: formData.ideaFesta
-        ? `${formData.ideaFesta.trim()}${formData.ulterioriInfo ? "\n\nInfo aggiuntive: " + formData.ulterioriInfo.trim() : ""}`
-        : formData.ulterioriInfo ? formData.ulterioriInfo.trim() : "",
+      messaggio: messageParts.join("\n\n"),
       budget: formData.budget,
       lingua: lang,
     };
