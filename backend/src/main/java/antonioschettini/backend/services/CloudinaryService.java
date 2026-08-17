@@ -1,5 +1,6 @@
 package antonioschettini.backend.services;
 
+import antonioschettini.backend.exceptions.BadRequestException;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class CloudinaryService {
         String contentType = file.getContentType();
         List<String> allowedImageTypes = List.of("image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml");
         if (contentType == null || !allowedImageTypes.contains(contentType.toLowerCase())) {
-            throw new RuntimeException("Tipo file non supportato per le immagini. Usa JPEG, PNG, WebP o GIF.");
+            throw new BadRequestException("Tipo file non supportato per le immagini. Usa JPEG, PNG, WebP o GIF.");
         }
         try {
             Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
@@ -46,7 +47,7 @@ public class CloudinaryService {
         String filename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "contratto.pdf";
         String contentType = file.getContentType();
         if (contentType != null && !contentType.toLowerCase().contains("pdf") && !filename.toLowerCase().endsWith(".pdf")) {
-            throw new RuntimeException("Tipo file non supportato per i contratti. Caricare solo file PDF.");
+            throw new BadRequestException("Tipo file non supportato per i contratti. Caricare solo file PDF.");
         }
         try {
             String cleanName = filename.replaceAll("[^a-zA-Z0-9._-]", "_");
@@ -91,7 +92,7 @@ public class CloudinaryService {
                 "video/mp4", "video/quicktime", "video/webm", "video/x-msvideo", "video/x-matroska"
         );
         if (contentType == null || !allowedMediaTypes.contains(contentType.toLowerCase())) {
-            throw new RuntimeException("Tipo file non supportato. Usa immagini (JPEG, PNG, WebP) o video (MP4, MOV, WebM).");
+            throw new BadRequestException("Tipo file non supportato. Usa immagini (JPEG, PNG, WebP) o video (MP4, MOV, WebM).");
         }
         try {
             long fileSize = file.getSize();

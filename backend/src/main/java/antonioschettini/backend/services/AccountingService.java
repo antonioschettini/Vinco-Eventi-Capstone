@@ -2,6 +2,7 @@ package antonioschettini.backend.services;
 
 import antonioschettini.backend.entities.AccountingEvent;
 import antonioschettini.backend.entities.QuoteRequest;
+import antonioschettini.backend.exceptions.BadRequestException;
 import antonioschettini.backend.exceptions.NotFoundException;
 import antonioschettini.backend.recordsDTO.AccountingReportDTO;
 import antonioschettini.backend.recordsDTO.AccountingEventDTO;
@@ -200,8 +201,10 @@ public class AccountingService {
             event.setContrattoPublicId(uploadRes.get("publicId"));
             event.setContrattoNomeFile(uploadRes.get("filename"));
             return accountingRepository.save(event);
+        } catch (BadRequestException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Errore durante l'upload del contratto PDF: " + e.getMessage(), e);
+            throw new BadRequestException("Errore durante l'upload del contratto PDF: " + e.getMessage());
         }
     }
 

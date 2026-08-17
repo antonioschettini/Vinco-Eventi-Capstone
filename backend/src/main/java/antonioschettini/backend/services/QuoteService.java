@@ -2,6 +2,7 @@ package antonioschettini.backend.services;
 
 import antonioschettini.backend.entities.QuoteRequest;
 import antonioschettini.backend.enums.QuoteStatus;
+import antonioschettini.backend.exceptions.BadRequestException;
 import antonioschettini.backend.exceptions.NotFoundException;
 import antonioschettini.backend.recordsDTO.QuoteRequestDTO;
 import antonioschettini.backend.repositories.QuoteRequestRepository;
@@ -119,7 +120,7 @@ public class QuoteService {
 
     public String generateIcsContent(QuoteRequest quote) {
         if (quote == null || quote.getDataEvento() == null) {
-            throw new IllegalStateException("Data evento non specificata per la richiesta preventivo");
+            throw new BadRequestException("Data evento non specificata per la richiesta preventivo");
         }
 
         String dtStart = quote.getDataEvento().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
