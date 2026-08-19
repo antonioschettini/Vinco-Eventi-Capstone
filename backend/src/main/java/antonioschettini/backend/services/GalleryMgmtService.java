@@ -5,6 +5,8 @@ import antonioschettini.backend.exceptions.NotFoundException;
 import antonioschettini.backend.recordsDTO.GalleryDTO;
 import antonioschettini.backend.repositories.GalleryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class GalleryMgmtService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
+    @Cacheable(value = "gallery")
     public List<GalleryItem> getAllGalleryItems() {
         return galleryRepository.findAllByOrderByDisplayOrderAscCreatedAtDesc();
     }
@@ -28,6 +31,7 @@ public class GalleryMgmtService {
                 .orElseThrow(() -> new NotFoundException("Elemento multimediale della galleria con ID " + id + " non trovato"));
     }
 
+    @CacheEvict(value = "gallery", allEntries = true)
     public GalleryItem createGalleryItem(GalleryDTO dto) {
         String posterUrl = dto.posterUrl();
         if ("video".equalsIgnoreCase(dto.type()) && (posterUrl == null || posterUrl.isBlank()) && dto.src() != null) {
@@ -57,6 +61,7 @@ public class GalleryMgmtService {
         return galleryRepository.save(item);
     }
 
+    @CacheEvict(value = "gallery", allEntries = true)
     public GalleryItem updateGalleryItem(UUID id, GalleryDTO dto) {
         GalleryItem existing = getGalleryItemById(id);
 
@@ -97,6 +102,7 @@ public class GalleryMgmtService {
         return galleryRepository.save(existing);
     }
 
+    @CacheEvict(value = "gallery", allEntries = true)
     public void deleteGalleryItem(UUID id) {
         GalleryItem existing = getGalleryItemById(id);
         

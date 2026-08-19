@@ -64,7 +64,14 @@ public class AuditInterceptor implements HandlerInterceptor {
     }
 
     private boolean isExcluded(String path) {
-        return MATCHER.match("/api/auth/**", path)
+        if (path == null || path.isBlank()) return true;
+        String normalized = path.toLowerCase().trim();
+        return normalized.equals("/")
+                || normalized.equals("/health")
+                || normalized.equals("/favicon.ico")
+                || normalized.equals("/robots.txt")
+                || MATCHER.match("/api/auth/**", path)
+                || MATCHER.match("/health", path)
                 || MATCHER.match("/api/health", path)
                 || MATCHER.match("/api/admin/audit/**", path)
                 || MATCHER.match("/uploads/**", path);

@@ -1,6 +1,7 @@
 package antonioschettini.backend.configuration;
 
-import org.springframework.boot.jdbc.DataSourceBuilder;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -30,8 +31,9 @@ public class DatabaseConfig {
         String username = env.getProperty("DB_USERNAME");
         String password = env.getProperty("DB_PASSWORD");
 
+        String cleanUrl;
         if (rawUrl != null && !rawUrl.isBlank()) {
-            String cleanUrl = rawUrl.trim();
+            cleanUrl = rawUrl.trim();
             // Gestione dei formati postgres:// o postgresql:// forniti da Render, Heroku e Railway
             if (cleanUrl.startsWith("postgres://") || cleanUrl.startsWith("postgresql://")) {
                 try {
@@ -58,30 +60,30 @@ public class DatabaseConfig {
             } else if (!cleanUrl.startsWith("jdbc:")) {
                 cleanUrl = "jdbc:" + cleanUrl;
             }
-
-            if (username == null) username = env.getProperty("spring.datasource.username", "postgres");
-            if (password == null) password = env.getProperty("spring.datasource.password", "postgres");
-
-            System.out.println(">>> [DatabaseConfig] Configurazione DataSource riuscita su URL: " + cleanUrl);
-
-            return DataSourceBuilder.create()
-                    .driverClassName("org.postgresql.Driver")
-                    .url(cleanUrl)
-                    .username(username)
-                    .password(password)
-                    .build();
+        } else {
+            cleanUrl = env.getProperty("spring.datasource.url", "jdbc:postgresql://localhost:5432/vinco_eventi");
         }
 
-        // Fallback default da spring.datasource.*
-        String defaultUrl = env.getProperty("spring.datasource.url", "jdbc:postgresql://localhost:5432/vinco_eventi");
-        String defaultUser = env.getProperty("spring.datasource.username", "postgres");
-        String defaultPass = env.getProperty("spring.datasource.password", "postgres");
+        if (username == null) username = env.getProperty("spring.datasource.username", "postgres");
+        if (password == null) password = env.getProperty("spring.datasource.password", "postgres");
 
-        return DataSourceBuilder.create()
-                .driverClassName("org.postgresql.Driver")
-                .url(defaultUrl)
-                .username(defaultUser)
-                .password(defaultPass)
-                .build();
+        System.out.println(">>> [DatabaseConfig] Configurazione DataSource riuscita su URL: " + cleanUrl);
+
+        HikariConfig config = new HikariConfig();
+        config.setDriverClassName("org.postgresql.Driver");
+        config.setJdbcUrl(cleanUrl);
+        config.setUsername(username);
+        config.setPassword(password);
+
+        // Ottimizzazioni Serverless Neon DB (Auto-suspend & Zero Compute Waste)
+        config.setMaximumPoolSize(5);
+        config.setMinimumIdle(0);
+        config.setIdleTimeout(60000);
+        config.setConnectionTimeout(20000);
+        config.setMaxLifetime(1800000);
+        config.setKeepaliveTime(0); // Disabilita keepalive ping 24/7 per permettere lo sleep di Neon
+        config.setPoolName("VincoHikariPool");
+
+        return new HikariDataSource(config);
     }
 }

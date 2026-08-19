@@ -5,6 +5,8 @@ import antonioschettini.backend.exceptions.NotFoundException;
 import antonioschettini.backend.recordsDTO.ServiceDTO;
 import antonioschettini.backend.repositories.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class ServiceMgmtService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
+    @Cacheable(value = "services")
     public List<ServiceEntity> getAllServices() {
         return serviceRepository.findAllByOrderByDisplayOrderAsc();
     }
@@ -28,6 +31,7 @@ public class ServiceMgmtService {
                 .orElseThrow(() -> new NotFoundException("Servizio non trovato con ID: " + id));
     }
 
+    @CacheEvict(value = "services", allEntries = true)
     public ServiceEntity createService(ServiceDTO dto) {
         ServiceEntity service = ServiceEntity.builder()
                 .titleIta(dto.titleIta())
@@ -48,6 +52,7 @@ public class ServiceMgmtService {
         return serviceRepository.save(service);
     }
 
+    @CacheEvict(value = "services", allEntries = true)
     public ServiceEntity updateService(UUID id, ServiceDTO dto) {
         ServiceEntity service = getServiceById(id);
 
@@ -83,6 +88,7 @@ public class ServiceMgmtService {
         return serviceRepository.save(service);
     }
 
+    @CacheEvict(value = "services", allEntries = true)
     public void deleteService(UUID id) {
         ServiceEntity service = getServiceById(id);
 

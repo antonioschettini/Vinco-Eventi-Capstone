@@ -47,7 +47,9 @@ import java.util.UUID;
 public class AuditService {
 
     private static final Logger log = LoggerFactory.getLogger(AuditService.class);
-    private static final int RETENTION_DAYS = 90;
+
+    @org.springframework.beans.factory.annotation.Value("${audit.retention-days:30}")
+    private int retentionDays = 30;
 
     @Autowired
     private AuditErrorLogRepository errorLogRepository;
@@ -208,11 +210,11 @@ public class AuditService {
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void cleanOldLogs() {
-        LocalDateTime cutoff = LocalDateTime.now().minusDays(RETENTION_DAYS);
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(retentionDays);
         int deletedErrors = errorLogRepository.deleteOlderThan(cutoff);
         int deletedVisits = visitLogRepository.deleteOlderThan(cutoff);
         log.info("AuditService retention: eliminati {} error log e {} visit log più vecchi di {} giorni",
-                deletedErrors, deletedVisits, RETENTION_DAYS);
+                deletedErrors, deletedVisits, retentionDays);
     }
 
     // ─────────────────────────────────────────────────────────────
