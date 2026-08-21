@@ -160,10 +160,6 @@
   transition: color 0.35s ease;
 }
 
-.company-info p {
-  text-align: center;
-}
-
 .text-forest {
   color: #52cb87 !important;
 }
@@ -264,7 +260,6 @@
   font-weight: 500;
   color: rgba(255, 255, 255, 0.85) !important;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-  text-align: center;
 }
 
 

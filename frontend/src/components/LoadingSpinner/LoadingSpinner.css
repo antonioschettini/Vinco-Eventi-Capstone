@@ -22,7 +22,6 @@
 
 .loading-spinner__message {
   letter-spacing: 0.5px;
-  text-align: center;
   animation: pulseMessage 1.8s infinite ease-in-out;
 }
 
