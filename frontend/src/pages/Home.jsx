@@ -116,13 +116,13 @@ function Home() {
       <section className="contact-instagram-section py-5">
         <Container className="py-3 py-md-4">
           <Row className="g-4 g-lg-5 align-items-center">
-            {/* Colonna Sinistra: Instagram Smartphone Mockup */}
-            <Col xs={12} lg={5} xl={5} className="d-flex justify-content-center">
+            {/* Colonna Smartphone Mockup (Sinistra su desktop, Sotto al form su mobile) */}
+            <Col xs={12} lg={5} xl={5} className="d-flex justify-content-center order-2 order-lg-1">
               <InstagramMockup />
             </Col>
 
-            {/* Colonna Destra: Form di Contatto */}
-            <Col xs={12} lg={7} xl={7}>
+            {/* Colonna Form di Contatto (Destra su desktop, Sopra allo smartphone su mobile) */}
+            <Col xs={12} lg={7} xl={7} className="order-1 order-lg-2">
               <ContactForm />
             </Col>
           </Row>

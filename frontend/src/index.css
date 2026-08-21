@@ -60,6 +60,12 @@ body {
   color: var(--light-text);
 }
 
+/* Allineamento Giustificato Globale per tutti i paragrafi di testo */
+p {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
 /* Uniformità stato Focus per Form, Input, Select e Textarea (Zero blu Bootstrap) */
 [data-bs-theme="dark"] .form-control:focus,
 [data-bs-theme="dark"] .form-select:focus {
