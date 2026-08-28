@@ -46,8 +46,8 @@ public class EmailService {
 
 
     private static final String URL_LOGO_VINCO = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903278/vinco_email_assets/vinco_email_assets/logo-vinco-off.png";
-    private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787905647/vinco_email_assets/google-official-icon.png";
-    private static final String URL_APPLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787905649/vinco_email_assets/apple-official-icon.png";
+    private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787905894/vinco_email_assets/google-official-icon.png";
+    private static final String URL_APPLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787905895/vinco_email_assets/apple-official-icon.png";
     private static final String URL_DASHBOARD_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903272/vinco_email_assets/vinco_email_assets/dashboard-icon.png";
     private static final String URL_INSTAGRAM_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903274/vinco_email_assets/vinco_email_assets/instagram-icon.png";
     private static final String URL_PHONE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903276/vinco_email_assets/vinco_email_assets/phone-icon.png";
