@@ -5,20 +5,19 @@ import "./InstagramMockup.css";
 
 import { triggerHapticFeedback } from "../../utils/vibration";
 
-// Assets imports from src/assets/home/
-import imgSposi from "../../assets/home/foto bacio sposi.webp";
-import imgAperitivo from "../../assets/home/foto band aperitivo.webp";
-import imgDancefloor from "../../assets/home/dancefloor.webp";
-import imgFumogeni from "../../assets/home/14. fumogeni color.webp";
-import imgCielo from "../../assets/home/cielo stellato.webp";
-
+// Assets imports from src/assets/Vinco Eventi assets/assets immagini/
+import imgCielo from "../../assets/Vinco Eventi assets/assets immagini/cielo stellato.webp";
+import imgFontane from "../../assets/Vinco Eventi assets/assets immagini/fontane sparkular.webp";
+import imgFumogeni from "../../assets/Vinco Eventi assets/assets immagini/fumogeni colorati.webp";
+import imgTrolling from "../../assets/Vinco Eventi assets/assets immagini/trolling band.webp";
+import imgSwing from "../../assets/Vinco Eventi assets/assets immagini/swing band aperitif.webp";
 
 const slideImages = [
-  { id: 1, src: imgSposi, alt: "Sposi VINCO EVENTI" },
-  { id: 2, src: imgAperitivo, alt: "Aperitivo con Band dal Vivo" },
-  { id: 3, src: imgDancefloor, alt: "Dancefloor & DJ Set" },
-  { id: 4, src: imgFumogeni, alt: "Effetti Spettacolari & Fumogeni" },
-  { id: 5, src: imgCielo, alt: "Atmosfera Cielo Stellato" },
+  { id: 1, src: imgCielo, alt: "Atmosfera Cielo Stellato" },
+  { id: 2, src: imgFontane, alt: "Fontane Sparkular Scenografiche" },
+  { id: 3, src: imgFumogeni, alt: "Effetti Fumogeni Colorati" },
+  { id: 4, src: imgTrolling, alt: "Trolling Band Live Show" },
+  { id: 5, src: imgSwing, alt: "Swing Band Aperitif" },
 ];
 
 function InstagramMockup() {

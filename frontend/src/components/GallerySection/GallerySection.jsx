@@ -19,8 +19,6 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
     const target = videoRef.current;
     if (!target || hasError) return;
 
-    target.play().catch(() => {});
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -35,7 +33,7 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
           }
         });
       },
-      { threshold: 0.1, rootMargin: "100px" }
+      { threshold: 0.15, rootMargin: "50px" }
     );
 
     observer.observe(target);
@@ -69,7 +67,6 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
       muted
       loop
       playsInline
-      autoPlay
       preload="metadata"
       onError={() => setHasError(true)}
       onLoadedMetadata={(e) => {

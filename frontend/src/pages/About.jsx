@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { translations } from "../utils/translations";
 import LocationMap from "../components/LocationMap/LocationMap";
 import MatrimonioWidgets from "../components/MatrimonioWidgets/MatrimonioWidgets";
-const heroBgImage = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786265144/vinco_eventi_assets/jgj8b2jhbeaervxidek4.jpg";
-const storyImage = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786265143/vinco_eventi_assets/jduafvl0hcqgjhcyzoxb.jpg";
+import heroBgImage from "../assets/Vinco Eventi assets/assets immagini/foto dj enzo colaluca.webp";
 import useScrollReveal from "../utils/useScrollReveal";
 import "./About.css";
 
@@ -21,7 +20,7 @@ function About() {
 
   return (
     <div className="about-page">
-      {/* 1. 🖼️ HERO SECTION (Stessa UI/UX della Galleria: Testo Sovrapposto Direttamente allo Sfondo, Sfondo foto enzo dj set.jpeg) */}
+      {/* 1. 🖼️ HERO SECTION (Testo Sovrapposto Direttamente allo Sfondo) */}
       <section
         className="hero-gallery-section py-5 position-relative"
         style={{ backgroundImage: `url("${heroBgImage}")` }}
@@ -45,31 +44,19 @@ function About() {
       {/* 2. SEZIONE STORIA & VISIONE AZIENDALE */}
       <section className="about-story-section py-5 my-3 my-md-4">
         <Container className="py-2">
-          <Row className="g-4 g-lg-5 align-items-center mb-5">
-            {/* Foto Vincenzo Colaluca / VINCO EVENTI */}
-            <Col xs={12} lg={6}>
-              <div className="story-img-wrapper">
-                <img
-                  src={storyImage}
-                  alt="Vincenzo Colaluca - VINCO EVENTI"
-                  loading="lazy"
-                />
-              </div>
-            </Col>
-
-            {/* Testo Descrittivo */}
-            <Col xs={12} lg={6}>
-              <div className="story-content">
-                <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill font-body fw-semibold text-uppercase tracking-wider mb-2">
+          <Row className="justify-content-center mb-5">
+            <Col xs={12} lg={10} xl={9}>
+              <div className="story-content text-center">
+                <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill font-body fw-semibold text-uppercase tracking-wider mb-3">
                   <i className="bi bi-patch-check-fill me-1"></i> VINCO EVENTI Story
                 </span>
                 <h2 className="display-5 font-heading text-body fw-bold mb-4">
                   {t.storyTitle}
                 </h2>
-                <p className="lead font-body text-body fw-medium mb-4">
+                <p className="lead font-body text-body fw-medium mb-4 max-w-800 mx-auto">
                   {t.storySub}
                 </p>
-                <div className="font-body text-body-secondary fs-6 lh-lg d-flex flex-column gap-3 mb-0">
+                <div className="font-body text-body-secondary fs-6 lh-lg d-flex flex-column gap-3 mb-0 text-start max-w-800 mx-auto">
                   <p className="mb-0">{t.storyP1}</p>
                   <p className="mb-0">{t.storyP2}</p>
                   <p className="mb-0">{t.storyP3}</p>

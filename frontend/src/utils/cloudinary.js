@@ -70,7 +70,7 @@ export function getOptimizedCloudinaryUrl(url, options = {}) {
     transformList.push(`q_${transformQuality}`, `w_${width}`, `c_${crop}`);
   } else if (type === "carousel") {
     transformList.push("q_auto", "w_1200", `c_${crop}`);
-  } else if (type === "grid") {
+  } else if (type === "grid" || type === "poster") {
     transformList.push("q_auto", "w_800", `c_${crop}`);
   } else if (type === "modal") {
     transformList.push("q_auto", "w_1600", `c_${crop}`);

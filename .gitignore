@@ -20,3 +20,8 @@ task_list.json
 env.properties
 backend/env.properties
 
+# Heavy raw video assets (streamed via Cloudinary CDN)
+**/assets video/
+*.mp4
+*.mov
+

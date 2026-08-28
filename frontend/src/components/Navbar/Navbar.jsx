@@ -20,6 +20,7 @@ import tracks from "../../data/tracksData";
 import API_BASE_URL from "../../config/api";
 import AudioController from "../AudioPlayer/AudioController";
 import { translations } from "../../utils/translations";
+import vincoLogo from "../../assets/Vinco Eventi assets/assets loghi/Logo vinco eventi off.png";
 import "./Navbar.css";
 
 // SVG Bandiera Italiana (Rapporto 3:2 perfetto)
@@ -447,7 +448,7 @@ function Navbar() {
 
           <div className="logo-wrapper">
             <img
-              src="/logoVincoEventi.jpeg"
+              src={vincoLogo}
               alt="VINCO EVENTI Logo"
               className="logo-img"
             />

@@ -45,13 +45,13 @@ public class EmailService {
     private String brevoApiKey;
 
 
-    private static final String URL_LOGO_VINCO = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263577/vinco_email_assets/g8xo3jtogac3rdr5kgfw.png";
-    private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786265382/vinco_email_assets/google-official-v2.svg";
-    private static final String URL_APPLE_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786265381/vinco_email_assets/apple-official-v2.svg";
-    private static final String URL_DASHBOARD_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263579/vinco_email_assets/rv8jkbcolykkaccvceie.png";
-    private static final String URL_INSTAGRAM_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263579/vinco_email_assets/ppypfvmhxsgmynx4a8wl.png";
-    private static final String URL_PHONE_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263580/vinco_email_assets/lkhurx9vaflldpam4hix.png";
-    private static final String URL_WHATSAPP_ICON = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263580/vinco_email_assets/eh1so4civt5pvomslk5b.png";
+    private static final String URL_LOGO_VINCO = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903278/vinco_email_assets/vinco_email_assets/logo-vinco-off.png";
+    private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903273/vinco_email_assets/vinco_email_assets/google-icon.png";
+    private static final String URL_APPLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903271/vinco_email_assets/vinco_email_assets/apple-icon.png";
+    private static final String URL_DASHBOARD_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903272/vinco_email_assets/vinco_email_assets/dashboard-icon.png";
+    private static final String URL_INSTAGRAM_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903274/vinco_email_assets/vinco_email_assets/instagram-icon.png";
+    private static final String URL_PHONE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903276/vinco_email_assets/vinco_email_assets/phone-icon.png";
+    private static final String URL_WHATSAPP_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903277/vinco_email_assets/vinco_email_assets/whatsapp-icon.png";
 
     @Async
     public void sendQuoteNotificationEmail(QuoteRequest quote) {

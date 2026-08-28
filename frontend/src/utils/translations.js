@@ -109,7 +109,7 @@ export const translations = {
       },
       otherProposals: {
         title: "ALTRE PROPOSTE",
-        text: "VINCO EVENTI dispone di numerose band di musicisti e cantanti di alto livello adatte ad ogni tipologia di evento e gusto musicale. L’obiettivo è quello di customizzare l’evento per ogni singolo cliente diventando così un vero e proprio consulente musicale. VINCO EVENTI collabora, inoltre con tanti Wedding Planner e Destination Wedding Planner per proporre e costruire insieme al cliente le soluzioni migliori in termini di gusto musicale e budget. Dall’accompagnamento musicale per riti civili, aperitivi, pranzi o cene nuziali, taglio torta e dj set post party.",
+        text: "VINCO EVENTI dispone di numerose band di musicisti e cantanti di alto livello adatte ad ogni tipologia di evento e gusto musicale. L’obiettivo è quello di customizzare l’evento per ogni singolo cliente diventando così un vero e proprio consulente musicale. VINCO EVENTI collabora, inoltre con tanti Wedding Planner e Destination Wedding Planner per proporre e costruire insieme al cliente le soluzioni migliori in termini di gusto musicale e budget. Dall’accompagnamento musicale per riti civili, aperitivi, pranzi o cene nuziali, taglio torta e dj set afterparty.",
       },
       adminActions: {
         adminMode: "Modalità Admin Attiva - Gestione CRUD Servizi",

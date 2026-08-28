@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
-const heroBgImage = "https://res.cloudinary.com/oe1bztwb/image/upload/v1786265143/vinco_eventi_assets/jduafvl0hcqgjhcyzoxb.jpg";
+import heroBgImage from "../assets/Vinco Eventi assets/assets immagini/dj colaluca.webp";
 import GallerySection from "../components/GallerySection/GallerySection";
 import useScrollReveal from "../utils/useScrollReveal";
 

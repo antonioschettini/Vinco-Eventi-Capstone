@@ -3,12 +3,12 @@ import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
-import bioBgImage from "../assets/home/foto per sfondo bio.webp";
+import bioBgImage from "../assets/Vinco Eventi assets/assets immagini/Biografia HeroSection Dj colaluca bn.webp";
 
-import cerimoniaImg from "../assets/home/14. fumogeni color.webp";
-import aperitivoImg from "../assets/home/foto intrattenimento aperitivo.webp";
-import pranzoCenaImg from "../assets/home/foto band sera.webp";
-import afterPartyImg from "../assets/home/dancefloor.webp";
+import cerimoniaImg from "../assets/Vinco Eventi assets/assets immagini/fumogeni cerimonia.webp";
+import aperitivoImg from "../assets/Vinco Eventi assets/assets immagini/aperitivo swing band.webp";
+import pranzoCenaImg from "../assets/Vinco Eventi assets/assets immagini/violino & sax led show.webp";
+import afterPartyImg from "../assets/Vinco Eventi assets/assets immagini/dancefloor 3d.webp";
 
 import InstagramMockup from "../components/InstagramMockup/InstagramMockup";
 import ContactForm from "../components/ContactForm/ContactForm";

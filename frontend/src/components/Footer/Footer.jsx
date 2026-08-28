@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
-import useScrollReveal from "../../utils/useScrollReveal";
-const footerBgImage = "https://res.cloudinary.com/oe1bztwb/image/upload/c_crop,g_center,y_0,h_0.92/v1786265141/vinco_eventi_assets/bzgnb1lhn2ok8bnuzcgs.jpg";
+import footerBgImage from "../../assets/Vinco Eventi assets/assets immagini/Consolle e cuffia.webp";
 import "./Footer.css";
 
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";

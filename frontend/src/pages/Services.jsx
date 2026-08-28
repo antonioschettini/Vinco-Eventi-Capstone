@@ -2,7 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
-import heroBgImage from "../assets/home/fotoEnzoSera.webp";
+import heroBgImage from "../assets/Vinco Eventi assets/assets immagini/Footer Immagine consolle mani.webp";
+import essentialItaImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/essentialIta.png";
+import essentialEngImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/essentialEng.png";
+import plusItaImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/plusIta.png";
+import plusEngImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/plusEng.png";
+import fullItaImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/fullIta.png";
+import fullEngImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/fullEng.png";
 import API_BASE_URL from "../config/api";
 import { apiFetch, authApiFetch } from "../utils/apiClient";
 import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
@@ -75,26 +81,18 @@ function Services() {
       return dbUrl;
     }
 
-    // Fallback statico per i 3 badge standard, quando l'immagine non è nel DB
+    // Fallback statico per i 3 badge standard dai file locali ufficiali
     const badge = service.badge ? service.badge.toUpperCase() : "ESSENTIAL";
     switch (badge) {
       case "ESSENTIAL":
       case "BASIC":
-        return isEng
-          ? "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263063/vinco_eventi_servizi/svlioqxv0xes6fumwpnl.jpg"
-          : "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263061/vinco_eventi_servizi/wjtchgjbcxvyl8q6bick.jpg";
+        return isEng ? essentialEngImg : essentialItaImg;
       case "PLUS":
-        return isEng
-          ? "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263088/vinco_eventi_servizi/wprtcafdwgjkadlgrgkk.jpg"
-          : "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263086/vinco_eventi_servizi/keyrbiqbz8v6i6funxo1.jpg";
+        return isEng ? plusEngImg : plusItaImg;
       case "FULL":
-        return isEng
-          ? "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263093/vinco_eventi_servizi/wygm59zynjvldm1gj4pj.jpg"
-          : "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263091/vinco_eventi_servizi/c9e0i6zst7e3zuyawbwe.jpg";
+        return isEng ? fullEngImg : fullItaImg;
       default:
-        return isEng
-          ? "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263063/vinco_eventi_servizi/svlioqxv0xes6fumwpnl.jpg"
-          : "https://res.cloudinary.com/oe1bztwb/image/upload/v1786263061/vinco_eventi_servizi/wjtchgjbcxvyl8q6bick.jpg";
+        return isEng ? essentialEngImg : essentialItaImg;
     }
   };
 
