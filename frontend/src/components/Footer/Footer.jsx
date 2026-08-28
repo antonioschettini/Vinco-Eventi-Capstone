@@ -3,6 +3,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { translations } from "../../utils/translations";
 import footerBgImage from "../../assets/Vinco Eventi assets/assets immagini/Consolle e cuffia.webp";
+import useScrollReveal from "../../utils/useScrollReveal";
 import "./Footer.css";
 
 import { handleEmailClick, handlePhoneClick } from "../../utils/contactHelpers";
