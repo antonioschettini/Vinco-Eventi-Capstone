@@ -51,7 +51,7 @@ public class EmailService {
     private static final String URL_DASHBOARD_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903272/vinco_email_assets/vinco_email_assets/dashboard-icon.png";
     private static final String URL_INSTAGRAM_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906011/vinco_email_assets/instagram-official-icon.png";
     private static final String URL_PHONE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906013/vinco_email_assets/phone-official-icon.png";
-    private static final String URL_WHATSAPP_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906009/vinco_email_assets/whatsapp-official-icon.png";
+    private static final String URL_WHATSAPP_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906177/vinco_email_assets/whatsapp-official-icon.png";
 
     @Async
     public void sendQuoteNotificationEmail(QuoteRequest quote) {
