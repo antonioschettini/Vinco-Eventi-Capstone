@@ -46,12 +46,12 @@ public class EmailService {
 
 
     private static final String URL_LOGO_VINCO = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903278/vinco_email_assets/vinco_email_assets/logo-vinco-off.png";
-    private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906283/vinco_email_assets/google-official-icon.png";
-    private static final String URL_APPLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906285/vinco_email_assets/apple-official-icon.png";
+    private static final String URL_GOOGLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906446/vinco_email_assets/google-official-icon.png";
+    private static final String URL_APPLE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906448/vinco_email_assets/apple-official-icon.png";
     private static final String URL_DASHBOARD_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787903272/vinco_email_assets/vinco_email_assets/dashboard-icon.png";
-    private static final String URL_INSTAGRAM_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906288/vinco_email_assets/instagram-official-icon.png";
-    private static final String URL_PHONE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906290/vinco_email_assets/phone-official-icon.png";
-    private static final String URL_WHATSAPP_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906286/vinco_email_assets/whatsapp-official-icon.png";
+    private static final String URL_INSTAGRAM_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906451/vinco_email_assets/instagram-official-icon.png";
+    private static final String URL_PHONE_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906453/vinco_email_assets/phone-official-icon.png";
+    private static final String URL_WHATSAPP_ICON = "https://res.cloudinary.com/fzdamrbc/image/upload/v1787906450/vinco_email_assets/whatsapp-official-icon.png";
 
     @Async
     public void sendQuoteNotificationEmail(QuoteRequest quote) {
