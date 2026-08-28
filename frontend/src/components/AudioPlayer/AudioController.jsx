@@ -8,6 +8,7 @@ import {
 } from "../../redux/slices/audioSlice";
 import tracks from "../../data/tracksData";
 import AudioConsentToast from "./AudioConsentToast";
+import { registerAudioElement } from "../../utils/audioService";
 
 function AudioController() {
   const dispatch = useDispatch();
@@ -19,8 +20,11 @@ function AudioController() {
 
   const currentTrack = tracks[currentTrackIndex] || tracks[0];
 
-  // Inizializzazione al montaggio: per rispettare la policy del browser, l'audio non parte finché l'utente non interagisce
+  // Inizializzazione al montaggio: registra l'istanza globale per l'avvio sincrono e imposta stato autoplay
   useEffect(() => {
+    if (audioRef.current) {
+      registerAudioElement(audioRef.current);
+    }
     dispatch(setAutoplayBlocked(true));
   }, [dispatch]);
 
@@ -31,10 +35,12 @@ function AudioController() {
 
     if (isPlaying) {
       if (audio.paused) {
-        audio.play().catch((err) => {
-          console.warn("Riproduzione interrotta o bloccata:", err);
-          dispatch(setIsPlaying(false));
-        });
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.warn("[AudioController] Riproduzione in attesa di interazione utente (iOS):", err);
+          });
+        }
       }
     } else {
       if (!audio.paused) {
@@ -99,9 +105,11 @@ function AudioController() {
   return (
     <>
       <audio
+        id="vinco-global-audio"
         ref={audioRef}
         src={currentTrack.src}
         preload="auto"
+        playsInline
         onEnded={handleEnded}
       />
       <AudioConsentToast />

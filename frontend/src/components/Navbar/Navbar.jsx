@@ -21,6 +21,7 @@ import API_BASE_URL from "../../config/api";
 import AudioController from "../AudioPlayer/AudioController";
 import { translations } from "../../utils/translations";
 import vincoLogo from "../../assets/Vinco Eventi assets/assets loghi/Logo vinco eventi off.png";
+import { toggleAudioSync } from "../../utils/audioService";
 import "./Navbar.css";
 
 // SVG Bandiera Italiana (Rapporto 3:2 perfetto)
@@ -204,7 +205,10 @@ function Navbar() {
 
           {/* Pulsante Play / Pause */}
           <button
-            onClick={() => dispatch(togglePlay())}
+            onClick={() => {
+              toggleAudioSync(isPlaying);
+              dispatch(togglePlay());
+            }}
             className="top-player-btn play-btn"
             title={isPlaying ? "Pausa" : "Riproduci"}
             aria-label={isPlaying ? "Pausa" : "Riproduci"}

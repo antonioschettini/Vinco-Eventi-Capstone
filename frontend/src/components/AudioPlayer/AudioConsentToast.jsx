@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setIsPlaying, setAutoplayBlocked } from "../../redux/slices/audioSlice";
+import { playAudioSync } from "../../utils/audioService";
 import "./AudioConsentToast.css";
 
 function AudioConsentToast() {
@@ -15,6 +16,8 @@ function AudioConsentToast() {
   }
 
   const handleActivateAudio = () => {
+    // Sblocco e avvio sincrono obbligatorio all'interno del gesto utente per iOS Safari / Apple WebKit
+    playAudioSync();
     dispatch(setIsPlaying(true));
     dispatch(setAutoplayBlocked(false));
     setDismissed(true);

@@ -9,6 +9,7 @@ import {
   setIsModalOpen,
   setModalPosition,
 } from "../../redux/slices/audioSlice";
+import { toggleAudioSync } from "../../utils/audioService";
 import { translations } from "../../utils/translations";
 import tracks from "../../data/tracksData";
 import "./TrackModal.css";
@@ -178,7 +179,10 @@ function TrackModal() {
           </button>
 
           <button
-            onClick={() => dispatch(togglePlay())}
+            onClick={() => {
+              toggleAudioSync(isPlaying);
+              dispatch(togglePlay());
+            }}
             className="btn-modal-play shadow-sm"
             title={isPlaying ? (t.pause || "Pausa") : (t.play || "Riproduci")}
             aria-label={isPlaying ? (t.pause || "Pausa") : (t.play || "Riproduci")}

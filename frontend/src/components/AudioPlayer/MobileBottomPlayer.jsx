@@ -8,6 +8,7 @@ import {
   toggleMute,
   toggleModal,
 } from "../../redux/slices/audioSlice";
+import { toggleAudioSync } from "../../utils/audioService";
 import tracks from "../../data/tracksData";
 import "./MobileBottomPlayer.css";
 
@@ -73,7 +74,10 @@ function MobileBottomPlayer() {
         </button>
 
         <button
-          onClick={() => dispatch(togglePlay())}
+          onClick={() => {
+            toggleAudioSync(isPlaying);
+            dispatch(togglePlay());
+          }}
           className="top-player-btn play-btn"
           title={isPlaying ? "Pausa" : "Riproduci"}
           aria-label={isPlaying ? "Pausa" : "Riproduci"}
