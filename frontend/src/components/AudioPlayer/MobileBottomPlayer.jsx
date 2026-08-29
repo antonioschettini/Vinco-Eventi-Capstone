@@ -8,7 +8,7 @@ import {
   toggleMute,
   toggleModal,
 } from "../../redux/slices/audioSlice";
-import { toggleAudioSync } from "../../utils/audioService";
+import { toggleAudioSync, setAudioGain } from "../../utils/audioService";
 import tracks from "../../data/tracksData";
 import "./MobileBottomPlayer.css";
 
@@ -21,6 +21,22 @@ function MobileBottomPlayer() {
   const currentTrack = tracks[currentTrackIndex] || tracks[0];
   const [showVolumePopover, setShowVolumePopover] = useState(false);
   const volumePopoverRef = useRef(null);
+
+  const handleVolumeChange = (newVol) => {
+    const clamped = Math.max(0, Math.min(1, newVol));
+    dispatch(setVolume(clamped));
+    setAudioGain(clamped);
+  };
+
+  const handleStepDown = () => {
+    const current = isMuted ? 0 : volume;
+    handleVolumeChange(Math.max(0, Math.round((current - 0.1) * 100) / 100));
+  };
+
+  const handleStepUp = () => {
+    const current = isMuted ? 0 : volume;
+    handleVolumeChange(Math.min(1, Math.round((current + 0.1) * 100) / 100));
+  };
 
   // Chiude il popover se si clicca all'esterno di esso
   useEffect(() => {
@@ -115,13 +131,14 @@ function MobileBottomPlayer() {
             ></i>
           </button>
 
-          {/* Popover Slider Volume Mobile */}
+          {/* Popover Slider Volume Mobile con pulsanti Up/Down reattivi */}
           {showVolumePopover && (
-            <div className="mobile-volume-popover p-2 shadow-lg rounded-3 d-flex align-items-center gap-2">
+            <div className="mobile-volume-popover p-2 shadow-lg rounded-3 d-flex align-items-center gap-1.5">
               <button
                 onClick={() => dispatch(toggleMute())}
-                className="btn btn-sm p-0 text-body border-0 flex-shrink-0"
+                className="btn btn-sm p-1 text-body border-0 flex-shrink-0"
                 title={isMuted || volume === 0 ? "Attiva audio" : "Muto"}
+                aria-label="Muto o Attiva Audio"
               >
                 <i
                   className={`bi ${
@@ -131,15 +148,34 @@ function MobileBottomPlayer() {
                   }`}
                 ></i>
               </button>
+              <button
+                type="button"
+                onClick={handleStepDown}
+                className="btn btn-sm p-1 text-body border-0 flex-shrink-0 mobile-vol-step-btn"
+                title="Abbassa volume"
+                aria-label="Abbassa volume"
+              >
+                <i className="bi bi-dash-lg"></i>
+              </button>
               <input
                 type="range"
                 min="0"
                 max="1"
                 step="0.01"
                 value={isMuted ? 0 : volume}
-                onChange={(e) => dispatch(setVolume(parseFloat(e.target.value)))}
+                onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
                 className="mobile-volume-slider flex-grow-1"
+                aria-label="Slider Volume"
               />
+              <button
+                type="button"
+                onClick={handleStepUp}
+                className="btn btn-sm p-1 text-body border-0 flex-shrink-0 mobile-vol-step-btn"
+                title="Alza volume"
+                aria-label="Alza volume"
+              >
+                <i className="bi bi-plus-lg"></i>
+              </button>
               <span className="mobile-volume-text extra-small fw-bold flex-shrink-0">
                 {isMuted ? "0%" : `${Math.round(volume * 100)}%`}
               </span>

@@ -54,26 +54,28 @@ export function getOptimizedCloudinaryUrl(url, options = {}) {
   // al volo per azzerare il consumo di "Video Transformations" su Cloudinary.
   // I video vengono serviti direttamente dall'URL raw CDN pulito.
   if (isVideo) {
-    // Se richiesta la copertina/poster ed è fornita in options, la utilizziamo direttamente
+    // Se richiesta la copertina/poster ed è fornita in options, la utilizziamo con risoluzione poster HD
     if (type === "poster" && options.posterUrl) {
-      return getOptimizedCloudinaryUrl(options.posterUrl, { type: "grid" });
+      return getOptimizedCloudinaryUrl(options.posterUrl, { type: "poster" });
     }
     const versionPath = version ? `${version}/` : "";
     return `${prefix}${versionPath}${publicIdPath}`;
   }
 
-  // PER LE IMMAGINI: Manteniamo le ottimizzazioni f_auto, q_auto e ridimensionamento responsivo
+  // PER LE IMMAGINI: Manteniamo le ottimizzazioni f_auto, q_auto e ridimensionamento responsivo ad alta fedeltà
   let transformQuality = quality;
   const transformList = [`f_${format}`];
 
   if (width) {
     transformList.push(`q_${transformQuality}`, `w_${width}`, `c_${crop}`);
   } else if (type === "carousel") {
-    transformList.push("q_auto", "w_1200", `c_${crop}`);
-  } else if (type === "grid" || type === "poster") {
-    transformList.push("q_auto", "w_800", `c_${crop}`);
+    transformList.push("q_auto:good", "w_1600", `c_${crop}`);
+  } else if (type === "poster") {
+    transformList.push("q_auto:good", "w_1440", `c_${crop}`);
+  } else if (type === "grid") {
+    transformList.push("q_auto", "w_900", `c_${crop}`);
   } else if (type === "modal") {
-    transformList.push("q_auto", "w_1600", `c_${crop}`);
+    transformList.push("q_auto:good", "w_1920", `c_${crop}`);
   }
 
   const versionPath = version ? `${version}/` : "";

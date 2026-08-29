@@ -14,18 +14,18 @@
 }
 
 .gallery-top-carousel {
-  max-width: 1040px;
+  max-width: 1160px;
   margin: 0 auto;
 }
 
 .gallery-carousel-item {
-  height: 500px;
+  height: 620px;
 }
 
 .carousel-media-wrapper {
   position: relative;
   width: 100%;
-  height: 500px;
+  height: 620px;
   overflow: hidden;
   background-color: #030805;
 }
@@ -34,7 +34,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
+  object-position: center 12%;
 }
 
 .carousel-top-badges {
@@ -65,10 +65,10 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 2.5rem 2rem 2.25rem !important;
-  background: linear-gradient(0deg, rgba(3, 8, 5, 0.96) 0%, rgba(3, 8, 5, 0.78) 45%, rgba(3, 8, 5, 0.35) 80%, transparent 100%);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  padding: 1.75rem 2rem 1.35rem !important;
+  background: linear-gradient(0deg, rgba(3, 8, 5, 0.95) 0%, rgba(3, 8, 5, 0.72) 45%, rgba(3, 8, 5, 0.2) 78%, transparent 100%);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   text-align: left;
   z-index: 4;
 }
@@ -82,7 +82,7 @@
   text-shadow: 
     0 2px 8px rgba(0, 0, 0, 0.98),
     0 4px 18px rgba(0, 0, 0, 0.9);
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.35rem;
   letter-spacing: -0.01em;
 }
 
@@ -95,26 +95,41 @@
   text-shadow: 
     0 2px 6px rgba(0, 0, 0, 0.95),
     0 3px 14px rgba(0, 0, 0, 0.85);
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.65rem;
   max-width: 860px;
 }
 
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
+  .gallery-top-carousel {
+    max-width: 980px;
+  }
+
   .gallery-carousel-item,
   .carousel-media-wrapper {
-    height: 450px;
+    height: 560px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .gallery-top-carousel {
+    max-width: 100%;
+  }
+
+  .gallery-carousel-item,
+  .carousel-media-wrapper {
+    height: 500px;
   }
 }
 
 @media (max-width: 575.98px) {
   .gallery-carousel-item,
   .carousel-media-wrapper {
-    height: 420px;
+    height: 440px;
   }
 
   .carousel-top-badges {
-    padding: 1rem 1rem 0.5rem;
-    gap: 0.4rem;
+    padding: 0.85rem 1rem 0.5rem;
+    gap: 0.35rem;
   }
 
   .carousel-top-badges .badge {
@@ -123,7 +138,7 @@
   }
 
   .carousel-overlay-caption {
-    padding: 1.5rem 1rem 2rem !important;
+    padding: 1.25rem 1rem 1.5rem !important;
   }
 
   .carousel-overlay-title {
@@ -133,7 +148,7 @@
 
   .carousel-overlay-subtitle {
     font-size: 0.86rem !important;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.55rem;
   }
 }
 

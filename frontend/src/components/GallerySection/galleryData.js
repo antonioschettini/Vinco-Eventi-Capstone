@@ -13,7 +13,7 @@ export const galleryItems = [
     "featured": true,
     "startTime": 1.5,
     "src": "https://res.cloudinary.com/fzdamrbc/video/upload/v1787903295/vinco_eventi_galleria/vinco_eventi_galleria/Video_presentazione_vinco_eventi_.mp4",
-    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto,w_720,so_2/v1787903295/vinco_eventi_galleria/vinco_eventi_galleria/Video_presentazione_vinco_eventi_.jpg",
+    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto:good,w_1280,so_2/v1787903295/vinco_eventi_galleria/vinco_eventi_galleria/Video_presentazione_vinco_eventi_.jpg",
     "publicId": "vinco_eventi_galleria/vinco_eventi_galleria/Video_presentazione_vinco_eventi_",
     "id": "dde69263-f5b6-40a1-aee9-f3257f132ce3",
     "isFallback": true
@@ -29,7 +29,7 @@ export const galleryItems = [
     "featured": true,
     "startTime": 1.0,
     "src": "https://res.cloudinary.com/fzdamrbc/video/upload/v1787903300/vinco_eventi_galleria/vinco_eventi_galleria/blasck_voice___sax_on_dancefloor_3d.mp4",
-    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto,w_720,so_2/v1787903300/vinco_eventi_galleria/vinco_eventi_galleria/blasck_voice___sax_on_dancefloor_3d.jpg",
+    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto:good,w_1280,so_2/v1787903300/vinco_eventi_galleria/vinco_eventi_galleria/blasck_voice___sax_on_dancefloor_3d.jpg",
     "publicId": "vinco_eventi_galleria/vinco_eventi_galleria/blasck_voice___sax_on_dancefloor_3d",
     "id": "f44b086a-9278-4938-b17f-cae346dc325f",
     "isFallback": true
@@ -45,7 +45,7 @@ export const galleryItems = [
     "featured": true,
     "startTime": 1.0,
     "src": "https://res.cloudinary.com/fzdamrbc/video/upload/v1787903303/vinco_eventi_galleria/vinco_eventi_galleria/live_show_duo_violino.mp4",
-    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto,w_720,so_2/v1787903303/vinco_eventi_galleria/vinco_eventi_galleria/live_show_duo_violino.jpg",
+    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto:good,w_1280,so_2/v1787903303/vinco_eventi_galleria/vinco_eventi_galleria/live_show_duo_violino.jpg",
     "publicId": "vinco_eventi_galleria/vinco_eventi_galleria/live_show_duo_violino",
     "id": "0970c218-5a40-4de9-8f1a-dff4d3f05934",
     "isFallback": true
@@ -61,7 +61,7 @@ export const galleryItems = [
     "featured": true,
     "startTime": 1.0,
     "src": "https://res.cloudinary.com/fzdamrbc/video/upload/v1787903310/vinco_eventi_galleria/vinco_eventi_galleria/dj_colaluca_djset___percussion.mp4",
-    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto,w_720,so_2/v1787903310/vinco_eventi_galleria/vinco_eventi_galleria/dj_colaluca_djset___percussion.jpg",
+    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto:good,w_1280,so_2/v1787903310/vinco_eventi_galleria/vinco_eventi_galleria/dj_colaluca_djset___percussion.jpg",
     "publicId": "vinco_eventi_galleria/vinco_eventi_galleria/dj_colaluca_djset___percussion",
     "id": "83139e51-3794-4b46-bd47-cf3015e94ca3",
     "isFallback": true
@@ -77,7 +77,7 @@ export const galleryItems = [
     "featured": true,
     "startTime": 1.0,
     "src": "https://res.cloudinary.com/fzdamrbc/video/upload/v1787903316/vinco_eventi_galleria/vinco_eventi_galleria/live_band_2.mp4",
-    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto,w_720,so_2/v1787903316/vinco_eventi_galleria/vinco_eventi_galleria/live_band_2.jpg",
+    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto:good,w_1280,so_2/v1787903316/vinco_eventi_galleria/vinco_eventi_galleria/live_band_2.jpg",
     "publicId": "vinco_eventi_galleria/vinco_eventi_galleria/live_band_2",
     "id": "c342c0d1-15a8-4186-a524-b64d417a6f53",
     "isFallback": true
@@ -93,7 +93,7 @@ export const galleryItems = [
     "featured": true,
     "startTime": 1.0,
     "src": "https://res.cloudinary.com/fzdamrbc/video/upload/v1787903322/vinco_eventi_galleria/vinco_eventi_galleria/dj_set_colaluca_american_wedding.mp4",
-    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto,w_720,so_2/v1787903322/vinco_eventi_galleria/vinco_eventi_galleria/dj_set_colaluca_american_wedding.jpg",
+    "posterUrl": "https://res.cloudinary.com/fzdamrbc/video/upload/f_jpg,q_auto:good,w_1280,so_2/v1787903322/vinco_eventi_galleria/vinco_eventi_galleria/dj_set_colaluca_american_wedding.jpg",
     "publicId": "vinco_eventi_galleria/vinco_eventi_galleria/dj_set_colaluca_american_wedding",
     "id": "76b4c5b6-80cc-4e98-a19c-574b0347b055",
     "isFallback": true

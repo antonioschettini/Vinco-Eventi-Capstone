@@ -8,13 +8,17 @@ import {
 } from "../../redux/slices/audioSlice";
 import tracks from "../../data/tracksData";
 import AudioConsentToast from "./AudioConsentToast";
-import { registerAudioElement } from "../../utils/audioService";
+import {
+  registerAudioElement,
+  initAudioGain,
+  setAudioGain,
+} from "../../utils/audioService";
 
 function AudioController() {
   const dispatch = useDispatch();
   const audioRef = useRef(null);
 
-  const { isPlaying, volume, currentTrackIndex } = useSelector(
+  const { isPlaying, volume, currentTrackIndex, isMuted } = useSelector(
     (state) => state.audio
   );
 
@@ -24,6 +28,7 @@ function AudioController() {
   useEffect(() => {
     if (audioRef.current) {
       registerAudioElement(audioRef.current);
+      initAudioGain(audioRef.current);
     }
     dispatch(setAutoplayBlocked(true));
   }, [dispatch]);
@@ -49,13 +54,15 @@ function AudioController() {
     }
   }, [isPlaying, dispatch]);
 
-  // Sincronizza il volume
+  // Sincronizza il volume cross-device con Web Audio GainNode & HTML5 volume
   useEffect(() => {
     const audio = audioRef.current;
     if (audio) {
-      audio.volume = volume;
+      initAudioGain(audio);
+      const effectiveVol = isMuted ? 0 : volume;
+      setAudioGain(effectiveVol);
     }
-  }, [volume]);
+  }, [volume, isMuted]);
 
   // Sincronizza cambio traccia e MediaSession API per controlli mobile / schermata di blocco
   useEffect(() => {

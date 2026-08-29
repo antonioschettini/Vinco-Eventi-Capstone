@@ -16,12 +16,12 @@ import {
   loginFailure,
   logout,
 } from "../../redux/slices/authSlice";
+import { toggleAudioSync, setAudioGain } from "../../utils/audioService";
 import tracks from "../../data/tracksData";
 import API_BASE_URL from "../../config/api";
 import AudioController from "../AudioPlayer/AudioController";
 import { translations } from "../../utils/translations";
 import vincoLogo from "../../assets/Vinco Eventi assets/assets loghi/Logo vinco eventi off.png";
-import { toggleAudioSync } from "../../utils/audioService";
 import "./Navbar.css";
 
 // SVG Bandiera Italiana (Rapporto 3:2 perfetto)
@@ -269,7 +269,11 @@ function Navbar() {
               max="1"
               step="0.01"
               value={isMuted ? 0 : volume}
-              onChange={(e) => dispatch(setVolume(parseFloat(e.target.value)))}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                dispatch(setVolume(val));
+                setAudioGain(val);
+              }}
               className="top-volume-slider"
               title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
             />
