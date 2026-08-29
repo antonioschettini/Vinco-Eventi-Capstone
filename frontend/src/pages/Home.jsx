@@ -95,26 +95,27 @@ function Home() {
               const meta = cardMetadata[key];
               return (
                 <div key={key} className="col-12 col-sm-6 col-lg-3 d-flex">
-                  <div className="entertainment-card poster-card card border-0 rounded-4 w-100 position-relative overflow-hidden shadow-sm">
-                    <div className={`entertainment-img-wrapper entertainment-img-wrapper--${key}`}>
+                  <div className="entertainment-card luxury-card card border-0 rounded-4 w-100 d-flex flex-column overflow-hidden">
+                    <div className={`entertainment-img-wrapper entertainment-img-wrapper--${key} position-relative overflow-hidden`}>
                       <img
                         src={image}
                         alt={card.title}
                         className={`entertainment-card-img entertainment-card-img--${key}`}
                         loading="lazy"
                       />
+                      <div className="poster-card-top-badge">
+                        <span className="poster-step-pill">
+                          <i className={`bi ${meta.icon} me-1`}></i>
+                          <span>{meta.step}</span>
+                        </span>
+                      </div>
                     </div>
-                    <div className="poster-card-top-badge">
-                      <span className="poster-step-pill">
-                        <i className={`bi ${meta.icon} me-1`}></i>
-                        <span>{meta.step}</span>
-                      </span>
-                    </div>
-                    <div className="poster-card-content p-3 p-xl-4">
-                      <h3 className="poster-card-title mb-2">
+                    <div className="luxury-card-body p-3 p-xl-4 d-flex flex-column flex-grow-1">
+                      <h3 className="luxury-card-title font-heading fw-bold mb-2">
                         {card.title}
                       </h3>
-                      <p className="poster-card-text mb-0">
+                      <div className="luxury-title-divider mb-3"></div>
+                      <p className="luxury-card-text font-body mb-0 lh-base flex-grow-1">
                         {card.text}
                       </p>
                     </div>

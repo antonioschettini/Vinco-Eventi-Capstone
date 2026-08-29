@@ -434,61 +434,62 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   border-radius: 2px;
 }
 
-/* Card "Editorial Poster Full-Bleed" (Opzione A) - Massimo Risalto Visivo & UI/UX Cross-Device */
-.entertainment-card.poster-card {
-  position: relative;
-  min-height: 520px;
+/* Card Intrattenimento "Luxury Editorial" - Massima Armonia Visiva & Leggibilità Cristallina */
+.entertainment-card.luxury-card {
+  border: none !important;
   border-radius: 20px !important;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  background-color: #030805;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-bs-theme="light"] .entertainment-card.poster-card {
-  border: 1px solid rgba(32, 74, 53, 0.12) !important;
-  box-shadow: 0 10px 30px rgba(32, 74, 53, 0.08);
-}
-
-[data-bs-theme="dark"] .entertainment-card.poster-card {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-}
-
-/* Background Image: Full Bleed Container */
-.poster-card .entertainment-img-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
   height: 100%;
-  min-height: 100%;
-  max-height: 100%;
-  aspect-ratio: auto;
-  overflow: hidden;
-  z-index: 1;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.poster-card .entertainment-card-img {
+[data-bs-theme="dark"] .entertainment-card.luxury-card {
+  background-color: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+[data-bs-theme="light"] .entertainment-card.luxury-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(32, 74, 53, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(32, 74, 53, 0.06);
+}
+
+/* 1. Sezione Superiore: Fotografia Pura e 100% Visibile */
+.luxury-card .entertainment-img-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 220px;
+  max-height: 280px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #030805;
+}
+
+.luxury-card .entertainment-card-img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center center;
-  filter: grayscale(80%) brightness(0.92);
-  opacity: 0.9;
+  filter: grayscale(80%) brightness(0.95);
+  opacity: 0.92;
   transform: scale(1.0);
   transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
               opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Top Floating Step Badge */
+/* Floating Step Badge sulla Foto */
 .poster-card-top-badge {
   position: absolute;
-  top: 1.15rem;
-  left: 1.15rem;
+  top: 0.95rem;
+  left: 0.95rem;
   z-index: 4;
   pointer-events: none;
 }
@@ -496,73 +497,82 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 .poster-step-pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  background: rgba(3, 8, 5, 0.68);
+  gap: 5px;
+  background: rgba(3, 8, 5, 0.72);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #58bc82;
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   padding: 4px 10px;
   border-radius: 30px;
   border: 1px solid rgba(88, 188, 130, 0.35);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
-/* Bottom Glassmorphic Content Layer */
-.poster-card-content {
-  position: relative;
-  z-index: 3;
-  width: 100%;
-  background: linear-gradient(0deg, rgba(3, 8, 5, 0.98) 0%, rgba(3, 8, 5, 0.88) 55%, rgba(3, 8, 5, 0.45) 80%, transparent 100%);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  text-align: left;
+/* 2. Sezione Inferiore: Box Editoriale Pulito con Tipografia di Lusso */
+.luxury-card-body {
+  padding: 1.5rem 1.35rem 1.65rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
 }
 
-.poster-card-title {
+.luxury-card-title {
   font-family: var(--font-heading, "Cormorant Garamond", serif);
-  font-size: clamp(1.4rem, 1.8vw, 1.85rem);
-  line-height: 1.2;
-  color: #ffffff !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--bs-body-color);
   letter-spacing: -0.01em;
 }
 
-.poster-card-text {
-  font-size: clamp(0.85rem, 0.95vw, 0.94rem);
-  line-height: 1.55;
-  color: #e5f2eb !important;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
-  opacity: 0.95;
+.luxury-title-divider {
+  width: 28px;
+  height: 2.5px;
+  background-color: var(--bs-success, #58bc82);
+  border-radius: 2px;
 }
 
-/* Desktop Hover Effects */
+.luxury-card-text {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--bs-secondary-color);
+}
+
+[data-bs-theme="dark"] .luxury-card-text {
+  color: #c5d8ce !important;
+}
+
+[data-bs-theme="light"] .luxury-card-text {
+  color: #4a5c52 !important;
+}
+
+/* Effetto Hover su Desktop */
 @media (hover: hover) and (pointer: fine) {
-  .entertainment-card.poster-card:hover {
-    transform: translateY(-8px);
+  .entertainment-card.luxury-card:hover {
+    transform: translateY(-6px);
   }
 
-  [data-bs-theme="dark"] .entertainment-card.poster-card:hover {
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(88, 188, 130, 0.25) !important;
+  [data-bs-theme="dark"] .entertainment-card.luxury-card:hover {
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(88, 188, 130, 0.22) !important;
     border-color: rgba(88, 188, 130, 0.4) !important;
   }
 
-  [data-bs-theme="light"] .entertainment-card.poster-card:hover {
-    box-shadow: 0 20px 45px rgba(32, 74, 53, 0.22) !important;
-    border-color: rgba(32, 74, 53, 0.35) !important;
+  [data-bs-theme="light"] .entertainment-card.luxury-card:hover {
+    box-shadow: 0 18px 40px rgba(32, 74, 53, 0.16) !important;
+    border-color: rgba(32, 74, 53, 0.32) !important;
   }
 
-  .entertainment-card.poster-card:hover .entertainment-card-img {
+  .entertainment-card.luxury-card:hover .entertainment-card-img {
     filter: grayscale(0%) brightness(1.02) !important;
     opacity: 1 !important;
     transform: scale(1.06);
   }
 
-  .entertainment-card.poster-card:hover .poster-step-pill {
+  .entertainment-card.luxury-card:hover .poster-step-pill {
     background: #204a35;
     color: #ffffff;
     border-color: #58bc82;
@@ -571,28 +581,27 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
 /* Touch & Mobile Reveal on Scroll */
 @media (hover: none), (max-width: 991.98px) {
-  .entertainment-card.poster-card {
-    min-height: 480px;
+  .entertainment-card.luxury-card {
     transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.3s, 
                 box-shadow 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.3s !important;
   }
 
-  .entertainment-card.poster-card.is-in-view {
-    transform: translateY(-4px);
+  .entertainment-card.luxury-card.is-in-view {
+    transform: translateY(-3px);
   }
 
-  [data-bs-theme="dark"] .entertainment-card.poster-card.is-in-view {
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 25px rgba(88, 188, 130, 0.2) !important;
+  [data-bs-theme="dark"] .entertainment-card.luxury-card.is-in-view {
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), 0 0 20px rgba(88, 188, 130, 0.18) !important;
   }
 
-  [data-bs-theme="light"] .entertainment-card.poster-card.is-in-view {
-    box-shadow: 0 16px 36px rgba(32, 74, 53, 0.18) !important;
+  [data-bs-theme="light"] .entertainment-card.luxury-card.is-in-view {
+    box-shadow: 0 14px 32px rgba(32, 74, 53, 0.12) !important;
   }
 
-  .entertainment-card.poster-card.is-in-view .entertainment-card-img {
+  .entertainment-card.luxury-card.is-in-view .entertainment-card-img {
     filter: grayscale(0%) brightness(1.02) !important;
     opacity: 1 !important;
-    transform: scale(1.04);
+    transform: scale(1.03);
   }
 }
 
@@ -610,26 +619,6 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 @media (min-width: 1400px) {
   .entertainment-card-img--pranzoCena {
     object-position: 35% center;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .entertainment-card.poster-card {
-    min-height: 450px;
-  }
-
-  .poster-card-content {
-    padding: 1.25rem 1.15rem 1.25rem !important;
-  }
-
-  .poster-card-title {
-    font-size: 1.35rem !important;
-    margin-bottom: 0.25rem !important;
-  }
-
-  .poster-card-text {
-    font-size: 0.86rem !important;
-    line-height: 1.5 !important;
   }
 }
 
