@@ -94,7 +94,7 @@ function Home() {
               const image = cardImages[key];
               const meta = cardMetadata[key];
               return (
-                <div key={key} className="col-12 col-sm-6 col-lg-3 d-flex">
+                <div key={key} className="col-12 col-md-6 col-xxl-3 d-flex">
                   <div className="entertainment-card luxury-card card border-0 rounded-4 w-100 d-flex flex-column overflow-hidden">
                     <div className={`entertainment-img-wrapper entertainment-img-wrapper--${key} position-relative overflow-hidden`}>
                       <img

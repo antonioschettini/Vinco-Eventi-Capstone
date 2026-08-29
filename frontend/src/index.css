@@ -463,9 +463,9 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 .luxury-card .entertainment-img-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  min-height: 220px;
-  max-height: 280px;
+  aspect-ratio: 16 / 11;
+  min-height: 250px;
+  max-height: 320px;
   overflow: hidden;
   flex-shrink: 0;
   background-color: #030805;
@@ -513,7 +513,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
 /* 2. Sezione Inferiore: Box Editoriale Pulito con Tipografia di Lusso */
 .luxury-card-body {
-  padding: 1.5rem 1.35rem 1.65rem;
+  padding: 1.35rem 1.25rem 1.5rem;
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
@@ -521,7 +521,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
 .luxury-card-title {
   font-family: var(--font-heading, "Cormorant Garamond", serif);
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.25;
   color: var(--bs-body-color);
@@ -537,8 +537,8 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
 .luxury-card-text {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 0.88rem;
+  line-height: 1.55;
   color: var(--bs-secondary-color);
 }
 
@@ -579,6 +579,27 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   }
 }
 
+/* Griglia 2x2 su Tablet & Laptop (768px - 1399px) */
+@media (min-width: 768px) and (max-width: 1399.98px) {
+  .luxury-card .entertainment-img-wrapper {
+    aspect-ratio: 16 / 10;
+    min-height: 280px;
+  }
+
+  .luxury-card-body {
+    padding: 1.5rem 1.5rem 1.65rem;
+  }
+
+  .luxury-card-title {
+    font-size: 1.45rem;
+  }
+
+  .luxury-card-text {
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+}
+
 /* Touch & Mobile Reveal on Scroll */
 @media (hover: none), (max-width: 991.98px) {
   .entertainment-card.luxury-card {
@@ -602,6 +623,27 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
     filter: grayscale(0%) brightness(1.02) !important;
     opacity: 1 !important;
     transform: scale(1.03);
+  }
+}
+
+/* Mobile sotto 576px */
+@media (max-width: 575.98px) {
+  .luxury-card .entertainment-img-wrapper {
+    aspect-ratio: 16 / 10;
+    min-height: 220px;
+  }
+
+  .luxury-card-body {
+    padding: 1.25rem 1.15rem 1.35rem;
+  }
+
+  .luxury-card-title {
+    font-size: 1.3rem;
+  }
+
+  .luxury-card-text {
+    font-size: 0.88rem;
+    line-height: 1.5;
   }
 }
 
