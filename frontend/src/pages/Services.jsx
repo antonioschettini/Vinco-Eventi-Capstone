@@ -3,14 +3,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { Container, Row, Col } from "react-bootstrap";
 import { translations } from "../utils/translations";
 import heroBgImage from "../assets/Vinco Eventi assets/assets immagini/Footer Immagine consolle mani.webp";
-import essentialItaImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/essentialIta.png";
-import essentialEngImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/essentialEng.png";
-import plusItaImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/plusIta.png";
-import plusEngImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/plusEng.png";
-import fullItaImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/fullIta.png";
-import fullEngImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/fullEng.png";
+import essentialItaImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/essentialIta.webp";
+import essentialEngImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/essentialEng.webp";
+import plusItaImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/plusIta.webp";
+import plusEngImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/plusEng.webp";
+import fullItaImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/fullIta.webp";
+import fullEngImg from "../assets/Vinco Eventi assets/4 BannerBox IT ENG Servizi/fullEng.webp";
 import API_BASE_URL from "../config/api";
 import { apiFetch, authApiFetch } from "../utils/apiClient";
+import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
 import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import { handlePhoneClick, handleEmailClick } from "../utils/contactHelpers";
@@ -76,9 +77,9 @@ function Services() {
     const isEng = lang === "en";
     const dbUrl = isEng ? service.imageUrlEng : service.imageUrlIta;
 
-    // Se il DB ha un URL valido (Cloudinary o esterno), usalo direttamente
+    // Se il DB ha un URL valido (Cloudinary o esterno), ottimizzalo con f_auto, q_auto
     if (dbUrl && dbUrl.startsWith("http")) {
-      return dbUrl;
+      return getOptimizedCloudinaryUrl(dbUrl, { type: "grid" });
     }
 
     // Fallback statico per i 3 badge standard dai file locali ufficiali
