@@ -98,6 +98,13 @@
   border-color: rgba(32, 74, 53, 0.3);
 }
 
+.review-author-info {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  min-width: 0;
+}
+
 .review-avatar {
   width: 44px;
   height: 44px;
@@ -111,6 +118,12 @@
   justify-content: center;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(32, 74, 53, 0.3);
+}
+
+@media (max-width: 575.98px) {
+  .review-author-info {
+    gap: 0.8rem;
+  }
 }
 
 .review-stars {

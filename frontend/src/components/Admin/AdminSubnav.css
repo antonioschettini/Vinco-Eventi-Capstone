@@ -9,17 +9,57 @@
 .admin-subnav-track {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   overflow-x: auto;
-  white-space: nowrap;
-  padding: 0.25rem 0.2rem;
+  overflow-y: hidden;
+  padding: 0.35rem 0.2rem 0.65rem;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(32, 74, 53, 0.4) rgba(0, 0, 0, 0.05);
 }
 
+[data-bs-theme="dark"] .admin-subnav-track {
+  scrollbar-color: rgba(74, 222, 128, 0.45) rgba(255, 255, 255, 0.06);
+}
+
+/* Scrollbar orizzontale sempre visibile, sottile ed elegante */
 .admin-subnav-track::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  height: 6px;
+  display: block;
+}
+
+.admin-subnav-track::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+[data-bs-theme="dark"] .admin-subnav-track::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-subnav-track::-webkit-scrollbar-thumb {
+  background: rgba(32, 74, 53, 0.4);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+[data-bs-theme="dark"] .admin-subnav-track::-webkit-scrollbar-thumb {
+  background: rgba(74, 222, 128, 0.45);
+}
+
+.admin-subnav-track::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-forest, #204a35);
+}
+
+[data-bs-theme="dark"] .admin-subnav-track::-webkit-scrollbar-thumb:hover {
+  background: #4ade80;
+}
+
+@media (min-width: 768px) {
+  .admin-subnav-track {
+    flex-wrap: wrap;
+  }
 }
 
 .admin-subnav-link {

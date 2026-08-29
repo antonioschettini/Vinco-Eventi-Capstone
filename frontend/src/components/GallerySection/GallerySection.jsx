@@ -484,6 +484,14 @@ function GallerySection() {
                                 e.target.currentTime = item.startTime;
                               }
                             }}
+                            onCanPlay={(e) => {
+                              if (item.startTime && e.target && e.target.currentTime < item.startTime) {
+                                e.target.currentTime = item.startTime;
+                              }
+                              if (e.target && e.target.paused) {
+                                e.target.play().catch(() => {});
+                              }
+                            }}
                             className="carousel-media-content"
                           />
                         ) : (
@@ -513,11 +521,11 @@ function GallerySection() {
                         )}
                       </div>
 
-                      <div className="carousel-overlay-caption p-4">
-                        <h3 className="h3 font-heading text-white mb-1 fw-bold">
+                      <div className="carousel-overlay-caption">
+                        <h3 className="carousel-overlay-title">
                           {item.title}
                         </h3>
-                        <p className="text-white-50 fs-6 mb-0">{item.subtitle}</p>
+                        <p className="carousel-overlay-subtitle">{item.subtitle}</p>
                       </div>
                     </div>
                   </Carousel.Item>

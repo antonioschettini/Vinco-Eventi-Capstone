@@ -452,7 +452,7 @@ function MatrimonioWidgets() {
                 <div className={`review-item-card h-100 d-flex flex-column justify-content-between ${isRefreshing ? "refreshing" : ""}`}>
                   <div>
                     <div className="d-flex align-items-center justify-content-between mb-3 gap-2 flex-nowrap">
-                      <div className="d-flex align-items-center gap-2.5 min-w-0">
+                      <div className="review-author-info min-w-0">
                         <div className="review-avatar flex-shrink-0">{rev.initials}</div>
                         <div className="min-w-0">
                           <h4 className="h6 font-heading fw-bold text-body mb-0 text-truncate">
