@@ -39,6 +39,13 @@ function Home() {
     afterParty: afterPartyImg,
   };
 
+  const cardMetadata = {
+    cerimonia: { step: "01", icon: "bi-suit-heart-fill" },
+    aperitivo: { step: "02", icon: "bi-cup-straw" },
+    pranzoCena: { step: "03", icon: "bi-music-note-beamed" },
+    afterParty: { step: "04", icon: "bi-stars" },
+  };
+
   const cardKeys = ["cerimonia", "aperitivo", "pranzoCena", "afterParty"];
 
   return (
@@ -66,7 +73,7 @@ function Home() {
         </Container>
       </section>
 
-      {/* Intrattenimento su Misura e Artisti Section */}
+      {/* Intrattenimento su Misura e Artisti Section (Opzione A: Editorial Poster Full-Bleed) */}
       <section className="entertainment-section py-5">
         <div className="container py-3">
           <div className="row justify-content-center mb-5">
@@ -85,9 +92,10 @@ function Home() {
             {cardKeys.map((key) => {
               const card = t.cards[key];
               const image = cardImages[key];
+              const meta = cardMetadata[key];
               return (
-                <div key={key} className="col-12 col-sm-6 col-xxl-3 d-flex">
-                  <div className="entertainment-card card border-0 rounded-4 w-100 d-flex flex-column">
+                <div key={key} className="col-12 col-sm-6 col-lg-3 d-flex">
+                  <div className="entertainment-card poster-card card border-0 rounded-4 w-100 position-relative overflow-hidden shadow-sm">
                     <div className={`entertainment-img-wrapper entertainment-img-wrapper--${key}`}>
                       <img
                         src={image}
@@ -96,11 +104,17 @@ function Home() {
                         loading="lazy"
                       />
                     </div>
-                    <div className="card-body p-3 p-xl-4 d-flex flex-column flex-grow-1">
-                      <h3 className="h4 font-heading fw-bold text-body mb-2 mb-xl-3">
+                    <div className="poster-card-top-badge">
+                      <span className="poster-step-pill">
+                        <i className={`bi ${meta.icon} me-1`}></i>
+                        <span>{meta.step}</span>
+                      </span>
+                    </div>
+                    <div className="poster-card-content p-3 p-xl-4">
+                      <h3 className="poster-card-title mb-2">
                         {card.title}
                       </h3>
-                      <p className="font-body text-body-secondary fs-6 mb-0 lh-base flex-grow-1">
+                      <p className="poster-card-text mb-0">
                         {card.text}
                       </p>
                     </div>

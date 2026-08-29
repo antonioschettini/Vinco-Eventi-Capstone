@@ -434,116 +434,169 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   border-radius: 2px;
 }
 
-/* Card Senza Bordi ed Effetto Scroll Reveal / Hover Dynamico per Grayscale -> Colori Nativi */
-.entertainment-card {
-  border: none !important;
-  border-radius: 16px;
-  overflow: hidden;
-  /* Le card sono SEMPRE verticali — nessun layout orizzontale */
-  flex-direction: column !important;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  height: 100%;
-}
-
-[data-bs-theme="dark"] .entertainment-card {
-  background-color: rgba(255, 255, 255, 0.04);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-[data-bs-theme="light"] .entertainment-card {
-  background-color: rgba(0, 0, 0, 0.02);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-}
-
-/* Wrapper immagine: bilanciamento armonioso 50% foto / 50% testo */
-.entertainment-img-wrapper {
+/* Card "Editorial Poster Full-Bleed" (Opzione A) - Massimo Risalto Visivo & UI/UX Cross-Device */
+.entertainment-card.poster-card {
   position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  min-height: 220px;
-  max-height: 320px;
+  min-height: 520px;
+  border-radius: 20px !important;
   overflow: hidden;
-  flex-shrink: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background-color: #030805;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.entertainment-card-img {
-  display: block;
+[data-bs-theme="light"] .entertainment-card.poster-card {
+  border: 1px solid rgba(32, 74, 53, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(32, 74, 53, 0.08);
+}
+
+[data-bs-theme="dark"] .entertainment-card.poster-card {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* Background Image: Full Bleed Container */
+.poster-card .entertainment-img-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  aspect-ratio: auto;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.poster-card .entertainment-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Ancoraggio esplicito al centro — mantiene il soggetto centrato su qualsiasi larghezza/altezza del wrapper */
   object-position: center center;
-  transform-origin: center center;
-  filter: grayscale(85%);
-  opacity: 0.88;
+  filter: grayscale(80%) brightness(0.92);
+  opacity: 0.9;
+  transform: scale(1.0);
   transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
               opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hover esclusivo per DESKTOP: partenza da grayscale(85%) e colore vivo + glow all'hover */
+/* Top Floating Step Badge */
+.poster-card-top-badge {
+  position: absolute;
+  top: 1.15rem;
+  left: 1.15rem;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.poster-step-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(3, 8, 5, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #58bc82;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 4px 10px;
+  border-radius: 30px;
+  border: 1px solid rgba(88, 188, 130, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Bottom Glassmorphic Content Layer */
+.poster-card-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  background: linear-gradient(0deg, rgba(3, 8, 5, 0.98) 0%, rgba(3, 8, 5, 0.88) 55%, rgba(3, 8, 5, 0.45) 80%, transparent 100%);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  text-align: left;
+}
+
+.poster-card-title {
+  font-family: var(--font-heading, "Cormorant Garamond", serif);
+  font-size: clamp(1.4rem, 1.8vw, 1.85rem);
+  line-height: 1.2;
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  letter-spacing: -0.01em;
+}
+
+.poster-card-text {
+  font-size: clamp(0.85rem, 0.95vw, 0.94rem);
+  line-height: 1.55;
+  color: #e5f2eb !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+  opacity: 0.95;
+}
+
+/* Desktop Hover Effects */
 @media (hover: hover) and (pointer: fine) {
-  .entertainment-card:hover {
-    transform: translateY(-6px);
+  .entertainment-card.poster-card:hover {
+    transform: translateY(-8px);
   }
 
-  [data-bs-theme="dark"] .entertainment-card:hover {
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 25px rgba(76, 166, 121, 0.25) !important;
+  [data-bs-theme="dark"] .entertainment-card.poster-card:hover {
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(88, 188, 130, 0.25) !important;
+    border-color: rgba(88, 188, 130, 0.4) !important;
   }
 
-  [data-bs-theme="light"] .entertainment-card:hover {
-    box-shadow: 0 16px 36px rgba(32, 74, 53, 0.16) !important;
+  [data-bs-theme="light"] .entertainment-card.poster-card:hover {
+    box-shadow: 0 20px 45px rgba(32, 74, 53, 0.22) !important;
+    border-color: rgba(32, 74, 53, 0.35) !important;
   }
 
-  .entertainment-card:hover .entertainment-card-img {
-    filter: grayscale(0%) !important;
+  .entertainment-card.poster-card:hover .entertainment-card-img {
+    filter: grayscale(0%) brightness(1.02) !important;
     opacity: 1 !important;
-    transform: scale(1.05);
+    transform: scale(1.06);
+  }
+
+  .entertainment-card.poster-card:hover .poster-step-pill {
+    background: #204a35;
+    color: #ffffff;
+    border-color: #58bc82;
   }
 }
 
-/* Dispositivi Touch & Mobile: Con Delay di 0.4s e Transizione Morbida di 1.2s che anima il passaggio sotto gli occhi dell'utente al scroll .is-in-view */
+/* Touch & Mobile Reveal on Scroll */
 @media (hover: none), (max-width: 991.98px) {
-  .entertainment-card {
-    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s, 
-                box-shadow 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s !important;
+  .entertainment-card.poster-card {
+    min-height: 480px;
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.3s, 
+                box-shadow 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.3s !important;
   }
 
-  .entertainment-card-img {
-    filter: grayscale(85%);
-    opacity: 0.88;
-    transition: filter 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s,
-                transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s,
-                opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s !important;
+  .entertainment-card.poster-card.is-in-view {
+    transform: translateY(-4px);
   }
 
-  .entertainment-card.is-in-view {
-    transform: translateY(-3px);
+  [data-bs-theme="dark"] .entertainment-card.poster-card.is-in-view {
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 25px rgba(88, 188, 130, 0.2) !important;
   }
 
-  [data-bs-theme="dark"] .entertainment-card.is-in-view {
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), 0 0 20px rgba(76, 166, 121, 0.2) !important;
+  [data-bs-theme="light"] .entertainment-card.poster-card.is-in-view {
+    box-shadow: 0 16px 36px rgba(32, 74, 53, 0.18) !important;
   }
 
-  [data-bs-theme="light"] .entertainment-card.is-in-view {
-    box-shadow: 0 14px 32px rgba(32, 74, 53, 0.14) !important;
-  }
-
-  .entertainment-card.is-in-view .entertainment-card-img {
-    filter: grayscale(0%) !important;
+  .entertainment-card.poster-card.is-in-view .entertainment-card-img {
+    filter: grayscale(0%) brightness(1.02) !important;
     opacity: 1 !important;
-    transform: scale(1.03);
-  }
-
-  .entertainment-card:active {
-    transform: scale(0.98) !important;
+    transform: scale(1.04);
   }
 }
 
-/* Posizionamento soggetto personalizzato per card specifiche */
+/* Posizionamento soggetto personalizzato per foto specifiche */
 @media (min-width: 992px) and (max-width: 1399px) {
   .entertainment-card-img--aperitivo {
     object-position: left center;
@@ -560,26 +613,23 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   }
 }
 
-@media (min-width: 992px) and (max-width: 1399px) {
-  .entertainment-img-wrapper {
-    aspect-ratio: 16 / 11;
-    max-height: 280px;
+@media (max-width: 575.98px) {
+  .entertainment-card.poster-card {
+    min-height: 450px;
   }
-}
 
-@media (min-width: 1400px) and (max-width: 1599px) {
-  .entertainment-img-wrapper {
-    aspect-ratio: 4 / 3;
-    min-height: 235px;
-    max-height: 260px;
+  .poster-card-content {
+    padding: 1.25rem 1.15rem 1.25rem !important;
   }
-}
 
-@media (min-width: 1600px) {
-  .entertainment-img-wrapper {
-    aspect-ratio: 4 / 3;
-    min-height: 250px;
-    max-height: 280px;
+  .poster-card-title {
+    font-size: 1.35rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .poster-card-text {
+    font-size: 0.86rem !important;
+    line-height: 1.5 !important;
   }
 }
 
