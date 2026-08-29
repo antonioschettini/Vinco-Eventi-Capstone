@@ -272,9 +272,9 @@ function MatrimonioWidgets() {
     ? t.reviewsCountPattern.replace("{count}", totalReviewsCount)
     : `(${totalReviewsCount} ${lang === "en" ? "reviews" : "recensioni"})`;
 
-  const readAllReviewsLabel = t.readAllReviewsPattern
-    ? t.readAllReviewsPattern.replace("{count}", totalReviewsCount)
-    : `${lang === "en" ? "Read all" : "Leggi tutte le"} ${totalReviewsCount} ${lang === "en" ? "reviews on" : "recensioni su"}`;
+  const readAllReviewsMainText = (t.readAllReviewsText || (lang === "en" ? "Read all {count} reviews" : "Leggi tutte le {count} recensioni"))
+    .replace("{count}", totalReviewsCount);
+  const readAllReviewsPrep = t.readAllReviewsPreposition || (lang === "en" ? "on" : "su");
 
   return (
     <section className="matrimonio-section py-5 bg-body-tertiary border-top border-bottom">
@@ -423,16 +423,16 @@ function MatrimonioWidgets() {
                 <i className="bi bi-chat-quote-fill me-2 text-forest"></i>
                 {t.reviewsWidgetTitle}
               </h3>
-              <div className="d-flex align-items-center gap-2 bg-success bg-opacity-10 px-3 py-1.5 rounded-pill border border-success border-opacity-25">
+              <div className="d-flex align-items-center gap-2 bg-success bg-opacity-10 px-3 py-1.5 rounded-pill border border-success border-opacity-25 flex-nowrap">
                 <span className="fw-bold text-success font-body fs-5">5.0</span>
-                <div className="review-stars">
-                  <i className="bi bi-star-fill text-warning me-1"></i>
-                  <i className="bi bi-star-fill text-warning me-1"></i>
-                  <i className="bi bi-star-fill text-warning me-1"></i>
-                  <i className="bi bi-star-fill text-warning me-1"></i>
+                <div className="review-stars flex-shrink-0">
+                  <i className="bi bi-star-fill text-warning"></i>
+                  <i className="bi bi-star-fill text-warning"></i>
+                  <i className="bi bi-star-fill text-warning"></i>
+                  <i className="bi bi-star-fill text-warning"></i>
                   <i className="bi bi-star-fill text-warning"></i>
                 </div>
-                <span className="small text-body-secondary font-body ms-1">
+                <span className="small text-body-secondary font-body ms-1 text-nowrap">
                   {reviewsCountLabel}
                 </span>
               </div>
@@ -451,19 +451,19 @@ function MatrimonioWidgets() {
               <Col key={rev.id} xs={12} md={6}>
                 <div className={`review-item-card h-100 d-flex flex-column justify-content-between ${isRefreshing ? "refreshing" : ""}`}>
                   <div>
-                    <div className="d-flex align-items-center justify-content-between mb-3">
-                      <div className="d-flex align-items-center gap-3">
-                        <div className="review-avatar">{rev.initials}</div>
-                        <div>
-                          <h4 className="h6 font-heading fw-bold text-body mb-0">
+                    <div className="d-flex align-items-center justify-content-between mb-3 gap-2 flex-nowrap">
+                      <div className="d-flex align-items-center gap-2.5 min-w-0">
+                        <div className="review-avatar flex-shrink-0">{rev.initials}</div>
+                        <div className="min-w-0">
+                          <h4 className="h6 font-heading fw-bold text-body mb-0 text-truncate">
                             {rev.name}
                           </h4>
-                          <span className="small text-body-secondary font-body">
+                          <span className="small text-body-secondary font-body d-block text-truncate">
                             {t.weddingDateLabel || "Data nozze:"} {reviewDate}
                           </span>
                         </div>
                       </div>
-                      <div className="review-stars">
+                      <div className="review-stars flex-shrink-0 ms-2">
                         <i className="bi bi-star-fill text-warning"></i>
                         <i className="bi bi-star-fill text-warning"></i>
                         <i className="bi bi-star-fill text-warning"></i>
@@ -503,10 +503,10 @@ function MatrimonioWidgets() {
               type="button"
               onClick={handleRefreshReviews}
               className="btn-matrimonio-refresh"
-              aria-label={t.refreshReviews || "Mostra altre recensioni"}
+              aria-label={t.refreshReviews || "Mostra nuove recensioni"}
             >
               <i className={`bi bi-arrow-clockwise fs-5 ${isRefreshing ? "spin-icon" : ""}`}></i>
-              <span>{t.refreshReviews || "Mostra altre recensioni"}</span>
+              <span>{t.refreshReviews || "Mostra nuove recensioni"}</span>
             </button>
 
             <a
@@ -514,14 +514,18 @@ function MatrimonioWidgets() {
               target="_blank"
               rel="nofollow noopener noreferrer"
               className="btn-matrimonio-all"
+              aria-label={`${readAllReviewsMainText} ${readAllReviewsPrep} Matrimonio.com`}
             >
-              <span>{readAllReviewsLabel}</span>
-              <img
-                src="https://cdn1.matrimonio.com/assets/img/logos/gen_logoHeader.svg"
-                alt="Matrimonio.com"
-                className="matrimonio-logo-img"
-              />
-              <i className="bi bi-box-arrow-up-right ms-1"></i>
+              <span className="btn-matrimonio-main-text">{readAllReviewsMainText}</span>
+              <span className="btn-matrimonio-brand-wrap">
+                <span className="btn-matrimonio-prep">{readAllReviewsPrep}</span>
+                <img
+                  src="https://cdn1.matrimonio.com/assets/img/logos/gen_logoHeader.svg"
+                  alt="Matrimonio.com"
+                  className="matrimonio-logo-img"
+                />
+                <i className="bi bi-box-arrow-up-right ms-1"></i>
+              </span>
             </a>
           </Col>
         </Row>

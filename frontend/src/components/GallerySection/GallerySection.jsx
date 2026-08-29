@@ -500,16 +500,20 @@ function GallerySection() {
                           className="carousel-media-content"
                         />
                       )}
-                      <div className="carousel-overlay-caption p-4">
-                        <span className="badge bg-success px-3 py-2 rounded-pill mb-2">
+                      {/* Badge fissati in alto per non oscurare il video */}
+                      <div className="carousel-top-badges">
+                        <span className="badge bg-success px-3 py-2 rounded-pill">
                           {item.type === "video" ? t.videoBadge : t.photoBadge}
                         </span>
                         {item.category && (
-                          <span className="badge bg-warning text-dark px-3 py-2 rounded-pill mb-2 ms-2 fw-bold">
+                          <span className="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">
                             <i className="bi bi-tag-fill me-1"></i>
                             {getCategoryLabel(item.category, lang)}
                           </span>
                         )}
+                      </div>
+
+                      <div className="carousel-overlay-caption p-4">
                         <h3 className="h3 font-heading text-white mb-1 fw-bold">
                           {item.title}
                         </h3>

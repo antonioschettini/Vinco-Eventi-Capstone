@@ -115,7 +115,12 @@
 
 .review-stars {
   color: #ffc107;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 2.5px;
 }
 
 /* Pulsante Tutte le Recensioni */
@@ -125,12 +130,31 @@
   color: var(--bs-body-color);
   font-weight: 600;
   border-radius: 12px;
-  padding: 0.85rem 1.75rem;
+  padding: 0.85rem 1.6rem;
   display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.45rem;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1.35;
+}
+
+.btn-matrimonio-main-text {
+  white-space: normal;
+}
+
+.btn-matrimonio-brand-wrap {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  gap: 0.35rem;
+}
+
+.btn-matrimonio-prep {
+  font-weight: 600;
 }
 
 /* Logo Matrimonio.com Adattivo per Light e Dark Mode */
@@ -138,6 +162,7 @@
   height: 18px;
   width: auto;
   transition: filter 0.3s ease, opacity 0.3s ease;
+  vertical-align: middle;
 }
 
 [data-bs-theme="light"] .matrimonio-logo-img {

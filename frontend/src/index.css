@@ -339,11 +339,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
   .hero-gallery-section:hover .hero-gallery-content {
     transform: translateY(-3px);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22) !important;
   }
 
   .hero-gallery-section:hover .hero-gallery-title {
@@ -391,11 +391,11 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
 
   .hero-gallery-section.is-in-view .hero-gallery-content {
     transform: translateY(-3px);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22) !important;
   }
 
   .hero-gallery-section.is-in-view .hero-gallery-title {

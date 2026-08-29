@@ -14,13 +14,13 @@
 }
 
 .gallery-carousel-item {
-  height: 440px;
+  height: 580px;
 }
 
 .carousel-media-wrapper {
   position: relative;
   width: 100%;
-  height: 440px;
+  height: 580px;
   overflow: hidden;
 }
 
@@ -28,7 +28,27 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center 30%;
+}
+
+.carousel-top-badges {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.carousel-top-badges .badge {
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
 }
 
 .carousel-overlay-caption {
@@ -36,8 +56,46 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  background: linear-gradient(to top, rgba(10, 15, 12, 0.9) 0%, rgba(10, 15, 12, 0.4) 60%, transparent 100%);
+  background: linear-gradient(to top, rgba(10, 15, 12, 0.92) 0%, rgba(10, 15, 12, 0.5) 60%, transparent 100%);
   text-align: left;
+  z-index: 4;
+}
+
+@media (max-width: 991.98px) {
+  .gallery-carousel-item,
+  .carousel-media-wrapper {
+    height: 520px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .gallery-carousel-item,
+  .carousel-media-wrapper {
+    height: 480px;
+  }
+
+  .carousel-top-badges {
+    top: 1rem;
+    left: 1rem;
+    gap: 0.4rem;
+  }
+
+  .carousel-top-badges .badge {
+    font-size: 0.76rem;
+    padding: 0.35rem 0.65rem !important;
+  }
+
+  .carousel-overlay-caption {
+    padding: 1.25rem 1rem !important;
+  }
+
+  .carousel-overlay-caption h3 {
+    font-size: 1.22rem !important;
+  }
+
+  .carousel-overlay-caption p {
+    font-size: 0.85rem !important;
+  }
 }
 
 /* Custom Elegant Carousel Navigation Controls */

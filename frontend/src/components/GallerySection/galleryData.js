@@ -641,5 +641,53 @@ export const galleryItems = [
     "publicId": "vinco_eventi_galleria/vinco_eventi_galleria/violoncello",
     "id": "ff109778-7895-4dd1-bc06-d72f8a6d9df3",
     "isFallback": true
+  },
+  {
+    "displayOrder": 41,
+    "type": "image",
+    "titleIta": "Consolle DJ & Atmosfera Notturna",
+    "titleEng": "DJ Booth & Night Party Atmosphere",
+    "subtitleIta": "Controllo totale del dancefloor e vibrazioni esclusive per la notte.",
+    "subtitleEng": "Total dancefloor control and exclusive party vibes under the stars.",
+    "category": "djset",
+    "featured": false,
+    "startTime": null,
+    "src": "https://res.cloudinary.com/fzdamrbc/image/upload/v1787983645/vinco_eventi_galleria/consolle_dj.webp",
+    "posterUrl": "https://res.cloudinary.com/fzdamrbc/image/upload/v1787983645/vinco_eventi_galleria/consolle_dj.webp",
+    "publicId": "vinco_eventi_galleria/consolle_dj",
+    "id": "ca00878d-7ac6-4df3-98d8-29953ef52d0b",
+    "isFallback": true
+  },
+  {
+    "displayOrder": 42,
+    "type": "image",
+    "titleIta": "White Party & Live Sax Performance",
+    "titleEng": "Exclusive White Party & Live Sax",
+    "subtitleIta": "DJ set esplosivo e sax luminoso a bordo piscina per un party da sogno.",
+    "subtitleEng": "Explosive DJ set paired with illuminated live sax for a dream party experience.",
+    "category": "djset",
+    "featured": false,
+    "startTime": null,
+    "src": "https://res.cloudinary.com/fzdamrbc/image/upload/v1787983646/vinco_eventi_galleria/djset_coccaro_white_party.webp",
+    "posterUrl": "https://res.cloudinary.com/fzdamrbc/image/upload/v1787983646/vinco_eventi_galleria/djset_coccaro_white_party.webp",
+    "publicId": "vinco_eventi_galleria/djset_coccaro_white_party",
+    "id": "2e340423-2edc-40cf-ba33-7fd4467ce20f",
+    "isFallback": true
+  },
+  {
+    "displayOrder": 43,
+    "type": "image",
+    "titleIta": "Clubbing Experience & Dancefloor Vibes",
+    "titleEng": "Clubbing Experience & Dancefloor Vibes",
+    "subtitleIta": "Scenografia luci dinamiche e dancefloor scatenato con VINCO EVENTI.",
+    "subtitleEng": "Dynamic light design and non-stop dancing curated by VINCO EVENTI.",
+    "category": "djset",
+    "featured": false,
+    "startTime": null,
+    "src": "https://res.cloudinary.com/fzdamrbc/image/upload/v1787983648/vinco_eventi_galleria/djset_di_spalle.webp",
+    "posterUrl": "https://res.cloudinary.com/fzdamrbc/image/upload/v1787983648/vinco_eventi_galleria/djset_di_spalle.webp",
+    "publicId": "vinco_eventi_galleria/djset_di_spalle",
+    "id": "92fbc81e-604c-4be3-9efd-d946b499e2b5",
+    "isFallback": true
   }
 ];
