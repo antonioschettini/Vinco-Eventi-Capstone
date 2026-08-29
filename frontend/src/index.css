@@ -455,13 +455,13 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
-/* Wrapper immagine: altezza base per mobile e tablet */
+/* Wrapper immagine: bilanciamento armonioso 50% foto / 50% testo */
 .entertainment-img-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
-  min-height: 200px;
-  max-height: 280px;
+  aspect-ratio: 4 / 3;
+  min-height: 220px;
+  max-height: 320px;
   overflow: hidden;
   flex-shrink: 0;
   display: flex;
@@ -543,12 +543,7 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   }
 }
 
-/*
-  Posizionamento soggetto personalizzato per card specifiche.
-  Nel breakpoint lg (992–1399px) le card sono più larghe (2 colonne)
-  ma più corte in proporzione: i soggetti a sinistra nelle foto 2 e 3
-  vengono tagliati con il centramento di default.
-*/
+/* Posizionamento soggetto personalizzato per card specifiche */
 @media (min-width: 992px) and (max-width: 1399px) {
   .entertainment-card-img--aperitivo {
     object-position: left center;
@@ -559,46 +554,32 @@ div, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span, a, button {
   }
 }
 
-/* Card 3 (pranzoCena): soggetto riposizionato anche su 4 colonne (≥1400px) */
 @media (min-width: 1400px) {
   .entertainment-card-img--pranzoCena {
     object-position: 35% center;
   }
 }
 
-/*
-  Desktop lg (992px – 1399px): griglia 2×2, card verticali larghe.
-  L'immagine più alta sfrutta la maggiore larghezza della card.
-*/
 @media (min-width: 992px) and (max-width: 1399px) {
   .entertainment-img-wrapper {
-    height: 320px;
+    aspect-ratio: 16 / 11;
+    max-height: 280px;
   }
 }
 
-/*
-  Desktop xl (1400px – 1599px): 4 colonne.
-  Immagine ridotta per bilanciare la minor larghezza della card.
-*/
 @media (min-width: 1400px) and (max-width: 1599px) {
   .entertainment-img-wrapper {
-    height: 195px;
+    aspect-ratio: 4 / 3;
+    min-height: 235px;
+    max-height: 260px;
   }
 }
 
-/*
-  Desktop xxl (1600px – 1919px): 4 colonne più larghe.
-*/
-@media (min-width: 1600px) and (max-width: 1919px) {
+@media (min-width: 1600px) {
   .entertainment-img-wrapper {
-    height: 215px;
-  }
-}
-
-/* 4K e oltre */
-@media (min-width: 1920px) {
-  .entertainment-img-wrapper {
-    height: 240px;
+    aspect-ratio: 4 / 3;
+    min-height: 250px;
+    max-height: 280px;
   }
 }
 

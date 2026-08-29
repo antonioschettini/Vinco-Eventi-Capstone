@@ -209,8 +209,35 @@
 }
 
 .calendar-day-cell.today {
-  border: 2px solid #198754;
-  background: rgba(25, 135, 84, 0.06);
+  position: relative;
+  border: 2px solid #204a35;
+  background: linear-gradient(135deg, rgba(32, 74, 53, 0.08) 0%, rgba(88, 188, 130, 0.05) 100%);
+  box-shadow: inset 0 0 0 1px rgba(88, 188, 130, 0.3), 0 2px 8px rgba(32, 74, 53, 0.12);
+}
+
+[data-bs-theme="dark"] .calendar-day-cell.today {
+  border: 2px solid #58bc82;
+  background: linear-gradient(135deg, rgba(88, 188, 130, 0.14) 0%, rgba(32, 74, 53, 0.22) 100%);
+  box-shadow: inset 0 0 0 1px rgba(88, 188, 130, 0.4), 0 0 14px rgba(88, 188, 130, 0.18);
+}
+
+.calendar-day-cell.today .day-number span:first-child span:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  background: #204a35;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 800;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+[data-bs-theme="dark"] .calendar-day-cell.today .day-number span:first-child span:first-child {
+  background: #58bc82;
+  color: #0c120e;
 }
 
 .day-number {
