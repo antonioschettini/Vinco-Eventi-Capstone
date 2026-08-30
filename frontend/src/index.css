@@ -25,6 +25,7 @@
   --font-heading: "Glacial Indifference", "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-body: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-accent: "Inter", "Plus Jakarta Sans", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   --primary-forest: #204a35;
   --primary-forest-hover: #163324;
@@ -87,34 +88,60 @@ body {
   color: var(--light-text);
 }
 
-/* Titoli, Display e Heading del Brand */
+/* 1. Titoli, Display, Heading, Brand e Azioni Principali: GLACIAL INDIFFERENCE */
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6,
 .display-1, .display-2, .display-3, .display-4, .display-5, .display-6,
-.font-heading {
+.font-heading,
+.navbar-brand,
+.nav-link,
+.custom-nav-link,
+.admin-subnav-link,
+.badge,
+.modal-title,
+.card-title,
+.table th,
+.btn,
+.stat-number {
   font-family: var(--font-heading);
-  font-weight: 700;
   letter-spacing: -0.015em;
 }
 
-.font-body {
-  font-family: var(--font-body);
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-weight: 700;
 }
 
-/* Badge, Navbar Brand e Nav Links con stile Tipografico Moderno */
 .badge {
-  font-family: var(--font-heading);
   letter-spacing: 0.03em;
 }
 
-.navbar-brand, .nav-link {
-  font-family: var(--font-heading);
+.navbar-brand, .nav-link, .custom-nav-link {
   letter-spacing: 0.02em;
 }
 
-/* Form, Input, Select e Textarea con Font Body Altamente Leggibile */
+/* 2. Paragrafi, Form, Input, Select, Textarea e Testi Dettaglio: PLUS JAKARTA SANS */
+p,
+span,
+label,
+.font-body,
+.form-label,
+.form-check-label,
+.form-text,
+.card-text,
+.modal-body,
+.table td,
+.company-info,
+.footer-copyright-text {
+  font-family: var(--font-body);
+}
+
 .form-control, .form-select, input, textarea, select {
   font-family: var(--font-body) !important;
+}
+
+/* 3. Codice, Timestamp, ID Audit, IP e Dati Tecnici: MONOSPACE ELEGANTE */
+code, pre, .font-mono, .audit-code, .ip-badge, .timestamp-mono {
+  font-family: var(--font-mono) !important;
 }
 
 /* Uniformità stato Focus per Form, Input, Select e Textarea (Zero blu Bootstrap) */
