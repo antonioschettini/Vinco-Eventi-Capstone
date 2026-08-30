@@ -18,7 +18,6 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
   const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVideoError(false);
   }, [show, currentIndex]);
 
@@ -218,7 +217,7 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
                 controls
                 autoPlay
                 loop
-                preload="auto"
+                preload="metadata"
                 playsInline
                 onError={() => setVideoError(true)}
                 className="media-player-element rounded-3"

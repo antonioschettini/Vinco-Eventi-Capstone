@@ -426,6 +426,13 @@
   transform: scale(1.08);
 }
 
+.grid-video-preview-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
 /* Play Icon Overlay Centered on Videos */
 .play-icon-overlay {
   position: absolute;
@@ -435,14 +442,15 @@
   font-size: 3.5rem;
   color: rgba(255, 255, 255, 0.9);
   text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-  transition: all 0.3s ease;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
   z-index: 2;
+  opacity: 0.95;
 }
 
 .gallery-card:hover .play-icon-overlay {
-  color: var(--primary-forest, #204a35);
-  transform: translate(-50%, -50%) scale(1.2);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.85);
   filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
 }
 

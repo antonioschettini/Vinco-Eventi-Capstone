@@ -79,7 +79,6 @@ function AdminQuotes() {
   }, [token, dispatch]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchQuotes();
   }, [fetchQuotes]);
 

@@ -10,39 +10,20 @@ import MediaModal from "../MediaModal/MediaModal";
 import imageCompression from "browser-image-compression";
 import "./GallerySection.css";
 
-// Componente helper per la riproduzione lazy dei video in griglia tramite Intersection Observer
+// Componente helper per la riproduzione on-demand dei video in griglia:
+// Mostra la copertina WebP/JPG ad alta definizione per azzerare il consumo di banda iniziale (Mobile & Desktop).
+// Su Desktop attiva una fluida video-preview muta all'hover del mouse (onMouseEnter).
+// Su Mobile/Touch apre istantaneamente il Lightbox al tocco a piena risoluzione.
 function LazyGridVideo({ src, posterUrl, item, className }) {
-  const videoRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const videoRef = useRef(null);
 
-  useEffect(() => {
-    const target = videoRef.current;
-    if (!target || hasError) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (target.paused) {
-              target.play().catch(() => {});
-            }
-          } else {
-            if (!target.paused) {
-              target.pause();
-            }
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: "50px" }
-    );
-
-    observer.observe(target);
-    return () => {
-      if (target) observer.unobserve(target);
-    };
-  }, [hasError]);
-
-  const poster = posterUrl || (src && !src.startsWith("http") ? src : getOptimizedCloudinaryUrl(src, { type: "poster" }));
+  const poster =
+    posterUrl ||
+    (src && !src.startsWith("http")
+      ? src
+      : getOptimizedCloudinaryUrl(src, { type: "poster" }));
 
   if (hasError || !src) {
     return (
@@ -60,22 +41,37 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
     : getOptimizedCloudinaryUrl(src, { type: "grid" });
 
   return (
-    <video
-      ref={videoRef}
-      src={videoSrc}
-      poster={poster}
-      muted
-      loop
-      playsInline
-      preload="metadata"
-      onError={() => setHasError(true)}
-      onLoadedMetadata={(e) => {
-        if (item.startTime && e.target) {
-          e.target.currentTime = item.startTime;
-        }
-      }}
-      className={className}
-    />
+    <div
+      className="grid-video-preview-wrapper w-100 h-100 position-relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <img
+        src={poster}
+        alt={item.title}
+        className={`${className} ${isHovered ? "d-none" : "d-block"}`}
+        loading="lazy"
+      />
+      {isHovered && (
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          poster={poster}
+          muted
+          loop
+          playsInline
+          autoPlay
+          preload="metadata"
+          onError={() => setHasError(true)}
+          onLoadedMetadata={(e) => {
+            if (item.startTime && e.target) {
+              e.target.currentTime = item.startTime;
+            }
+          }}
+          className={className}
+        />
+      )}
+    </div>
   );
 }
 
@@ -217,6 +213,29 @@ function GallerySection() {
 
   // State per l'indice attivo del Carosello "Momenti in Evidenza"
   const [carouselIndex, setCarouselIndex] = useState(0);
+
+  // Monitoraggio della visibilità del Carosello Top per azzerare lo streaming video se l'utente scorre in basso
+  const carouselContainerRef = useRef(null);
+  const [isCarouselInView, setIsCarouselInView] = useState(true);
+
+  useEffect(() => {
+    const target = carouselContainerRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsCarouselInView(entry.isIntersecting);
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(target);
+    return () => {
+      if (target) observer.unobserve(target);
+    };
+  }, []);
 
   // Pre-caricamento in sottofondo delle copertine/poster HD delle slide adiacenti nel carosello
   useEffect(() => {
@@ -431,7 +450,10 @@ function GallerySection() {
 
         {/* Carosello In Evidenza */}
         {featuredItems.length > 0 && (
-          <div className="carousel-highlight-container mb-5 p-3 p-md-4 rounded-4 position-relative">
+          <div
+            ref={carouselContainerRef}
+            className="carousel-highlight-container mb-5 p-3 p-md-4 rounded-4 position-relative"
+          >
             <div className="text-center mb-4">
               <h2 className="display-6 font-heading fw-bold text-body mb-2">
                 {t.carouselTitle}
@@ -470,7 +492,7 @@ function GallerySection() {
                   >
                     <div className="carousel-media-wrapper">
                       {item.type === "video" ? (
-                        isActive ? (
+                        isActive && isCarouselInView ? (
                           <video
                             src={item.startTime ? `${getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}#t=${item.startTime}` : getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}
                             poster={itemPoster}
@@ -478,7 +500,7 @@ function GallerySection() {
                             loop
                             playsInline
                             autoPlay
-                            preload="auto"
+                            preload="metadata"
                             onLoadedMetadata={(e) => {
                               if (item.startTime && e.target) {
                                 e.target.currentTime = item.startTime;

@@ -71,7 +71,9 @@ export function setAudioGain(volume) {
   if (audio) {
     try {
       audio.volume = safeVol;
-    } catch (e) {}
+    } catch {
+      // Ignora restrizioni di volume sui browser mobile non supportati
+    }
   }
 
   // 2. Aggiorna GainNode Web Audio API per iOS Safari e mobile

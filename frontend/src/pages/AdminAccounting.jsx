@@ -127,7 +127,6 @@ export default function AdminAccounting() {
 
   // Reset pagina al cambio filtri
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [selectedMonth, currentYear, viewMode]);
 
@@ -236,7 +235,6 @@ export default function AdminAccounting() {
   }, [currentYear, selectedMonth, token, dispatch]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchEventsAndReport();
   }, [fetchEventsAndReport]);
 
@@ -627,7 +625,6 @@ export default function AdminAccounting() {
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentPage(totalPages);
     }
   }, [events.length, totalPages, currentPage]);
