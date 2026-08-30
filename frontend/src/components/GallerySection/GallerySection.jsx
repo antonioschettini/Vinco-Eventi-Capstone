@@ -71,6 +71,7 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
         alt={item.title}
         className={className}
         loading="lazy"
+        decoding="async"
       />
     );
   }
@@ -100,6 +101,7 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
         alt={item.title}
         className={`${className} ${shouldPlay ? "d-none" : "d-block"}`}
         loading="lazy"
+        decoding="async"
       />
       {shouldPlay && (
         <video
@@ -828,6 +830,7 @@ function GallerySection() {
                         alt={item.title}
                         className="gallery-media-thumb"
                         loading="lazy"
+                        decoding="async"
                       />
                       <div className="expand-icon-overlay">
                         <i className="bi bi-arrows-angle-expand"></i>

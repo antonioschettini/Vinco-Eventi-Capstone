@@ -236,6 +236,7 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
                 src={currentMedia.type === "video" ? posterUrl : modalMediaUrl}
                 alt={currentMedia.title || "Gallery image"}
                 className="media-image-element rounded-3"
+                decoding="async"
               />
             )}
           </div>
