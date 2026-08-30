@@ -13,11 +13,44 @@ import "./GallerySection.css";
 // Componente helper per la riproduzione on-demand dei video in griglia:
 // Mostra la copertina WebP/JPG ad alta definizione per azzerare il consumo di banda iniziale (Mobile & Desktop).
 // Su Desktop attiva una fluida video-preview muta all'hover del mouse (onMouseEnter).
-// Su Mobile/Touch apre istantaneamente il Lightbox al tocco a piena risoluzione.
+// Su Mobile/Touch attiva l'anteprima video dinamica quando la card entra nel campo visivo durante lo scorrimento.
+// Al tocco apre istantaneamente il Lightbox a piena risoluzione.
 function LazyGridVideo({ src, posterUrl, item, className }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isInView, setIsInView] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const containerRef = useRef(null);
   const videoRef = useRef(null);
+
+  // Rilevamento visibilità nello scroll per dispositivi Mobile e Tablet
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !("IntersectionObserver" in window)) return;
+
+    const isTouchOrMobile =
+      window.matchMedia("(hover: none)").matches ||
+      window.matchMedia("(max-width: 991.98px)").matches;
+
+    if (!isTouchOrMobile) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsInView(entry.isIntersecting);
+        });
+      },
+      {
+        threshold: 0.35, // Attiva l'anteprima quando almeno il 35% della card è visibile
+        rootMargin: "0px 0px -20px 0px",
+      }
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.unobserve(el);
+      observer.disconnect();
+    };
+  }, []);
 
   const poster =
     posterUrl ||
@@ -40,19 +73,24 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
     ? `${getOptimizedCloudinaryUrl(src, { type: "grid" })}#t=${item.startTime}`
     : getOptimizedCloudinaryUrl(src, { type: "grid" });
 
+  const shouldPlay = isHovered || isInView;
+
   return (
     <div
-      className="grid-video-preview-wrapper w-100 h-100 position-relative"
+      ref={containerRef}
+      className={`grid-video-preview-wrapper w-100 h-100 position-relative ${
+        shouldPlay ? "is-playing" : ""
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <img
         src={poster}
         alt={item.title}
-        className={`${className} ${isHovered ? "d-none" : "d-block"}`}
+        className={`${className} ${shouldPlay ? "d-none" : "d-block"}`}
         loading="lazy"
       />
-      {isHovered && (
+      {shouldPlay && (
         <video
           ref={videoRef}
           src={videoSrc}
@@ -66,6 +104,16 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
           onLoadedMetadata={(e) => {
             if (item.startTime && e.target) {
               e.target.currentTime = item.startTime;
+            }
+          }}
+          onCanPlay={(e) => {
+            if (e.target && e.target.paused) {
+              const playPromise = e.target.play();
+              if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                  // Fallback protetto in caso di blocco autoplay da risparmio energetico
+                });
+              }
             }
           }}
           className={className}

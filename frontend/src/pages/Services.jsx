@@ -460,8 +460,8 @@ function Services() {
                 <h2 className="display-5 font-heading text-body fw-bold mb-4">
                   {t.otherProposals.title}
                 </h2>
-                <div className="font-body text-body-secondary fs-6 lh-lg d-flex flex-column gap-3 mb-0">
-                  <p className="mb-0" style={{ textAlign: "justify" }}>
+                <div className="font-body text-body-secondary fs-6 lh-lg d-flex flex-column gap-3 mb-0 text-start">
+                  <p className="mb-0 other-proposals-text">
                     {t.otherProposals.text}
                   </p>
                 </div>

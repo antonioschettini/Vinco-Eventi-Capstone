@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 
 /**
- * Hook custom per simulare l'effetto hover / illuminazione dinamica durante lo scroll (particolarmente su mobile).
+ * Hook custom per simulare l'effetto hover / illuminazione dinamica durante lo scroll (particolarmente su mobile e tablet).
  * Utilizza la IntersectionObserver API per rilevare quando le card o le Hero Section entrano nel campo visivo del lettore,
- * attivando la classe CSS 'is-in-view' che applica il passaggio da scala di grigi a colore pieno e l'illuminazione dello sfondo.
+ * attivando la classe CSS 'is-in-view' che applica il passaggio da scala di grigi a colore pieno e l'illuminazione del bordo/sfondo.
  */
 export function useScrollReveal(
   selector = ".scroll-reveal, .entertainment-card, .hero-gallery-section, .hero-bio-section, .service-card-box, .stat-card, .pillar-card, .story-img-wrapper, .about-quote-wrapper, .instagram-mockup-container, .gallery-media-card, .footer-section, .footer-glass-card"
@@ -15,6 +15,8 @@ export function useScrollReveal(
       });
       return;
     }
+
+    const observedSet = new WeakSet();
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -32,14 +34,35 @@ export function useScrollReveal(
       }
     );
 
-    const elements = document.querySelectorAll(selector);
-    elements.forEach((el) => observer.observe(el));
+    const observeAll = () => {
+      document.querySelectorAll(selector).forEach((el) => {
+        if (!observedSet.has(el)) {
+          observedSet.add(el);
+          observer.observe(el);
+        }
+      });
+    };
+
+    observeAll();
+
+    // Osserva anche eventuali elementi aggiunti dinamicamente (es. caricamento pacchetti o media da DB)
+    let mutationObserver = null;
+    if ("MutationObserver" in window) {
+      mutationObserver = new MutationObserver(() => {
+        observeAll();
+      });
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    }
 
     return () => {
-      elements.forEach((el) => observer.unobserve(el));
+      if (mutationObserver) mutationObserver.disconnect();
       observer.disconnect();
     };
   }, [selector]);
 }
 
 export default useScrollReveal;
+

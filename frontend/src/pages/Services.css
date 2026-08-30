@@ -58,8 +58,34 @@
   }
 }
 
-/* Touch feedback su schermi touch/mobile */
+/* Touch feedback e Scroll Reveal su schermi touch/mobile/tablet */
 @media (hover: none), (max-width: 991.98px) {
+  .service-card-box {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-bs-theme="dark"] .service-card-box.is-in-view {
+    border-color: var(--emerald-accent, #48936c) !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(72, 147, 108, 0.35) !important;
+    transform: translateY(-3px);
+  }
+
+  [data-bs-theme="dark"] .service-card-box.is-in-view .service-card-img {
+    transform: scale(1.03);
+  }
+
+  [data-bs-theme="light"] .service-card-box.is-in-view {
+    border-color: var(--primary-forest, #204a35) !important;
+    box-shadow: 0 14px 36px rgba(32, 74, 53, 0.18), 0 0 20px rgba(32, 74, 53, 0.12) !important;
+    transform: translateY(-3px);
+  }
+
+  [data-bs-theme="light"] .service-card-box.is-in-view .service-card-img {
+    transform: scale(1.03);
+  }
+
   .service-card-box:active {
     transform: scale(0.98);
   }
@@ -165,3 +191,13 @@
 .other-proposals-section {
   position: relative;
 }
+
+.other-proposals-text {
+  text-align: left;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: manual;
+  line-height: 1.8;
+}
+

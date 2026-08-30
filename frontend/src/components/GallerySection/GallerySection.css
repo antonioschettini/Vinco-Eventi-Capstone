@@ -448,7 +448,8 @@
   opacity: 0.95;
 }
 
-.gallery-card:hover .play-icon-overlay {
+.gallery-card:hover .play-icon-overlay,
+.grid-video-preview-wrapper.is-playing ~ .play-icon-overlay {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.85);
   filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
