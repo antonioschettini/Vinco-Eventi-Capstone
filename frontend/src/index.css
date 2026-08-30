@@ -27,6 +27,11 @@
   --font-accent: "Inter", "Plus Jakarta Sans", sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
+  /* Sovrascrittura variabili native Bootstrap 5 per garantire copertura 100% a cascata */
+  --bs-body-font-family: var(--font-body);
+  --bs-font-sans-serif: var(--font-body);
+  --bs-font-monospace: var(--font-mono);
+
   --primary-forest: #204a35;
   --primary-forest-hover: #163324;
   --emerald-accent: #48936c;
