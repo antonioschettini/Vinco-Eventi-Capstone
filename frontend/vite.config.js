@@ -18,4 +18,16 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-redux': ['@reduxjs/toolkit', 'react-redux'],
+          'vendor-bootstrap': ['react-bootstrap', 'bootstrap'],
+          'vendor-compression': ['browser-image-compression'],
+        },
+      },
+    },
+  },
 })
