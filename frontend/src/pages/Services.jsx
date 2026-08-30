@@ -404,6 +404,8 @@ function Services() {
                         src={getServiceImage(pkg)}
                         alt={`${title} VINCO EVENTI`}
                         className="service-card-img"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <span className={`package-badge-pill badge-${badgeUpper.toLowerCase()}`}>
                         {badgeUpper}

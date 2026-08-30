@@ -102,6 +102,7 @@ function Home() {
                         alt={card.title}
                         className={`entertainment-card-img entertainment-card-img--${key}`}
                         loading="lazy"
+                        decoding="async"
                       />
                       <div className="poster-card-top-badge">
                         <span className="poster-step-pill">
