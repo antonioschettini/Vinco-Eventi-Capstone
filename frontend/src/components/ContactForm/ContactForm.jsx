@@ -78,12 +78,12 @@ const isValidPersonName = (name) => {
   return /^[a-zA-Zà-ùÀ-Ùá-úÁ-Úä-üÄ-ÜñÑ\s'.-]+$/.test(trimmed);
 };
 
-// Valida Nome Struttura / Location (2-80 caratteri, esclude simboli di injection)
+// Valida Nome Struttura / Location (2-80 caratteri, esclude virgole e simboli di injection)
 const isValidVenueName = (venue) => {
   if (!venue) return false;
   const trimmed = venue.trim();
   if (trimmed.length < 2 || trimmed.length > 80) return false;
-  return !/[=<>;$%*|\\{}]/.test(trimmed);
+  return !/[,=<>;$%*|\\{}]/.test(trimmed);
 };
 
 // Valida Città / Località (2-50 caratteri, alfabetico/accentato/punti/spazi)
@@ -334,7 +334,9 @@ function ContactForm() {
         ? (formData.tipoCerimoniaAltro.trim() ? `Altro: ${formData.tipoCerimoniaAltro.trim()}` : "Altro")
         : formData.tipoCerimonia;
 
-    const combinedLocation = `${formData.nomeLocation.trim()}, ${formData.cittaLocation.trim()}`;
+    const cleanVenue = formData.nomeLocation.trim().replace(/,/g, " ");
+    const cleanCity = formData.cittaLocation.trim().replace(/,/g, " ");
+    const combinedLocation = `${cleanVenue}, ${cleanCity}`;
 
     const ideaFestaVal = formData.ideaFesta ? formData.ideaFesta.trim() : "";
     const ulterioriInfoVal = formData.ulterioriInfo ? formData.ulterioriInfo.trim() : "";
