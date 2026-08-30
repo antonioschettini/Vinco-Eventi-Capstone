@@ -86,7 +86,7 @@
 }
 
 .carousel-overlay-title {
-  font-family: var(--font-heading, "Cormorant Garamond", serif);
+  font-family: var(--font-heading);
   font-weight: 800;
   font-size: clamp(1.2rem, 2.2vw, 1.85rem);
   line-height: 1.25;
@@ -99,7 +99,7 @@
 }
 
 .carousel-overlay-subtitle {
-  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-family: var(--font-body);
   font-weight: 500;
   font-size: clamp(0.85rem, 1.1vw, 1.02rem);
   line-height: 1.45;
