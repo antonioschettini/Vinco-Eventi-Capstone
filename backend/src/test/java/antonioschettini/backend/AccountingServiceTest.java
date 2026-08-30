@@ -51,7 +51,7 @@ class AccountingServiceTest {
                 LocalDate.of(2026, 9, 15),
                 LocalDate.of(2026, 9, 15),
                 true,
-                "Masseria Coccaro",
+                "Villa Belvedere",
                 "Matrimonio",
                 new BigDecimal("2500.00"),
                 "[{\"desc\":\"Service Audio\",\"costo\":300}]",

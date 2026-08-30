@@ -35,7 +35,7 @@ class BackendApplicationTests {
                 "+39 3331234567",
                 LocalDate.now().plusDays(10),
                 "Matrimonio",
-                "Masseria Coccaro, Monopoli",
+                "Villa Belvedere, Monopoli",
                 "120",
                 "Pranzo",
                 "Religioso",
@@ -111,7 +111,7 @@ class BackendApplicationTests {
                 .telefono("+39 3331234567")
                 .dataEvento(LocalDate.now().plusDays(30))
                 .tipoEvento("Matrimonio")
-                .location("Masseria Coccaro, Monopoli")
+                .location("Villa Belvedere, Monopoli")
                 .numeroOspiti("120")
                 .budget("1.500€-3.000€")
                 .lingua("it")
@@ -125,7 +125,7 @@ class BackendApplicationTests {
                 .telefono("+1 555123456")
                 .dataEvento(LocalDate.now().plusDays(30))
                 .tipoEvento("Wedding")
-                .location("Masseria Coccaro, Monopoli")
+                .location("Villa Belvedere, Monopoli")
                 .numeroOspiti("100")
                 .budget("3.000€-5.000€")
                 .lingua("en")
