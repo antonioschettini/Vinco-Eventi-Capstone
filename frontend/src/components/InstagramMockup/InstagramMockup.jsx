@@ -33,6 +33,27 @@ function InstagramMockup() {
   const [showHeartAnim, setShowHeartAnim] = useState(false);
   const [showRedirectModal, setShowRedirectModal] = useState(false);
 
+  // Orario reale dello smartphone aggiornato in tempo reale
+  const [currentTime, setCurrentTime] = useState(() => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  });
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      setCurrentTime(`${hours}:${minutes}`);
+    };
+
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Scorrimento immagini automatico in loop
   useEffect(() => {
     if (isPaused) return;
@@ -131,7 +152,7 @@ function InstagramMockup() {
       <div className="phone-chassis">
         {/* Top Notch & Status Bar */}
         <div className="phone-top-bar d-flex justify-content-between align-items-center">
-          <span className="phone-clock font-body fw-bold">21:49</span>
+          <span className="phone-clock font-body fw-bold">{currentTime}</span>
           <div className="phone-notch">
             <span className="camera-lens"></span>
             <span className="speaker"></span>

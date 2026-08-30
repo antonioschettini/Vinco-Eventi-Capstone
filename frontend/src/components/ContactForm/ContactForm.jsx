@@ -733,14 +733,14 @@ function ContactForm() {
               tabIndex={7}
               value={formData.nomeLocation}
               onChange={handleChange}
-              placeholder={t.venueNamePlaceholder || "Es. Masseria Coccaro"}
+              placeholder={t.venueNamePlaceholder || "Es. Villa Belvedere"}
               className={`form-control font-body ${
                 validated && !isValidVenueName(formData.nomeLocation) ? "is-invalid" : ""
               }`}
               required
             />
             <div className="invalid-feedback">
-              {t.validationGuidance?.nomeLocation || t.venueNameError || "Inserisci il nome valido della struttura o location (es. Masseria Coccaro)."}
+              {t.validationGuidance?.nomeLocation || t.venueNameError || "Inserisci il nome valido della struttura o location (es. Villa Belvedere)."}
             </div>
           </div>
 

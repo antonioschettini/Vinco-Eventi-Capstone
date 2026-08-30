@@ -27,7 +27,7 @@ L'applicativo unisce un **frontend raffinato ed elegante** in React a un **backe
 ### 📝 3. Form Richiesta Preventivo Intelligente
 - **Campi Dettagliati:** Selezione della tipologia di evento, data futura, momento della giornata (Pranzo/Cena), tipo di cerimonia, numero ospiti e fascia di budget.
 - **Validazioni Avanzate:** 
-  - Controllo in tempo reale sul formato del luogo (richiesta di Luogo e Località separati da virgola, es. *Masseria Coccaro, Monopoli*).
+  - Controllo in tempo reale sul formato del luogo (richiesta di Luogo e Località separati da virgola, es. *Villa Belvedere, Monopoli*).
   - Selettore di prefisso telefonico mondiale con **bandiera del paese e ricerca istantanea**.
 - **Invio Notifiche Email Automatiche:** Invio di 2 email trasparenti (notifica al team *Vinco Eventi* e conferma immediata al cliente).
 - **Modale Scelta Email (`EmailChoiceModal`):** Permette all'utente di inviare la richiesta tramite il proprio client preferito (App di posta predefinita, Gmail Web, Outlook Web, o copia rapida negli appunti).
@@ -94,7 +94,7 @@ Autenticazione: **Bearer JWT** su header `Authorization: Bearer <token>` per tut
     "telefono": "+39 3331234567",
     "dataEvento": "2026-09-15",
     "tipoEvento": "Matrimonio",
-    "location": "Masseria Coccaro, Monopoli",
+    "location": "Villa Belvedere, Monopoli",
     "numeroOspiti": "120",
     "orarioGiornata": "Cena",
     "tipoCerimonia": "Civile / Simbolico",

@@ -12,7 +12,7 @@ async function testQuoteSubmission() {
     telefono: "+39 3496037722",
     dataEvento: "2026-08-09",
     tipoEvento: "Matrimonio",
-    location: "Masseria Coccaro, Monopoli",
+    location: "Villa Belvedere, Monopoli",
     numeroOspiti: "120",
     orarioGiornata: "Pranzo",
     tipoCerimonia: "Religioso",
