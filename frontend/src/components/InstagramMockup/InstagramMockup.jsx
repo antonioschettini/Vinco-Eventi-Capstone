@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { Modal } from "react-bootstrap";
 import { translations } from "../../utils/translations";
 import "./InstagramMockup.css";
 
@@ -30,6 +31,7 @@ function InstagramMockup() {
   const [likeCount, setLikeCount] = useState(1483);
   const [isPaused, setIsPaused] = useState(false);
   const [showHeartAnim, setShowHeartAnim] = useState(false);
+  const [showRedirectModal, setShowRedirectModal] = useState(false);
 
   // Scorrimento immagini automatico in loop
   useEffect(() => {
@@ -71,6 +73,23 @@ function InstagramMockup() {
 
   const handleBookmarkToggle = () => {
     setIsBookmarked((prev) => !prev);
+  };
+
+  // Apertura modale di avviso verso profilo Instagram ufficiale
+  const handleOpenInstagramModal = (e) => {
+    if (e) e.stopPropagation();
+    triggerHapticFeedback(15);
+    setShowRedirectModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowRedirectModal(false);
+  };
+
+  const handleProceedToInstagram = () => {
+    triggerHapticFeedback(20);
+    setShowRedirectModal(false);
+    window.open("https://www.instagram.com/vincoeventi/", "_blank", "noopener,noreferrer");
   };
 
   // Touch swipe state per l'esperienza da smartphone
@@ -129,14 +148,26 @@ function InstagramMockup() {
           {/* Instagram Top Header */}
           <div className="ig-header d-flex justify-content-between align-items-center border-bottom border-secondary border-opacity-10">
             <div className="d-flex align-items-center gap-2 overflow-hidden">
-              <div className="ig-avatar-ring">
-                <img
-                  src="/logo tondo vinco eventi trasparente.png"
-                  alt="VINCO EVENTI"
-                  className="ig-avatar-img"
-                />
-              </div>
-              <div className="d-flex flex-column lh-1 overflow-hidden">
+              <button
+                type="button"
+                className="ig-avatar-ring-btn border-0 bg-transparent p-0 flex-shrink-0"
+                onClick={handleOpenInstagramModal}
+                title={t.storyTooltip || "Guarda le Storie e il profilo ufficiale su Instagram"}
+                aria-label="Visualizza Storia e Profilo Instagram di VINCO EVENTI"
+              >
+                <div className="ig-avatar-ring">
+                  <img
+                    src="/logo tondo vinco eventi trasparente.png"
+                    alt="VINCO EVENTI"
+                    className="ig-avatar-img"
+                  />
+                </div>
+              </button>
+              <div
+                className="d-flex flex-column lh-1 overflow-hidden cursor-pointer ig-user-header-text"
+                onClick={handleOpenInstagramModal}
+                title={t.storyTooltip || "Guarda le Storie e il profilo ufficiale su Instagram"}
+              >
                 <div className="d-flex align-items-center gap-1">
                   <span className="ig-username fw-bold text-truncate">vincoeventi</span>
                   <i className="bi bi-patch-check-fill text-primary fs-7" title="Account Verificato"></i>
@@ -144,7 +175,12 @@ function InstagramMockup() {
                 <span className="ig-location text-body-secondary text-truncate">{t.location}</span>
               </div>
             </div>
-            <button className="btn btn-link p-0 text-body" aria-label="Option menu">
+            <button
+              className="btn btn-link p-0 text-body"
+              aria-label="Option menu"
+              onClick={handleOpenInstagramModal}
+              title={t.storyTooltip || "Guarda le Storie e il profilo ufficiale su Instagram"}
+            >
               <i className="bi bi-three-dots fs-6"></i>
             </button>
           </div>
@@ -272,7 +308,12 @@ function InstagramMockup() {
             <button className="btn btn-link p-0 text-body" aria-label="Reels">
               <i className="bi bi-play-btn"></i>
             </button>
-            <button className="btn btn-link p-0 text-body" aria-label="Profile">
+            <button
+              className="btn btn-link p-0 text-body"
+              aria-label="Profile"
+              onClick={handleOpenInstagramModal}
+              title={t.storyTooltip || "Guarda le Storie e il profilo ufficiale su Instagram"}
+            >
               <img
                 src="/logo tondo vinco eventi trasparente.png"
                 alt="Profile VINCO EVENTI"
@@ -283,6 +324,83 @@ function InstagramMockup() {
           </div>
         </div>
       </div>
+
+      {/* Modal Avviso Uscita verso Profilo Instagram Ufficiale */}
+      <Modal
+        show={showRedirectModal}
+        onHide={handleCloseModal}
+        centered
+        className="ig-redirect-modal"
+        dialogClassName="ig-modal-dialog modal-dialog-centered"
+        contentClassName="ig-modal-content border-0 rounded-4 overflow-hidden shadow-lg"
+      >
+        <div className="ig-modal-header d-flex justify-content-between align-items-center p-3 p-md-4 border-bottom">
+          <div className="d-flex align-items-center gap-2">
+            <span className="badge rounded-pill ig-modal-badge px-3 py-2 d-inline-flex align-items-center gap-1">
+              <i className="bi bi-instagram fs-6"></i>
+              <span className="fw-bold">Instagram</span>
+            </span>
+          </div>
+          <button
+            type="button"
+            className="btn-close ig-modal-close-btn p-2"
+            onClick={handleCloseModal}
+            aria-label="Chiudi modale"
+          ></button>
+        </div>
+
+        <Modal.Body className="p-4 text-center">
+          {/* Glowing Animated Profile Story Ring */}
+          <div className="ig-modal-avatar-wrapper mx-auto mb-3 position-relative d-inline-block">
+            <div className="ig-modal-avatar-ring">
+              <img
+                src="/logo tondo vinco eventi trasparente.png"
+                alt="VINCO EVENTI"
+                className="ig-modal-avatar-img"
+              />
+            </div>
+            <div className="ig-modal-verified-badge position-absolute bottom-0 end-0">
+              <i className="bi bi-patch-check-fill text-primary fs-5"></i>
+            </div>
+          </div>
+
+          <h4 className="h5 font-heading fw-bold text-body mb-1">
+            {t.modalProfileName || "VINCO EVENTI (@vincoeventi)"}
+          </h4>
+          <div className="mb-3">
+            <span className="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-1 font-body small fw-semibold">
+              <i className="bi bi-shield-check me-1"></i>
+              {t.modalOfficialTag || "Account Ufficiale Verificato"}
+            </span>
+          </div>
+
+          <h5 className="h6 font-heading text-body fw-bold mb-2">
+            {t.modalTitle || "Stai per lasciare il sito"}
+          </h5>
+          <p className="font-body text-body-secondary small mb-0 px-2 max-w-400 mx-auto">
+            {t.modalSubtitle || "Verrai reindirizzato al profilo ufficiale Instagram di VINCO EVENTI per visualizzare storie, reel e contenuti esclusivi."}
+          </p>
+        </Modal.Body>
+
+        <Modal.Footer className="border-top p-3 d-flex flex-column flex-sm-row justify-content-between gap-2 bg-body-tertiary">
+          <button
+            type="button"
+            className="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold w-100 w-sm-auto order-2 order-sm-1"
+            onClick={handleCloseModal}
+          >
+            {t.modalCancelBtn || "Rimani sul sito"}
+          </button>
+          <button
+            type="button"
+            className="btn ig-proceed-btn rounded-pill px-4 py-2 fw-bold text-white shadow-sm d-inline-flex align-items-center justify-content-center gap-2 w-100 w-sm-auto order-1 order-sm-2"
+            onClick={handleProceedToInstagram}
+          >
+            <i className="bi bi-instagram fs-6"></i>
+            <span>{t.modalProceedBtn || "Procedi su Instagram"}</span>
+            <i className="bi bi-box-arrow-up-right fs-7 ms-1"></i>
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

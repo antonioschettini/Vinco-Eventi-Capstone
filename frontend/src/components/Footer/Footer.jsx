@@ -171,9 +171,11 @@ function Footer() {
                 </a>
               </div>
 
-              {/* Diritti Riservati */}
+              {/* Diritti Riservati con Anno Dinamico */}
               <div className="copyright footer-copyright-divider pt-4 mt-2">
-                <p className="footer-copyright-text small mb-0">{t.rights}</p>
+                <p className="footer-copyright-text small mb-0">
+                  {t.rights || `© ${new Date().getFullYear()} VINCO EVENTI. ${t.allRightsReserved || "Tutti i diritti riservati."}`}
+                </p>
               </div>
             </div>
           </Col>
