@@ -115,7 +115,7 @@ function AudioController() {
         id="vinco-global-audio"
         ref={audioRef}
         src={currentTrack.src}
-        preload="auto"
+        preload="none"
         playsInline
         onEnded={handleEnded}
       />
