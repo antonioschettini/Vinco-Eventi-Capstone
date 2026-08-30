@@ -62,7 +62,7 @@ class EmailServiceTest {
                 .dataEvento(LocalDate.of(2026, 9, 20))
                 .dataRichiesta(LocalDateTime.now())
                 .tipoEvento("Wedding")
-                .location("Masseria San Domenico")
+                .location("Villa Belvedere, Fasano")
                 .numeroOspiti("120")
                 .orarioGiornata("Dinner")
                 .budget("3.000€-5.000€")
