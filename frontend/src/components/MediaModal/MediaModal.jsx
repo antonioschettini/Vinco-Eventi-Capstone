@@ -70,12 +70,21 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [show, currentIndex, items, onNavigate, onHide]);
 
-  // Pre-caricamento (prefetch) in background delle copertine/immagini adiacenti in JS per azzerare la latenza visiva ed evitare warning HTML <link rel="preload">
+  // Pre-caricamento (prefetch) in background delle sole immagini/poster adiacenti (MAI FILE VIDEO MP4)
   const nextItem = items && items.length > 1 ? items[(currentIndex + 1) % items.length] : null;
   const prevItem = items && items.length > 1 ? items[(currentIndex - 1 + items.length) % items.length] : null;
 
-  const nextPosterUrl = nextItem ? (nextItem.posterUrl || getOptimizedCloudinaryUrl(nextItem.src, { type: "poster" })) : null;
-  const prevPosterUrl = prevItem ? (prevItem.posterUrl || getOptimizedCloudinaryUrl(prevItem.src, { type: "poster" })) : null;
+  const getPosterForPrefetch = (item) => {
+    if (!item) return null;
+    if (item.posterUrl) return item.posterUrl;
+    if (item.type === "image" && item.src) {
+      return getOptimizedCloudinaryUrl(item.src, { type: "modal" });
+    }
+    return null;
+  };
+
+  const nextPosterUrl = getPosterForPrefetch(nextItem);
+  const prevPosterUrl = getPosterForPrefetch(prevItem);
 
   useEffect(() => {
     if (!show) return;

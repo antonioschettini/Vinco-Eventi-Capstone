@@ -18,20 +18,26 @@ import "./GallerySection.css";
 function LazyGridVideo({ src, posterUrl, item, className }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isInView, setIsInView] = useState(false);
+  const [isTabVisible, setIsTabVisible] = useState(typeof document !== "undefined" ? !document.hidden : true);
   const [hasError, setHasError] = useState(false);
   const containerRef = useRef(null);
   const videoRef = useRef(null);
 
-  // Rilevamento visibilità nello scroll per dispositivi Mobile e Tablet
+  // Monitoraggio stato visibilità della scheda del browser (Page Visibility API)
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsTabVisible(!document.hidden);
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
+  // Rilevamento visibilità nello scroll (Viewport Detection per Mobile, Tablet e Desktop)
   useEffect(() => {
     const el = containerRef.current;
     if (!el || !("IntersectionObserver" in window)) return;
-
-    const isTouchOrMobile =
-      window.matchMedia("(hover: none)").matches ||
-      window.matchMedia("(max-width: 991.98px)").matches;
-
-    if (!isTouchOrMobile) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -40,8 +46,8 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
         });
       },
       {
-        threshold: 0.35, // Attiva l'anteprima quando almeno il 35% della card è visibile
-        rootMargin: "0px 0px -20px 0px",
+        threshold: 0.45, // Attiva l'anteprima solo quando la card è posizionata nella zona attiva dello schermo
+        rootMargin: "-5% 0px -5% 0px",
       }
     );
 
@@ -73,7 +79,12 @@ function LazyGridVideo({ src, posterUrl, item, className }) {
     ? `${getOptimizedCloudinaryUrl(src, { type: "grid" })}#t=${item.startTime}`
     : getOptimizedCloudinaryUrl(src, { type: "grid" });
 
-  const shouldPlay = isHovered || isInView;
+  const isTouchDevice =
+    typeof window !== "undefined" &&
+    (window.matchMedia("(hover: none)").matches || window.matchMedia("(max-width: 991.98px)").matches);
+
+  // Su desktop si attiva su hover (se tab attiva); su touch/mobile/tablet si attiva quando è nel viewport (se tab attiva)
+  const shouldPlay = isTabVisible && (isTouchDevice ? isInView : isHovered);
 
   return (
     <div
@@ -265,6 +276,18 @@ function GallerySection() {
   // Monitoraggio della visibilità del Carosello Top per azzerare lo streaming video se l'utente scorre in basso
   const carouselContainerRef = useRef(null);
   const [isCarouselInView, setIsCarouselInView] = useState(true);
+  const [isTabVisible, setIsTabVisible] = useState(typeof document !== "undefined" ? !document.hidden : true);
+
+  // Monitoraggio stato visibilità scheda browser (Page Visibility API)
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsTabVisible(!document.hidden);
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
 
   useEffect(() => {
     const target = carouselContainerRef.current;
@@ -285,15 +308,24 @@ function GallerySection() {
     };
   }, []);
 
-  // Pre-caricamento in sottofondo delle copertine/poster HD delle slide adiacenti nel carosello
+  // Pre-caricamento in sottofondo delle sole copertine/poster HD delle slide adiacenti (SOLO IMMAGINI, MAI FILE VIDEO MP4)
   useEffect(() => {
     if (!featuredItems || featuredItems.length <= 1) return;
 
     const nextItem = featuredItems[(carouselIndex + 1) % featuredItems.length];
     const prevItem = featuredItems[(carouselIndex - 1 + featuredItems.length) % featuredItems.length];
 
-    const nextPoster = nextItem.posterUrl || getOptimizedCloudinaryUrl(nextItem.src, { type: "poster" });
-    const prevPoster = prevItem.posterUrl || getOptimizedCloudinaryUrl(prevItem.src, { type: "poster" });
+    const getPosterForSlide = (item) => {
+      if (!item) return null;
+      if (item.posterUrl) return item.posterUrl;
+      if (item.type === "image" && item.src) {
+        return getOptimizedCloudinaryUrl(item.src, { type: "carousel" });
+      }
+      return null;
+    };
+
+    const nextPoster = getPosterForSlide(nextItem);
+    const prevPoster = getPosterForSlide(prevItem);
 
     if (nextPoster) {
       const imgNext = new Image();
@@ -515,7 +547,7 @@ function GallerySection() {
               activeIndex={carouselIndex}
               onSelect={(idx) => setCarouselIndex(idx)}
               fade
-              interval={4000}
+              interval={isCarouselInView && isTabVisible ? 5000 : null}
               className="gallery-top-carousel rounded-4 overflow-hidden shadow"
               prevIcon={
                 <div className="gallery-carousel-nav-btn prev" aria-hidden="true">
@@ -540,7 +572,7 @@ function GallerySection() {
                   >
                     <div className="carousel-media-wrapper">
                       {item.type === "video" ? (
-                        isActive && isCarouselInView ? (
+                        isActive && isCarouselInView && isTabVisible ? (
                           <video
                             src={item.startTime ? `${getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}#t=${item.startTime}` : getOptimizedCloudinaryUrl(item.src, { type: "carousel" })}
                             poster={itemPoster}
