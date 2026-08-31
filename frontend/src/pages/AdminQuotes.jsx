@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import API_BASE_URL from "../config/api";
 import { authApiFetch } from "../utils/apiClient";
+import { setGlobalError } from "../redux/slices/uiSlice";
 import { handleEmailClick, handlePhoneClick } from "../utils/contactHelpers";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
@@ -251,6 +252,12 @@ function AdminQuotes() {
         setTranslating(false);
       }
     }
+  };
+
+  const handleFilterSelect = (newFilter) => {
+    setActiveFilter(newFilter);
+    setVisibleCount(10);
+    setSelectedQuoteIds(new Set());
   };
 
   const handleToggleSelectQuote = (id) => {
