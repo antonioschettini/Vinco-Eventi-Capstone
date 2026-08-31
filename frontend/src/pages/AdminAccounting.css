@@ -489,11 +489,19 @@
   cursor: pointer;
   max-width: 100%;
   overflow: hidden;
+  user-select: none;
 }
 
 .pdf-upload-dropzone:hover {
   border-color: #198754;
   background: rgba(25, 135, 84, 0.07);
+}
+
+.pdf-upload-dropzone.is-dragging {
+  border-color: #198754;
+  background: rgba(25, 135, 84, 0.15);
+  box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.2);
+  transform: scale(1.01);
 }
 
 .file-input-wrapper {

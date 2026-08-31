@@ -126,4 +126,10 @@ class CloudinaryServiceTest {
         assertEquals("video", metadata.get("resourceType"));
         assertTrue(metadata.get("posterUrl").contains(".webp") || metadata.get("posterUrl").contains(".jpg") || metadata.get("posterUrl").contains("upload"));
     }
+
+    @Test
+    void testDownloadContractPdfThrowsBadRequestWhenNotFound() {
+        assertThrows(BadRequestException.class, () ->
+                cloudinaryService.downloadContractPdf("non_existent_id", "invalid_url"));
+    }
 }

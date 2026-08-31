@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import API_BASE_URL from "../config/api";
 import { authApiFetch } from "../utils/apiClient";
@@ -154,6 +154,22 @@ export default function AdminAccounting() {
   // Lista spese collaboratori/fornitori per l'evento correntemente aperto
   const [speseList, setSpeseList] = useState([]);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [isDraggingPdf, setIsDraggingPdf] = useState(false);
+  const [openingPdfId, setOpeningPdfId] = useState(null);
+  const fileInputRef = useRef(null);
+
+  // Previene l'apertura automatica del browser se un file viene trascinato ovunque nella finestra
+  useEffect(() => {
+    const preventDefaultDrag = (e) => {
+      e.preventDefault();
+    };
+    window.addEventListener("dragover", preventDefaultDrag);
+    window.addEventListener("drop", preventDefaultDrag);
+    return () => {
+      window.removeEventListener("dragover", preventDefaultDrag);
+      window.removeEventListener("drop", preventDefaultDrag);
+    };
+  }, []);
 
   // Stato per il Modale Riepilogo Eventi del Giorno
   const [dayEventsModal, setDayEventsModal] = useState({
@@ -401,10 +417,66 @@ export default function AdminAccounting() {
     });
   };
 
-  // Upload Contratto PDF
-  const handleUploadContract = async (e) => {
-    const file = e.target.files[0];
+  // Apertura e visualizzazione garantita del Contratto PDF tramite Blob nativo
+  const handleOpenContractPdf = async (ev) => {
+    if (!ev || !ev.id) return;
+    setOpeningPdfId(ev.id);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/agenda/${ev.id}/contratto`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        // Fallback diretto sull'URL registrato se presente
+        if (ev.contrattoUrl) {
+          window.open(ev.contrattoUrl, "_blank", "noopener,noreferrer");
+          return;
+        }
+        throw new Error("Impossibile recuperare il file PDF del contratto.");
+      }
+
+      const blob = await res.blob();
+      const pdfBlob = new Blob([blob], { type: "application/pdf" });
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      window.open(blobUrl, "_blank");
+    } catch (err) {
+      dispatch(
+        setGlobalError({
+          message: err.message || "Errore durante l'apertura del contratto PDF",
+          type: "danger",
+        })
+      );
+    } finally {
+      setOpeningPdfId(null);
+    }
+  };
+
+  // Elaborazione e Upload Contratto PDF (usato sia da file picker che da drag & drop)
+  const handleProcessContractFile = async (file) => {
     if (!file) return;
+
+    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    if (!isPdf) {
+      dispatch(
+        setGlobalError({
+          message: "Formato non supportato: il file selezionato deve essere un documento PDF (.pdf).",
+          type: "warning",
+        })
+      );
+      return;
+    }
+
+    if (file.size > 30 * 1024 * 1024) {
+      dispatch(
+        setGlobalError({
+          message: "Il file PDF è troppo grande. La dimensione massima consentita è 30 MB.",
+          type: "warning",
+        })
+      );
+      return;
+    }
 
     if (!editingEvent?.id) {
       setConfirmModalConfig({
@@ -428,7 +500,7 @@ export default function AdminAccounting() {
         `${API_BASE_URL}/api/admin/agenda/${editingEvent.id}/contratto`,
         {
           method: "POST",
-          body: bodyData
+          body: bodyData,
         },
         token,
         dispatch
@@ -436,10 +508,67 @@ export default function AdminAccounting() {
 
       setEditingEvent(updatedEvent);
       fetchEventsAndReport();
+      dispatch(
+        setGlobalError({
+          message: "Contratto PDF caricato con successo!",
+          type: "success",
+        })
+      );
     } catch (err) {
-      dispatch(setGlobalError({ message: err.message || "Errore durante l'upload del contratto PDF", type: "danger" }));
+      dispatch(
+        setGlobalError({
+          message: err.message || "Errore durante l'upload del contratto PDF",
+          type: "danger",
+        })
+      );
     } finally {
       setUploadingPdf(false);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (editingEvent?.id && !uploadingPdf) {
+      setIsDraggingPdf(true);
+    }
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (editingEvent?.id && !uploadingPdf) {
+      setIsDraggingPdf(true);
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingPdf(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingPdf(false);
+
+    if (!editingEvent?.id) {
+      setConfirmModalConfig({
+        isOpen: true,
+        title: "Salvataggio Evento Richiesto",
+        message: "Devi prima salvare l'evento per poter allegare il relativo contratto PDF.",
+        confirmText: "Ho Capito",
+        variant: "info",
+        icon: "bi-info-circle-fill",
+        onConfirm: () => closeConfirmModal(),
+      });
+      return;
+    }
+
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      handleProcessContractFile(file);
     }
   };
 
@@ -1090,15 +1219,25 @@ export default function AdminAccounting() {
                       </td>
                       <td className="text-center">
                         {ev.contrattoUrl ? (
-                          <a
-                            href={ev.contrattoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="badge bg-success text-white border-0 px-2 py-1 text-decoration-none"
+                          <button
+                            type="button"
+                            onClick={() => handleOpenContractPdf(ev)}
+                            disabled={openingPdfId === ev.id}
+                            className="badge bg-success text-white border-0 px-2 py-1 text-decoration-none d-inline-flex align-items-center gap-1 shadow-sm"
                             title="Apri il contratto PDF"
+                            style={{ cursor: "pointer" }}
                           >
-                            <i className="bi bi-check-circle-fill me-1"></i> Allegato
-                          </a>
+                            {openingPdfId === ev.id ? (
+                              <>
+                                <span className="spinner-border spinner-border-sm" role="status" style={{ width: "10px", height: "10px" }}></span>
+                                <span>Apertura...</span>
+                              </>
+                            ) : (
+                              <>
+                                <i className="bi bi-file-earmark-pdf-fill me-1"></i> Allegato
+                              </>
+                            )}
+                          </button>
                         ) : (
                           <span className="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">
                             <i className="bi bi-exclamation-triangle-fill me-1"></i> Mancante
@@ -1148,16 +1287,27 @@ export default function AdminAccounting() {
                         )}
                       </div>
                       {ev.contrattoUrl ? (
-                        <a
-                          href={ev.contrattoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="badge bg-success text-white px-2 py-1 text-decoration-none shadow-sm cursor-pointer d-inline-flex align-items-center gap-1"
+                        <button
+                          type="button"
+                          disabled={openingPdfId === ev.id}
+                          className="badge bg-success text-white px-2 py-1 text-decoration-none shadow-sm cursor-pointer d-inline-flex align-items-center gap-1 border-0"
                           title="Apri e visualizza il contratto PDF"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenContractPdf(ev);
+                          }}
                         >
-                          <i className="bi bi-file-earmark-pdf-fill"></i> Apri PDF
-                        </a>
+                          {openingPdfId === ev.id ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm" role="status" style={{ width: "10px", height: "10px" }}></span>
+                              <span>Apertura...</span>
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-file-earmark-pdf-fill"></i> Apri PDF
+                            </>
+                          )}
+                        </button>
                       ) : (
                         <button
                           type="button"
@@ -1516,16 +1666,25 @@ export default function AdminAccounting() {
                           </div>
                         </div>
                         <div className="pdf-action-buttons d-flex align-items-center gap-2 flex-shrink-0 align-self-end align-self-sm-center">
-                          <a
-                            href={editingEvent.contrattoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            type="button"
+                            disabled={openingPdfId === editingEvent.id}
+                            onClick={() => handleOpenContractPdf(editingEvent)}
                             className="btn btn-sm btn-success d-inline-flex align-items-center gap-1 px-3 py-1 fw-semibold text-nowrap"
-                            title="Apri PDF in nuova scheda"
+                            title="Apri e visualizza il contratto PDF"
                           >
-                            <i className="bi bi-eye-fill"></i>
-                            <span>Apri PDF</span>
-                          </a>
+                            {openingPdfId === editingEvent.id ? (
+                              <>
+                                <span className="spinner-border spinner-border-sm" role="status"></span>
+                                <span>Apertura...</span>
+                              </>
+                            ) : (
+                              <>
+                                <i className="bi bi-eye-fill"></i>
+                                <span>Apri PDF</span>
+                              </>
+                            )}
+                          </button>
                           <button
                             type="button"
                             onClick={handleDeleteContract}
@@ -1538,20 +1697,67 @@ export default function AdminAccounting() {
                         </div>
                       </div>
                     ) : (
-                      <div className="pdf-upload-dropzone">
-                        <i className="bi bi-cloud-arrow-up-fill text-success display-6 mb-2 d-block"></i>
-                        <div className="fw-bold text-body mb-1">Upload Contratto PDF</div>
-                        <small className="text-muted d-block mb-3">Seleziona il contratto siglato in formato .pdf</small>
-                        <div className="file-input-wrapper mx-auto">
+                      <div
+                        className={`pdf-upload-dropzone ${isDraggingPdf ? "is-dragging" : ""}`}
+                        onDragOver={handleDragOver}
+                        onDragEnter={handleDragEnter}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        onClick={() => {
+                          if (!uploadingPdf) {
+                            if (!editingEvent?.id) {
+                              setConfirmModalConfig({
+                                isOpen: true,
+                                title: "Salvataggio Evento Richiesto",
+                                message: "Devi prima salvare l'evento per poter allegare il relativo contratto PDF.",
+                                confirmText: "Ho Capito",
+                                variant: "info",
+                                icon: "bi-info-circle-fill",
+                                onConfirm: () => closeConfirmModal(),
+                              });
+                              return;
+                            }
+                            fileInputRef.current?.click();
+                          }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            fileInputRef.current?.click();
+                          }
+                        }}
+                      >
+                        <i className={`bi ${isDraggingPdf ? "bi-arrow-down-circle-fill text-success" : "bi-cloud-arrow-up-fill text-success"} display-6 mb-2 d-block`}></i>
+                        <div className="fw-bold text-body mb-1">
+                          {isDraggingPdf ? "Rilascia il file PDF qui per caricarlo" : "Upload Contratto PDF"}
+                        </div>
+                        <small className="text-muted d-block mb-3">
+                          {isDraggingPdf ? "Rilascia per avviare il caricamento" : "Trascina qui il file PDF oppure clicca per selezionarlo"}
+                        </small>
+                        <div className="file-input-wrapper mx-auto" onClick={(e) => e.stopPropagation()}>
                           <input
+                            ref={fileInputRef}
                             type="file"
-                            accept="application/pdf"
-                            onChange={handleUploadContract}
+                            accept="application/pdf,.pdf"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleProcessContractFile(file);
+                              }
+                              e.target.value = "";
+                            }}
                             disabled={uploadingPdf || !editingEvent?.id}
                             className="form-control form-control-sm"
                           />
                         </div>
-                        {uploadingPdf && <small className="text-success d-block mt-2 fw-bold">Caricamento su Cloudinary in corso...</small>}
+                        {uploadingPdf && (
+                          <div className="d-flex align-items-center justify-content-center gap-2 mt-3 text-success fw-bold">
+                            <div className="spinner-border spinner-border-sm text-success" role="status"></div>
+                            <small>Caricamento su Cloudinary in corso...</small>
+                          </div>
+                        )}
                         {!editingEvent?.id && (
                           <div className="pdf-save-warning-alert fw-bold rounded-3 py-2 px-3 mt-3 mb-0 d-inline-flex align-items-center gap-2 small">
                             <i className="bi bi-exclamation-triangle-fill text-warning fs-6"></i>
@@ -1654,7 +1860,7 @@ export default function AdminAccounting() {
                     className="btn btn-success btn-sm rounded-pill fw-bold d-inline-flex align-items-center gap-1 shadow-sm"
                   >
                     <i className="bi bi-plus-lg"></i>
-                    <span>+ Nuovo Evento per Questa Data</span>
+                    <span>Nuovo Evento per Questa Data</span>
                   </button>
                 </div>
 
@@ -1679,16 +1885,27 @@ export default function AdminAccounting() {
                         </div>
                         <div>
                           {ev.contrattoUrl ? (
-                            <a
-                              href={ev.contrattoUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="badge bg-success text-white px-2 py-1 text-decoration-none shadow-sm cursor-pointer d-inline-flex align-items-center gap-1"
+                            <button
+                              type="button"
+                              disabled={openingPdfId === ev.id}
+                              className="badge bg-success text-white px-2 py-1 text-decoration-none shadow-sm cursor-pointer d-inline-flex align-items-center gap-1 border-0"
                               title="Apri e visualizza il contratto PDF"
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenContractPdf(ev);
+                              }}
                             >
-                              <i className="bi bi-file-earmark-pdf-fill"></i> Apri PDF
-                            </a>
+                              {openingPdfId === ev.id ? (
+                                <>
+                                  <span className="spinner-border spinner-border-sm" role="status" style={{ width: "10px", height: "10px" }}></span>
+                                  <span>Apertura...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <i className="bi bi-file-earmark-pdf-fill"></i> Apri PDF
+                                </>
+                              )}
+                            </button>
                           ) : (
                             <button
                               type="button"

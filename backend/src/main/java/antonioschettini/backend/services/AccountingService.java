@@ -220,6 +220,19 @@ public class AccountingService {
         return accountingRepository.save(event);
     }
 
+    public byte[] getContractPdf(UUID id) {
+        AccountingEvent event = getEventById(id);
+        if ((event.getContrattoUrl() == null || event.getContrattoUrl().isBlank()) &&
+            (event.getContrattoPublicId() == null || event.getContrattoPublicId().isBlank())) {
+            throw new NotFoundException("Nessun contratto PDF associato a questo evento.");
+        }
+        try {
+            return cloudinaryService.downloadContractPdf(event.getContrattoPublicId(), event.getContrattoUrl());
+        } catch (Exception e) {
+            throw new BadRequestException("Errore durante il recupero del contratto PDF: " + e.getMessage());
+        }
+    }
+
     public AccountingReportDTO getFinancialReport(Integer year, Integer month) {
         List<AccountingEvent> events = getAllEvents(year, month);
 

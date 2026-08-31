@@ -6,7 +6,10 @@ import antonioschettini.backend.recordsDTO.AccountingReportDTO;
 import antonioschettini.backend.services.AccountingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +38,21 @@ public class AdminAccountingController {
     public ResponseEntity<AccountingEvent> getEventById(@PathVariable UUID id) {
         AccountingEvent event = accountingService.getEventById(id);
         return ResponseEntity.ok(event);
+    }
+
+    @GetMapping("/{id}/contratto")
+    public ResponseEntity<byte[]> getContractPdf(@PathVariable UUID id) {
+        AccountingEvent event = accountingService.getEventById(id);
+        byte[] pdfBytes = accountingService.getContractPdf(id);
+        String filename = event.getContrattoNomeFile() != null && !event.getContrattoNomeFile().isBlank()
+                ? event.getContrattoNomeFile()
+                : "contratto.pdf";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.inline().filename(filename).build());
+        headers.setCacheControl("private, max-age=3600");
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 
     @PostMapping

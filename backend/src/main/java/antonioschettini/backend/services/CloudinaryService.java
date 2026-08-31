@@ -10,8 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.*;
 
 @Service
@@ -78,6 +83,102 @@ public class CloudinaryService {
                     "filename", filename
             );
         }
+    }
+
+    public byte[] downloadContractPdf(String publicId, String fallbackUrl) throws IOException {
+        String targetPublicId = publicId;
+        if (targetPublicId == null || targetPublicId.isBlank()) {
+            targetPublicId = extractPublicIdFromUrl(fallbackUrl);
+        }
+
+        if (targetPublicId != null && !targetPublicId.isBlank()) {
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(10))
+                    .build();
+
+            // 1. Tenta con resource_type: raw
+            try {
+                if (cloudinary != null && cloudinary.url() != null) {
+                    String downloadUrl = cloudinary.url()
+                            .resourceType("raw")
+                            .type("upload")
+                            .signed(true)
+                            .generate(targetPublicId);
+
+                    if (downloadUrl != null && !downloadUrl.isBlank()) {
+                        HttpRequest req = HttpRequest.newBuilder()
+                                .uri(URI.create(downloadUrl))
+                                .timeout(Duration.ofSeconds(20))
+                                .GET()
+                                .build();
+                        HttpResponse<byte[]> res = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
+                        if (res.statusCode() == 200 && res.body() != null && res.body().length > 0) {
+                            return res.body();
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                System.err.println("[WARN CloudinaryService] Download via signed url raw: " + ex.getMessage());
+            }
+
+            // 2. Tenta con resource_type: image
+            try {
+                if (cloudinary != null && cloudinary.url() != null) {
+                    String downloadUrl = cloudinary.url()
+                            .resourceType("image")
+                            .type("upload")
+                            .format("pdf")
+                            .signed(true)
+                            .generate(targetPublicId);
+
+                    if (downloadUrl != null && !downloadUrl.isBlank()) {
+                        HttpRequest req = HttpRequest.newBuilder()
+                                .uri(URI.create(downloadUrl))
+                                .timeout(Duration.ofSeconds(20))
+                                .GET()
+                                .build();
+                        HttpResponse<byte[]> res = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
+                        if (res.statusCode() == 200 && res.body() != null && res.body().length > 0) {
+                            return res.body();
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                System.err.println("[WARN CloudinaryService] Download via signed url image: " + ex.getMessage());
+            }
+
+            // 3. Tenta con secure_url diretto se fallbackUrl è presente
+            if (fallbackUrl != null && fallbackUrl.startsWith("http")) {
+                try {
+                    HttpRequest req = HttpRequest.newBuilder()
+                            .uri(URI.create(fallbackUrl))
+                            .timeout(Duration.ofSeconds(15))
+                            .GET()
+                            .build();
+                    HttpResponse<byte[]> res = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
+                    if (res.statusCode() == 200 && res.body() != null && res.body().length > 0) {
+                        return res.body();
+                    }
+                } catch (Exception ex) {
+                    // ignore
+                }
+            }
+        }
+
+        // 4. Fallback locale se presente in uploads
+        if (fallbackUrl != null && fallbackUrl.contains("uploads")) {
+            try {
+                String relative = fallbackUrl.substring(fallbackUrl.indexOf("uploads"));
+                java.nio.file.Path localPath = java.nio.file.Paths.get(relative);
+                if (Files.exists(localPath)) {
+                    return Files.readAllBytes(localPath);
+                }
+            } catch (Exception ex) {
+                // ignore
+            }
+        }
+
+        throw new BadRequestException("Impossibile recuperare il file PDF del contratto.");
     }
 
     public String uploadMedia(MultipartFile file) throws IOException {
