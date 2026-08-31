@@ -48,6 +48,7 @@ function AdminQuotes() {
   const [translatedText, setTranslatedText] = useState("");
   const [translating, setTranslating] = useState(false);
   const [visibleCount, setVisibleCount] = useState(10);
+  const [selectedQuoteIds, setSelectedQuoteIds] = useState(new Set());
 
   // Stato per il Modale Custom di Conferma / Avviso Admin
   const [confirmModalConfig, setConfirmModalConfig] = useState({
@@ -252,9 +253,174 @@ function AdminQuotes() {
     }
   };
 
-  const handleFilterSelect = (newFilter) => {
-    setActiveFilter(newFilter);
-    setVisibleCount(10);
+  const handleToggleSelectQuote = (id) => {
+    setSelectedQuoteIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectAllVisible = () => {
+    if (selectedQuoteIds.size === visibleQuotes.length && visibleQuotes.length > 0) {
+      setSelectedQuoteIds(new Set());
+    } else {
+      setSelectedQuoteIds(new Set(visibleQuotes.map((q) => q.id)));
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedQuoteIds(new Set());
+  };
+
+  const executeBatchStatusUpdate = async (newStatus) => {
+    if (selectedQuoteIds.size === 0) return;
+    const ids = Array.from(selectedQuoteIds);
+    setActionError("");
+    try {
+      await Promise.all(
+        ids.map((id) =>
+          authApiFetch(
+            `${API_BASE_URL}/api/admin/quotes/${id}/status`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ stato: newStatus }),
+            },
+            token,
+            dispatch
+          )
+        )
+      );
+      fetchQuotes();
+      setSelectedQuoteIds(new Set());
+      dispatch(
+        setGlobalError({
+          message: `${ids.length} preventivi aggiornati con successo allo stato ${newStatus === "PROCESSED" ? "GESTITO" : newStatus === "READ" ? "LETTO" : "IN ATTESA"}!`,
+          type: "success",
+          autoDismissMs: 4000,
+        })
+      );
+    } catch (err) {
+      setActionError(err.message || "Errore durante l'aggiornamento di massa dei preventivi");
+    }
+  };
+
+  const handleBatchStatusUpdate = (newStatus) => {
+    if (selectedQuoteIds.size === 0) return;
+    const count = selectedQuoteIds.size;
+    if (newStatus === "PROCESSED") {
+      setConfirmModalConfig({
+        isOpen: true,
+        title: "Conferma Operazione di Massa",
+        message: `Sei sicuro di voler contrassegnare ${count} preventivi come GESTITI? Gli eventi corrispondenti verranno creati o sincronizzati nell'Agenda Contabile.`,
+        confirmText: `Conferma ${count} Preventivi`,
+        variant: "success",
+        icon: "bi-calendar-check-fill",
+        onConfirm: () => {
+          closeConfirmModal();
+          executeBatchStatusUpdate("PROCESSED");
+        },
+      });
+    } else {
+      setConfirmModalConfig({
+        isOpen: true,
+        title: "Aggiorna Stato in Blocco",
+        message: `Vuoi impostare lo stato di ${count} preventivi su "${newStatus === "READ" ? "LETTO" : "IN ATTESA"}"?`,
+        confirmText: "Aggiorna Stato",
+        variant: "info",
+        icon: "bi-check2-all",
+        onConfirm: () => {
+          closeConfirmModal();
+          executeBatchStatusUpdate(newStatus);
+        },
+      });
+    }
+  };
+
+  const executeBatchDelete = async () => {
+    if (selectedQuoteIds.size === 0) return;
+    const ids = Array.from(selectedQuoteIds);
+    setActionError("");
+    try {
+      await Promise.all(
+        ids.map((id) =>
+          authApiFetch(
+            `${API_BASE_URL}/api/admin/quotes/${id}`,
+            { method: "DELETE" },
+            token,
+            dispatch
+          )
+        )
+      );
+      setAllQuotes((prev) => prev.filter((q) => !selectedQuoteIds.has(q.id)));
+      setSelectedQuoteIds(new Set());
+      dispatch(
+        setGlobalError({
+          message: `${ids.length} preventivi eliminati definitivamente con successo!`,
+          type: "success",
+          autoDismissMs: 4000,
+        })
+      );
+    } catch (err) {
+      setActionError(err.message || "Errore durante l'eliminazione di massa");
+    }
+  };
+
+  const handleBatchDelete = () => {
+    if (selectedQuoteIds.size === 0) return;
+    const count = selectedQuoteIds.size;
+    setConfirmModalConfig({
+      isOpen: true,
+      title: "Attenzione: Eliminazione di Massa",
+      message: `Sei assolutamente sicuro di voler eliminare definitivamente ${count} preventivi selezionati? L'azione rimuoverà tutte le relative pratiche e non potrà essere annullata.`,
+      confirmText: `Elimina ${count} Preventivi`,
+      variant: "danger",
+      icon: "bi-trash-fill",
+      onConfirm: () => {
+        closeConfirmModal();
+        executeBatchDelete();
+      },
+    });
+  };
+
+  // Apertura Chat WhatsApp con 1 Click e Messaggio Personalizzato
+  const handleOpenWhatsApp = (quote, e) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    if (!quote || !quote.telefono) {
+      dispatch(
+        setGlobalError({
+          message: "Numero di telefono non specificato per questo cliente.",
+          type: "warning",
+          autoDismissMs: 3000,
+        })
+      );
+      return;
+    }
+
+    let cleanPhone = quote.telefono.replace(/[^\d+]/g, "");
+    if (cleanPhone.startsWith("+")) {
+      cleanPhone = cleanPhone.substring(1);
+    } else if (cleanPhone.startsWith("00")) {
+      cleanPhone = cleanPhone.substring(2);
+    } else if (cleanPhone.startsWith("3") && cleanPhone.length === 10) {
+      cleanPhone = "39" + cleanPhone;
+    }
+
+    const eventDate = quote.dataEvento
+      ? new Date(quote.dataEvento).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" })
+      : "la data richiesta";
+
+    const greeting = `Ciao ${quote.nome}! Ti contatto da Vinco Eventi in merito alla tua richiesta di preventivo per l'evento "${quote.tipoEvento || "Evento"}" del ${eventDate}. Come possiamo aiutarti a renderlo indimenticabile?`;
+
+    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(greeting)}`;
+    window.open(url, "_blank");
   };
 
   // Conteggi KPI — calcolati in tempo reale sull'intero dataset
@@ -456,17 +622,34 @@ function AdminQuotes() {
               <table className="table table-hover table-custom-admin align-middle">
                 <thead className="admin-table-head">
                   <tr>
+                    <th style={{ width: "45px" }} className="text-center">
+                      <input
+                        type="checkbox"
+                        className="form-check-input cursor-pointer"
+                        checked={selectedQuoteIds.size === visibleQuotes.length && visibleQuotes.length > 0}
+                        onChange={handleSelectAllVisible}
+                        title="Seleziona / Deseleziona tutti i preventivi visibili"
+                      />
+                    </th>
                     <th style={{ width: "135px" }}>Data Richiesta</th>
                     <th style={{ width: "200px" }}>Cliente</th>
                     <th style={{ width: "240px" }}>Contatti</th>
                     <th style={{ width: "160px" }}>Evento</th>
                     <th style={{ width: "120px" }}>Stato</th>
-                    <th className="text-end" style={{ width: "160px" }}>Azioni</th>
+                    <th className="text-end" style={{ width: "190px" }}>Azioni</th>
                   </tr>
                 </thead>
                 <tbody>
                   {visibleQuotes.map((q) => (
-                    <tr key={q.id}>
+                    <tr key={q.id} className={selectedQuoteIds.has(q.id) ? "table-active border-start border-3 border-success" : ""}>
+                      <td className="text-center">
+                        <input
+                          type="checkbox"
+                          className="form-check-input cursor-pointer"
+                          checked={selectedQuoteIds.has(q.id)}
+                          onChange={() => handleToggleSelectQuote(q.id)}
+                        />
+                      </td>
                       <td className="small client-date-text text-nowrap">
                         <i className="bi bi-clock me-1"></i>
                         {new Date(q.dataRichiesta).toLocaleString("it-IT", {
@@ -551,6 +734,16 @@ function AdminQuotes() {
                             <i className="bi bi-eye-fill"></i>
                           </button>
 
+                          {q.telefono && (
+                            <button
+                              onClick={(e) => handleOpenWhatsApp(q, e)}
+                              className="btn btn-outline-whatsapp"
+                              title="Chat WhatsApp con il cliente (1-Click)"
+                            >
+                              <i className="bi bi-whatsapp"></i>
+                            </button>
+                          )}
+
                           {q.dataEvento && (
                             <button
                               onClick={() => setCalendarQuote(q)}
@@ -617,6 +810,12 @@ function AdminQuotes() {
                       {/* Card Header */}
                       <div className="quote-card-header d-flex justify-content-between align-items-center">
                         <div className="d-flex align-items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="form-check-input cursor-pointer me-1"
+                            checked={selectedQuoteIds.has(q.id)}
+                            onChange={() => handleToggleSelectQuote(q.id)}
+                          />
                           <div className="bg-success bg-opacity-10 text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style={{ width: 36, height: 36 }}>
                             <i className="bi bi-person-fill"></i>
                           </div>
@@ -713,6 +912,16 @@ function AdminQuotes() {
                       )}
 
                       <div className="admin-action-btn-group btn-group-sm">
+                        {q.telefono && (
+                          <button
+                            onClick={(e) => handleOpenWhatsApp(q, e)}
+                            className="btn btn-outline-whatsapp"
+                            title="Chat WhatsApp con il cliente (1-Click)"
+                          >
+                            <i className="bi bi-whatsapp"></i>
+                          </button>
+                        )}
+
                         {q.stato !== "PENDING" && (
                           <button
                             onClick={() => handleUpdateStatus(q.id, "PENDING")}
@@ -834,22 +1043,33 @@ function AdminQuotes() {
                       </a>
                     </p>
                   </div>
-                  <div className="col-12 col-md-6">
+                                <div className="col-12 col-md-6">
                     <span className="text-muted small fw-semibold d-block mb-1">Telefono:</span>
-                    <p className="mb-0 fw-semibold">
+                    <div className="d-flex flex-wrap align-items-center gap-2">
                       {selectedQuote.telefono ? (
-                        <a
-                          href={`tel:${selectedQuote.telefono.replace(/[^\d+]/g, "")}`}
-                          onClick={(e) => handlePhoneClick(e, selectedQuote.telefono)}
-                          className="text-decoration-none contact-chip-phone"
-                        >
-                          <i className="bi bi-telephone me-1"></i>
-                          {selectedQuote.telefono}
-                        </a>
+                        <>
+                          <a
+                            href={`tel:${selectedQuote.telefono.replace(/[^\d+]/g, "")}`}
+                            onClick={(e) => handlePhoneClick(e, selectedQuote.telefono)}
+                            className="text-decoration-none contact-chip-phone"
+                          >
+                            <i className="bi bi-telephone me-1"></i>
+                            {selectedQuote.telefono}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenWhatsApp(selectedQuote)}
+                            className="btn btn-sm btn-whatsapp py-1 px-3 d-inline-flex align-items-center gap-1 shadow-sm"
+                            title="Apri chat WhatsApp con messaggio precompilato"
+                          >
+                            <i className="bi bi-whatsapp"></i>
+                            <span>Scrivi su WhatsApp</span>
+                          </button>
+                        </>
                       ) : (
                         <span className="text-muted">Non specificato</span>
                       )}
-                    </p>
+                    </div>
                   </div>
 
                   <hr className="my-2" />
@@ -928,46 +1148,45 @@ function AdminQuotes() {
                     <div className="col-12 mt-2">
                       <div className="text-muted small d-flex align-items-center gap-2">
                         <span className="spinner-border spinner-border-sm text-success" role="status"></span>
-                        <span>Traduzione messaggio per Admin in corso...</span>
+                        <span>Traduzione automatica in corso...</span>
                       </div>
                     </div>
                   )}
 
-                  {/* Textarea 2: Impilata verticalmente sotto in col-12 */}
-                  {translatedText && !translating && (
-                    <div className="col-12 mt-3">
-                      <span className="text-muted small fw-semibold d-block mb-1">Traduzione Messaggio:</span>
+                  {translatedText && (
+                    <div className="col-12 mt-2">
+                      <span className="text-muted small fw-semibold d-block mb-1">
+                        <i className="bi bi-translate me-1 text-success"></i> Traduzione in Italiano:
+                      </span>
                       <div className="p-3 rounded bg-success bg-opacity-10 border border-success border-opacity-25">
-                        <div className="fw-bold text-success mb-1 small d-flex align-items-center gap-1">
-                          <i className="bi bi-translate"></i>
-                          <span>🇮🇹 Traduzione in Italiano per Admin:</span>
-                        </div>
-                        <p className="mb-0 text-success-emphasis" style={{ whiteSpace: "pre-wrap" }}>
-                          {translatedText}
+                        <p className="mb-0 text-body" style={{ whiteSpace: "pre-wrap" }}>
+                          {formatQuoteMessage(translatedText)}
                         </p>
                       </div>
                     </div>
                   )}
                 </div>
               </div>
-              <div className="modal-footer bg-body-tertiary d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <div className="d-flex flex-wrap align-items-center gap-2">
-                  <span className="small text-muted fw-semibold me-1">Cambia Stato:</span>
+              <div className="modal-footer bg-body-tertiary d-flex justify-content-between">
+                <div className="btn-group btn-group-sm">
                   <button
+                    type="button"
                     onClick={() => handleUpdateStatus(selectedQuote.id, "PENDING")}
-                    className={`btn btn-sm ${selectedQuote.stato === "PENDING" ? "btn-warning text-dark fw-bold disabled" : "btn-outline-warning"}`}
+                    className={`btn ${selectedQuote.stato === "PENDING" ? "btn-warning" : "btn-outline-warning"}`}
                   >
-                    <i className="bi bi-clock-history me-1"></i> In Attesa
+                    <i className="bi bi-hourglass-split me-1"></i> In Attesa
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleUpdateStatus(selectedQuote.id, "READ")}
-                    className={`btn btn-sm ${selectedQuote.stato === "READ" ? "btn-info text-white fw-bold disabled" : "btn-outline-info"}`}
+                    className={`btn ${selectedQuote.stato === "READ" ? "btn-info text-white" : "btn-outline-info"}`}
                   >
                     <i className="bi bi-envelope-open me-1"></i> Letto
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleUpdateStatus(selectedQuote.id, "PROCESSED")}
-                    className={`btn btn-sm ${selectedQuote.stato === "PROCESSED" ? "btn-success fw-bold disabled" : "btn-outline-success"}`}
+                    className={`btn ${selectedQuote.stato === "PROCESSED" ? "btn-success" : "btn-outline-success"}`}
                   >
                     <i className="bi bi-check-circle me-1"></i> Gestito
                   </button>
@@ -1003,6 +1222,59 @@ function AdminQuotes() {
           quote={calendarQuote}
           onClose={() => setCalendarQuote(null)}
         />
+      )}
+
+      {/* Floating Batch Action Bar per selezione multipla */}
+      {selectedQuoteIds.size > 0 && (
+        <div className="quotes-batch-action-bar d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div className="d-flex align-items-center gap-2">
+            <span className="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-3 py-2 rounded-pill font-monospace fw-bold fs-6">
+              <i className="bi bi-check2-square me-1"></i>
+              {selectedQuoteIds.size} {selectedQuoteIds.size === 1 ? "selezionato" : "selezionati"}
+            </span>
+          </div>
+
+          <div className="d-flex flex-wrap align-items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleBatchStatusUpdate("PROCESSED")}
+              className="btn btn-sm btn-success d-inline-flex align-items-center gap-1 rounded-pill px-3 fw-semibold shadow-sm"
+              title="Segna i preventivi selezionati come Gestiti / Confermati e inseriscili in Agenda"
+            >
+              <i className="bi bi-calendar-check-fill"></i>
+              <span>Segna Gestiti</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleBatchStatusUpdate("READ")}
+              className="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1 rounded-pill px-3 fw-semibold"
+              title="Segna come Letti"
+            >
+              <i className="bi bi-envelope-open"></i>
+              <span>Segna Letti</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleBatchDelete}
+              className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 rounded-pill px-3 fw-semibold"
+              title="Elimina definitivamente i preventivi selezionati"
+            >
+              <i className="bi bi-trash-fill"></i>
+              <span>Elimina</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleClearSelection}
+              className="btn btn-sm btn-outline-secondary rounded-pill px-3"
+              title="Annulla selezione"
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

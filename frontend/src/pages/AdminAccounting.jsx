@@ -156,6 +156,12 @@ export default function AdminAccounting() {
   const [uploadingPdf, setUploadingPdf] = useState(false);
   const [isDraggingPdf, setIsDraggingPdf] = useState(false);
   const [openingPdfId, setOpeningPdfId] = useState(null);
+  const [inlinePdfModal, setInlinePdfModal] = useState({
+    open: false,
+    url: null,
+    title: "",
+    eventId: null,
+  });
   const fileInputRef = useRef(null);
 
   // Previene l'apertura automatica del browser se un file viene trascinato ovunque nella finestra
@@ -417,7 +423,98 @@ export default function AdminAccounting() {
     });
   };
 
-  // Apertura e visualizzazione garantita del Contratto PDF tramite Blob nativo
+  // Esportazione Bilancio ed Eventi in formato CSV compatibile Excel Italiano (UTF-8 con BOM)
+  const handleExportCsv = () => {
+    if (!events || events.length === 0) {
+      dispatch(
+        setGlobalError({
+          message: "Nessun evento contabile presente per il periodo selezionato da esportare.",
+          type: "info",
+        })
+      );
+      return;
+    }
+
+    const headers = [
+      "ID Evento",
+      "Titolo Evento",
+      "Data Inizio",
+      "Data Fine",
+      "Nome Cliente",
+      "Cognome Cliente",
+      "Email Cliente",
+      "Telefono Cliente",
+      "Location",
+      "Tipo Evento",
+      "Importo Lordo (€)",
+      "Totale Spese (€)",
+      "Totale Netto (€)",
+      "Dettaglio Spese Fornitori",
+      "Presenza DJ Set Admin",
+      "Nome File Contratto",
+      "Note / Dettagli"
+    ];
+
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const rows = events.map((ev) => {
+      let speseStr = "";
+      try {
+        if (ev.speseJson) {
+          const parsed = typeof ev.speseJson === "string" ? JSON.parse(ev.speseJson) : ev.speseJson;
+          if (Array.isArray(parsed)) {
+            speseStr = parsed.map((s) => `${s.descrizione || "Spesa"}: €${(s.importo || 0)}`).join(" | ");
+          }
+        }
+      } catch (_) {
+        speseStr = "";
+      }
+
+      return [
+        escapeCsv(ev.id || ""),
+        escapeCsv(ev.titolo || ""),
+        escapeCsv(ev.dataEvento || ""),
+        escapeCsv(ev.dataFineEvento || ev.dataEvento || ""),
+        escapeCsv(ev.clienteNome || ""),
+        escapeCsv(ev.clienteCognome || ""),
+        escapeCsv(ev.clienteEmail || ""),
+        escapeCsv(ev.clienteTelefono || ""),
+        escapeCsv(ev.location || ""),
+        escapeCsv(ev.tipoEvento || ""),
+        escapeCsv(Number(ev.importoLordo || 0).toFixed(2).replace(".", ",")),
+        escapeCsv(Number(ev.totaleSpese || 0).toFixed(2).replace(".", ",")),
+        escapeCsv(Number(ev.totaleNetto || 0).toFixed(2).replace(".", ",")),
+        escapeCsv(speseStr),
+        escapeCsv(ev.hasDjSet ? "Sì (Enzo Colaluca)" : "No"),
+        escapeCsv(ev.contrattoNomeFile || "Nessun Contratto"),
+        escapeCsv(ev.note || "")
+      ].join(";");
+    });
+
+    const csvContent = "\uFEFF" + [headers.join(";"), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const periodLabel = selectedMonth === 0 ? `Anno_${currentYear}` : `Mese_${selectedMonth}_${currentYear}`;
+    link.setAttribute("href", url);
+    link.setAttribute("download", `VincoEventi_Bilancio_${periodLabel}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    dispatch(
+      setGlobalError({
+        message: `Report contabile (${periodLabel}) esportato con successo in formato Excel/CSV!`,
+        type: "success",
+      })
+    );
+  };
+
+  // Apertura e visualizzazione garantita del Contratto PDF tramite Modal Viewer integrato
   const handleOpenContractPdf = async (ev) => {
     if (!ev || !ev.id) return;
     setOpeningPdfId(ev.id);
@@ -440,7 +537,12 @@ export default function AdminAccounting() {
       const blob = await res.blob();
       const pdfBlob = new Blob([blob], { type: "application/pdf" });
       const blobUrl = URL.createObjectURL(pdfBlob);
-      window.open(blobUrl, "_blank");
+      setInlinePdfModal({
+        open: true,
+        url: blobUrl,
+        title: ev.contrattoNomeFile || "Contratto_Cliente.pdf",
+        eventId: ev.id,
+      });
     } catch (err) {
       dispatch(
         setGlobalError({
@@ -829,8 +931,8 @@ export default function AdminAccounting() {
               ))}
             </div>
 
-            {/* Toggle Vista e Nuovo Evento */}
-            <div className="d-flex align-items-center gap-2">
+            {/* Toggle Vista, Esporta Excel e Nuovo Evento */}
+            <div className="d-flex flex-wrap align-items-center gap-2">
               <div className="btn-group btn-group-sm">
                 <button
                   className={`btn ${viewMode === "calendar" ? "btn-success" : "btn-outline-secondary"}`}
@@ -848,8 +950,18 @@ export default function AdminAccounting() {
               </div>
 
               <button
+                type="button"
+                onClick={handleExportCsv}
+                className="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1 shadow-sm"
+                title="Esporta bilancio ed eventi in formato Excel / CSV compatibile con commercialista"
+              >
+                <i className="bi bi-file-earmark-excel-fill text-success"></i>
+                <span>Esporta Excel</span>
+              </button>
+
+              <button
                 onClick={() => handleOpenNewModal()}
-                className="btn btn-success btn-sm rounded-pill px-3 fw-bold"
+                className="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm"
               >
                 <i className="bi bi-plus-lg me-1"></i> Nuovo Evento
               </button>
@@ -2014,6 +2126,90 @@ export default function AdminAccounting() {
                   onClick={() => setDayEventsModal({ isOpen: false, dateStr: "", events: [] })}
                 >
                   Chiudi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODALE VISUALIZZATORE PDF INLINE ENTERPRISE */}
+      {inlinePdfModal.open && (
+        <div
+          className="modal fade show d-block"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.8)", zIndex: 1065 }}
+          tabIndex="-1"
+          role="dialog"
+        >
+          <div className="modal-dialog modal-xl modal-dialog-centered" style={{ maxWidth: "95vw", height: "92vh" }}>
+            <div className="modal-content h-100 border-0 shadow-lg d-flex flex-column rounded-4 overflow-hidden">
+              <div className="modal-header bg-dark text-white border-bottom border-secondary border-opacity-25 py-2 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div className="d-flex align-items-center gap-2 min-w-0 overflow-hidden">
+                  <div className="bg-danger bg-opacity-25 p-1 rounded text-danger d-flex align-items-center justify-content-center">
+                    <i className="bi bi-file-earmark-pdf-fill fs-5"></i>
+                  </div>
+                  <div className="min-w-0">
+                    <h6 className="modal-title fw-bold text-truncate mb-0 fs-6 text-white" title={inlinePdfModal.title}>
+                      {inlinePdfModal.title}
+                    </h6>
+                    <small className="text-success d-flex align-items-center gap-1 font-monospace" style={{ fontSize: "0.75rem" }}>
+                      <i className="bi bi-shield-check"></i> Documento Verificato &amp; Archiviato
+                    </small>
+                  </div>
+                </div>
+
+                <div className="d-flex align-items-center gap-2">
+                  <a
+                    href={inlinePdfModal.url}
+                    download={inlinePdfModal.title || "Contratto.pdf"}
+                    className="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1"
+                    title="Scarica file PDF"
+                  >
+                    <i className="bi bi-download"></i>
+                    <span className="d-none d-sm-inline">Scarica</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => window.open(inlinePdfModal.url, "_blank")}
+                    className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+                    title="Apri in una nuova scheda"
+                  >
+                    <i className="bi bi-box-arrow-up-right"></i>
+                    <span className="d-none d-sm-inline">Nuova Scheda</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-close btn-close-white"
+                    onClick={() => {
+                      if (inlinePdfModal.url) URL.revokeObjectURL(inlinePdfModal.url);
+                      setInlinePdfModal({ open: false, url: null, title: "", eventId: null });
+                    }}
+                    aria-label="Chiudi"
+                  ></button>
+                </div>
+              </div>
+
+              <div className="modal-body p-0 flex-grow-1 bg-secondary bg-opacity-10 position-relative">
+                <iframe
+                  src={inlinePdfModal.url}
+                  className="w-100 h-100 border-0"
+                  title="Anteprima PDF Contratto"
+                />
+              </div>
+
+              <div className="modal-footer bg-dark border-top border-secondary border-opacity-25 py-2 px-3 d-flex justify-content-between align-items-center">
+                <small className="text-secondary d-none d-md-block">
+                  Vinco Eventi • Gestione Contabile e Contratti Ufficiali
+                </small>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary px-4 rounded-pill"
+                  onClick={() => {
+                    if (inlinePdfModal.url) URL.revokeObjectURL(inlinePdfModal.url);
+                    setInlinePdfModal({ open: false, url: null, title: "", eventId: null });
+                  }}
+                >
+                  Chiudi Anteprima
                 </button>
               </div>
             </div>

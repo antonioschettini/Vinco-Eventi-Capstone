@@ -507,6 +507,56 @@ export default function AdminAudit() {
   }, []);
 
   // ─────────────────────────────────────────
+  // Esportazione Log Errori Audit in CSV
+  // ─────────────────────────────────────────
+  const handleExportAuditCsv = () => {
+    if (!errors || errors.length === 0) {
+      dispatch(
+        setGlobalError({
+          message: "Nessun log errori disponibile per il periodo selezionato.",
+          type: "info",
+          autoDismissMs: 4000,
+        })
+      );
+      return;
+    }
+
+    const headers = ["Data e Ora", "Status Code", "Metodo HTTP", "Endpoint", "Messaggio Errore", "IP Client"];
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const rows = errors.map((err) => [
+      escapeCsv(formatDateTime(err.timestamp || err.createdAt)),
+      escapeCsv(err.status || err.statusCode || ""),
+      escapeCsv(err.method || ""),
+      escapeCsv(err.path || err.endpoint || ""),
+      escapeCsv(err.message || err.error || ""),
+      escapeCsv(err.ipAddress || err.clientIp || "—")
+    ].join(";"));
+
+    const csvContent = "\uFEFF" + [headers.join(";"), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `VincoEventi_Audit_Errors_${activeDays}d.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    dispatch(
+      setGlobalError({
+        message: "Log audit errori esportato con successo in formato CSV!",
+        type: "success",
+        autoDismissMs: 4000,
+      })
+    );
+  };
+
+  // ─────────────────────────────────────────
   // Metriche derivate
   // ─────────────────────────────────────────
   const totalVisits = stats?.totalVisits ?? 0;
@@ -539,19 +589,31 @@ export default function AdminAudit() {
               </p>
             </div>
 
-            <div className="audit-filter-bar" role="group" aria-label="Filtro periodo">
-              {RANGE_PRESETS.map((p) => (
-                <button
-                  key={p.days}
-                  id={`audit-range-${p.days}`}
-                  className={`audit-filter-btn${activeDays === p.days ? " active" : ""}`}
-                  onClick={() => applyPreset(p.days)}
-                  aria-pressed={activeDays === p.days}
-                  type="button"
-                >
-                  {p.label}
-                </button>
-              ))}
+            <div className="d-flex flex-wrap align-items-center gap-2">
+              <div className="audit-filter-bar" role="group" aria-label="Filtro periodo">
+                {RANGE_PRESETS.map((p) => (
+                  <button
+                    key={p.days}
+                    id={`audit-range-${p.days}`}
+                    className={`audit-filter-btn${activeDays === p.days ? " active" : ""}`}
+                    onClick={() => applyPreset(p.days)}
+                    aria-pressed={activeDays === p.days}
+                    type="button"
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleExportAuditCsv}
+                className="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1 shadow-sm"
+                title="Esporta log errori in formato CSV"
+              >
+                <i className="bi bi-file-earmark-excel-fill text-success"></i>
+                <span>Esporta CSV</span>
+              </button>
             </div>
           </div>
 
