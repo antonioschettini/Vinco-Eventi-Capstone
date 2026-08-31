@@ -16,6 +16,24 @@ let audioCtx = null;
 let gainNode = null;
 let sourceNode = null;
 let currentGainVolume = 0.50;
+let userHasInteracted = false;
+
+// Sblocca la Web Audio API e l'AudioContext al primo tocco o click dell'utente
+if (typeof window !== "undefined") {
+  const unlockAudioContext = () => {
+    userHasInteracted = true;
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume().catch(() => {});
+    }
+    window.removeEventListener("click", unlockAudioContext);
+    window.removeEventListener("touchstart", unlockAudioContext);
+    window.removeEventListener("keydown", unlockAudioContext);
+  };
+
+  window.addEventListener("click", unlockAudioContext, { passive: true });
+  window.addEventListener("touchstart", unlockAudioContext, { passive: true });
+  window.addEventListener("keydown", unlockAudioContext, { passive: true });
+}
 
 export function registerAudioElement(el) {
   globalAudioElement = el;
@@ -28,21 +46,27 @@ export function getAudioElement() {
   return globalAudioElement;
 }
 
-export function getAudioContext() {
-  if (!audioCtx) {
+export function getAudioContext(forceCreate = false) {
+  // Crea l'AudioContext solo dopo la prima interazione utente (o se forzato da un'azione esplicita come play/slider)
+  // per rispettare le policy di autoplay di Chrome/Safari ed evitare avvisi in console.
+  if (!audioCtx && (userHasInteracted || forceCreate)) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (AudioContextClass) {
-      audioCtx = new AudioContextClass();
+      try {
+        audioCtx = new AudioContextClass();
+      } catch (_) {
+        // Ignora se non supportato
+      }
     }
   }
   return audioCtx;
 }
 
-export function initAudioGain(audioElement) {
+export function initAudioGain(audioElement, isUserAction = false) {
   const el = audioElement || getAudioElement();
   if (!el) return;
   try {
-    const ctx = getAudioContext();
+    const ctx = getAudioContext(isUserAction);
     if (!ctx) return;
 
     if (ctx.state === "suspended") {
@@ -56,17 +80,16 @@ export function initAudioGain(audioElement) {
       sourceNode.connect(gainNode);
       gainNode.connect(ctx.destination);
     }
-  } catch (e) {
-    // Se già collegato o non supportato, non bloccare
-    console.warn("[WebAudio] GainNode setup notice:", e.message || e);
+  } catch (_) {
+    // Se già collegato o inizializzazione differita, gestisce silenziosamente
   }
 }
 
-export function setAudioGain(volume) {
+export function setAudioGain(volume, isUserAction = false) {
   const safeVol = Math.max(0, Math.min(1, typeof volume === "number" ? volume : 0.50));
   currentGainVolume = safeVol;
 
-  // 1. Aggiorna volume standard HTML5 per desktop e browser Android che lo supportano
+  // 1. Aggiorna volume standard HTML5 per desktop e browser Android
   const audio = getAudioElement();
   if (audio) {
     try {
@@ -77,15 +100,15 @@ export function setAudioGain(volume) {
   }
 
   // 2. Aggiorna GainNode Web Audio API per iOS Safari e mobile
-  const ctx = getAudioContext();
+  const ctx = getAudioContext(isUserAction);
   if (ctx && gainNode) {
     try {
       if (ctx.state === "suspended") {
         ctx.resume().catch(() => {});
       }
       gainNode.gain.setValueAtTime(safeVol, ctx.currentTime);
-    } catch (e) {
-      console.warn("[WebAudio] Set gain error:", e);
+    } catch (_) {
+      // Fallback silenzioso
     }
   }
 }
@@ -93,16 +116,19 @@ export function setAudioGain(volume) {
 export function playAudioSync() {
   const audio = getAudioElement();
   if (audio) {
-    initAudioGain(audio);
+    initAudioGain(audio, true);
     try {
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
-          console.warn("[iOS Audio Sync] Riproduzione in attesa di sblocco:", err);
+          // Ignora AbortError fisiologico (es. cambio rapido traccia o navigazione)
+          if (err && err.name !== "AbortError" && err.name !== "NotAllowedError") {
+            console.info("[Audio] Riproduzione in attesa:", err.message || err);
+          }
         });
       }
-    } catch (e) {
-      console.warn("[iOS Audio Sync] Errore sync play:", e);
+    } catch (_) {
+      // Fallback sincrono silenzioso
     }
   }
 }
@@ -112,8 +138,8 @@ export function pauseAudioSync() {
   if (audio && !audio.paused) {
     try {
       audio.pause();
-    } catch (e) {
-      console.warn("[iOS Audio Sync] Errore sync pause:", e);
+    } catch (_) {
+      // Fallback silenzioso
     }
   }
 }
