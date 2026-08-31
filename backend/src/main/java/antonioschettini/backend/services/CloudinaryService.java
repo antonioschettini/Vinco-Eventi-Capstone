@@ -96,7 +96,55 @@ public class CloudinaryService {
                     .connectTimeout(Duration.ofSeconds(10))
                     .build();
 
-            // 1. Tenta con resource_type: raw
+            // 1. Tenta con privateDownload (resource_type: raw)
+            try {
+                if (cloudinary != null) {
+                    String downloadUrl = cloudinary.privateDownload(targetPublicId, "", ObjectUtils.asMap(
+                            "resource_type", "raw",
+                            "type", "upload"
+                    ));
+
+                    if (downloadUrl != null && !downloadUrl.isBlank()) {
+                        HttpRequest req = HttpRequest.newBuilder()
+                                .uri(URI.create(downloadUrl))
+                                .timeout(Duration.ofSeconds(20))
+                                .GET()
+                                .build();
+                        HttpResponse<byte[]> res = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
+                        if (res.statusCode() == 200 && res.body() != null && res.body().length > 0) {
+                            return res.body();
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                System.err.println("[WARN CloudinaryService] Download via privateDownload raw: " + ex.getMessage());
+            }
+
+            // 2. Tenta con privateDownload (resource_type: image)
+            try {
+                if (cloudinary != null) {
+                    String downloadUrl = cloudinary.privateDownload(targetPublicId, "pdf", ObjectUtils.asMap(
+                            "resource_type", "image",
+                            "type", "upload"
+                    ));
+
+                    if (downloadUrl != null && !downloadUrl.isBlank()) {
+                        HttpRequest req = HttpRequest.newBuilder()
+                                .uri(URI.create(downloadUrl))
+                                .timeout(Duration.ofSeconds(20))
+                                .GET()
+                                .build();
+                        HttpResponse<byte[]> res = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
+                        if (res.statusCode() == 200 && res.body() != null && res.body().length > 0) {
+                            return res.body();
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                System.err.println("[WARN CloudinaryService] Download via privateDownload image: " + ex.getMessage());
+            }
+
+            // 3. Tenta con signed URL
             try {
                 if (cloudinary != null && cloudinary.url() != null) {
                     String downloadUrl = cloudinary.url()
@@ -118,36 +166,10 @@ public class CloudinaryService {
                     }
                 }
             } catch (Exception ex) {
-                System.err.println("[WARN CloudinaryService] Download via signed url raw: " + ex.getMessage());
+                // ignore
             }
 
-            // 2. Tenta con resource_type: image
-            try {
-                if (cloudinary != null && cloudinary.url() != null) {
-                    String downloadUrl = cloudinary.url()
-                            .resourceType("image")
-                            .type("upload")
-                            .format("pdf")
-                            .signed(true)
-                            .generate(targetPublicId);
-
-                    if (downloadUrl != null && !downloadUrl.isBlank()) {
-                        HttpRequest req = HttpRequest.newBuilder()
-                                .uri(URI.create(downloadUrl))
-                                .timeout(Duration.ofSeconds(20))
-                                .GET()
-                                .build();
-                        HttpResponse<byte[]> res = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
-                        if (res.statusCode() == 200 && res.body() != null && res.body().length > 0) {
-                            return res.body();
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                System.err.println("[WARN CloudinaryService] Download via signed url image: " + ex.getMessage());
-            }
-
-            // 3. Tenta con secure_url diretto se fallbackUrl è presente
+            // 4. Tenta con secure_url diretto se fallbackUrl è presente
             if (fallbackUrl != null && fallbackUrl.startsWith("http")) {
                 try {
                     HttpRequest req = HttpRequest.newBuilder()
@@ -165,7 +187,7 @@ public class CloudinaryService {
             }
         }
 
-        // 4. Fallback locale se presente in uploads
+        // 5. Fallback locale se presente in uploads
         if (fallbackUrl != null && fallbackUrl.contains("uploads")) {
             try {
                 String relative = fallbackUrl.substring(fallbackUrl.indexOf("uploads"));

@@ -429,12 +429,12 @@ export default function AdminAccounting() {
       });
 
       if (!res.ok) {
-        // Fallback diretto sull'URL registrato se presente
-        if (ev.contrattoUrl) {
-          window.open(ev.contrattoUrl, "_blank", "noopener,noreferrer");
-          return;
-        }
-        throw new Error("Impossibile recuperare il file PDF del contratto.");
+        let errMsg = "Impossibile recuperare il file PDF del contratto.";
+        try {
+          const errJson = await res.json();
+          if (errJson && errJson.message) errMsg = errJson.message;
+        } catch (_) {}
+        throw new Error(errMsg);
       }
 
       const blob = await res.blob();
