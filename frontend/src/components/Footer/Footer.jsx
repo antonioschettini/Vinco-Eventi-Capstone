@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 import { translations } from "../../utils/translations";
 import footerBgImage from "../../assets/Vinco Eventi assets/assets immagini/Consolle e cuffia.webp";
 import useScrollReveal from "../../utils/useScrollReveal";
@@ -171,11 +172,21 @@ function Footer() {
                 </a>
               </div>
 
-              {/* Diritti Riservati con Anno Dinamico */}
-              <div className="copyright footer-copyright-divider pt-4 mt-2">
+              {/* Diritti Riservati con Anno Dinamico & Accesso Riservato */}
+              <div className="copyright footer-copyright-divider pt-4 mt-2 d-flex flex-column flex-sm-row justify-content-center align-items-center gap-2">
                 <p className="footer-copyright-text small mb-0">
                   {t.rights || `© ${new Date().getFullYear()} VINCO EVENTI. ${t.allRightsReserved || "Tutti i diritti riservati."}`}
                 </p>
+                <span className="text-secondary opacity-50 d-none d-sm-inline">•</span>
+                <Link
+                  to="/admin-enzo"
+                  className="footer-admin-link text-decoration-none text-secondary opacity-75 small d-inline-flex align-items-center gap-1"
+                  title="Area Riservata Amministratore"
+                  aria-label="Area Riservata Amministratore"
+                >
+                  <i className="bi bi-shield-lock-fill"></i>
+                  <span>Area Riservata</span>
+                </Link>
               </div>
             </div>
           </Col>

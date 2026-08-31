@@ -31,5 +31,21 @@
   "theme_color": "#0d1b1e",
   "background_color": "#000000",
   "display": "standalone",
-  "orientation": "portrait-primary"
+  "orientation": "portrait-primary",
+  "shortcuts": [
+    {
+      "name": "Dashboard Preventivi",
+      "short_name": "Preventivi",
+      "description": "Gestione Preventivi Vinco Eventi",
+      "url": "/admin-enzo/preventivi",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Agenda & Contabilità",
+      "short_name": "Agenda",
+      "description": "Gestione Agenda e Bilancio",
+      "url": "/admin-enzo/agenda",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    }
+  ]
 }
