@@ -564,7 +564,9 @@ export default function AdminAccounting() {
         try {
           const errJson = await res.json();
           if (errJson && errJson.message) errMsg = errJson.message;
-        } catch (_) {}
+        } catch {
+          // Fallback al messaggio di errore predefinito se non è un json
+        }
         throw new Error(errMsg);
       }
 
