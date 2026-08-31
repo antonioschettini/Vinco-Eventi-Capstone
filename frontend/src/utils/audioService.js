@@ -15,7 +15,7 @@ let globalAudioElement = null;
 let audioCtx = null;
 let gainNode = null;
 let sourceNode = null;
-let currentGainVolume = 0.20;
+let currentGainVolume = 0.50;
 
 export function registerAudioElement(el) {
   globalAudioElement = el;
@@ -63,7 +63,7 @@ export function initAudioGain(audioElement) {
 }
 
 export function setAudioGain(volume) {
-  const safeVol = Math.max(0, Math.min(1, typeof volume === "number" ? volume : 0.20));
+  const safeVol = Math.max(0, Math.min(1, typeof volume === "number" ? volume : 0.50));
   currentGainVolume = safeVol;
 
   // 1. Aggiorna volume standard HTML5 per desktop e browser Android che lo supportano

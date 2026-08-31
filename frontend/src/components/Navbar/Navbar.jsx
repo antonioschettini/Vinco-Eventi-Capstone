@@ -275,6 +275,11 @@ function Navbar() {
                 setAudioGain(val);
               }}
               className="top-volume-slider"
+              aria-label="Regola volume audio"
+              aria-valuenow={Math.round((isMuted ? 0 : volume) * 100)}
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuetext={`${Math.round((isMuted ? 0 : volume) * 100)}%`}
               title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
             />
           </div>

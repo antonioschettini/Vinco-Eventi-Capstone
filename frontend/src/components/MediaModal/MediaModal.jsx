@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Modal } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { setIsPlaying } from "../../redux/slices/audioSlice";
+import { setIsPlaying, setVideoVolume } from "../../redux/slices/audioSlice";
 import { translations, getCategoryLabel } from "../../utils/translations";
 import { getOptimizedCloudinaryUrl } from "../../utils/cloudinary";
 import { triggerHapticFeedback } from "../../utils/vibration";
@@ -11,15 +11,28 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
   const dispatch = useDispatch();
   const lang = useSelector((state) => state.ui.language);
   const isAudioPlaying = useSelector((state) => state.audio.isPlaying);
+  const videoVolume = useSelector((state) => state.audio.videoVolume ?? 0.50);
   const t = translations[lang].gallery;
 
   const currentMedia = items && items[currentIndex] ? items[currentIndex] : null;
 
   const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     setVideoError(false);
   }, [show, currentIndex]);
+
+  // Inizializza il volume del video con il valore memorizzato su Redux (default 50% iniziale o preferenza utente)
+  useEffect(() => {
+    if (show && currentMedia && currentMedia.type === "video" && videoRef.current) {
+      try {
+        videoRef.current.volume = typeof videoVolume === "number" ? videoVolume : 0.50;
+      } catch {
+        /* ignore volume error */
+      }
+    }
+  }, [show, currentMedia, videoVolume]);
 
   const isAudioPlayingRef = useRef(isAudioPlaying);
   const wasAudioPlayingRef = useRef(false);
@@ -50,6 +63,16 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
       }
     }
   }, [show, currentMedia, dispatch]);
+
+  // Cleanup difensivo allo smontaggio del modale se il video era aperto
+  useEffect(() => {
+    return () => {
+      if (wasAudioPlayingRef.current) {
+        wasAudioPlayingRef.current = false;
+        dispatch(setIsPlaying(true));
+      }
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     if (!show || !items || items.length === 0) return;
@@ -217,9 +240,7 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
           <div className="media-display-wrapper d-flex justify-content-center align-items-center w-100 h-100">
             {currentMedia.type === "video" && !videoError ? (
               <video
-                ref={(el) => {
-                  if (el) el.volume = 0.2;
-                }}
+                ref={videoRef}
                 key={currentMedia.id || currentMedia.src}
                 src={currentMedia.startTime ? `${modalMediaUrl}#t=${currentMedia.startTime}` : modalMediaUrl}
                 poster={posterUrl}
@@ -228,6 +249,20 @@ function MediaModal({ show, onHide, items, currentIndex, onNavigate }) {
                 loop
                 preload="metadata"
                 playsInline
+                onLoadedMetadata={(e) => {
+                  if (e.target) {
+                    try {
+                      e.target.volume = typeof videoVolume === "number" ? videoVolume : 0.50;
+                    } catch {
+                      /* ignore */
+                    }
+                  }
+                }}
+                onVolumeChange={(e) => {
+                  if (e.target && !e.target.muted) {
+                    dispatch(setVideoVolume(e.target.volume));
+                  }
+                }}
                 onError={() => setVideoError(true)}
                 className="media-player-element rounded-3"
               />

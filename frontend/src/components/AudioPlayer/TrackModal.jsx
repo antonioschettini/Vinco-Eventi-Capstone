@@ -9,7 +9,7 @@ import {
   setIsModalOpen,
   setModalPosition,
 } from "../../redux/slices/audioSlice";
-import { toggleAudioSync } from "../../utils/audioService";
+import { toggleAudioSync, setAudioGain } from "../../utils/audioService";
 import { translations } from "../../utils/translations";
 import tracks from "../../data/tracksData";
 import "./TrackModal.css";
@@ -228,8 +228,18 @@ function TrackModal() {
             max="1"
             step="0.01"
             value={isMuted ? 0 : volume}
-            onChange={(e) => dispatch(setVolume(parseFloat(e.target.value)))}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value);
+              dispatch(setVolume(val));
+              setAudioGain(val);
+            }}
             className="form-range volume-range flex-grow-1"
+            aria-label="Regola volume audio"
+            aria-valuenow={Math.round((isMuted ? 0 : volume) * 100)}
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuetext={`${Math.round((isMuted ? 0 : volume) * 100)}%`}
+            title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
           />
           <span className="volume-percent extra-small fw-semibold text-muted">
             {isMuted ? "0%" : `${Math.round(volume * 100)}%`}

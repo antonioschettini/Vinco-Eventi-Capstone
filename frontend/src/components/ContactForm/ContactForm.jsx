@@ -757,14 +757,14 @@ function ContactForm() {
               tabIndex={8}
               value={formData.cittaLocation}
               onChange={handleChange}
-              placeholder={t.cityNamePlaceholder || "Es. Monopoli"}
+              placeholder={t.cityNamePlaceholder || "Es. Roma"}
               className={`form-control font-body ${
                 validated && !isValidCityName(formData.cittaLocation) ? "is-invalid" : ""
               }`}
               required
             />
             <div className="invalid-feedback">
-              {t.validationGuidance?.cittaLocation || t.cityNameError || "Inserisci una città o località valida (es. Monopoli)."}
+              {t.validationGuidance?.cittaLocation || t.cityNameError || "Inserisci una città o località valida (es. Roma)."}
             </div>
           </div>
         </div>

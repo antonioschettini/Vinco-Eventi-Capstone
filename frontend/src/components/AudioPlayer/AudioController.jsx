@@ -52,7 +52,15 @@ function AudioController() {
         audio.pause();
       }
     }
-  }, [isPlaying, dispatch]);
+
+    if ("mediaSession" in navigator) {
+      try {
+        navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+      } catch {
+        /* ignore legacy mediaSession playbackState error */
+      }
+    }
+  }, [isPlaying]);
 
   // Sincronizza il volume cross-device con Web Audio GainNode & HTML5 volume
   useEffect(() => {
@@ -76,31 +84,36 @@ function AudioController() {
 
     // Integrazione Media Session API (Controlli mobile da schermata di blocco, tasti volume ed auto/bluetooth)
     if ("mediaSession" in navigator) {
-      navigator.mediaSession.metadata = new window.MediaMetadata({
-        title: currentTrack.title,
-        artist: currentTrack.artist || "Vincenzo Colaluca",
-        album: "VINCO EVENTI",
-        artwork: [
-          {
-            src: currentTrack.cover,
-            sizes: "512x512",
-            type: "image/jpeg",
-          },
-        ],
-      });
+      try {
+        navigator.mediaSession.metadata = new window.MediaMetadata({
+          title: currentTrack.title,
+          artist: currentTrack.artist || "Vincenzo Colaluca",
+          album: "VINCO EVENTI",
+          artwork: [
+            {
+              src: currentTrack.cover,
+              sizes: "512x512",
+              type: "image/jpeg",
+            },
+          ],
+        });
 
-      navigator.mediaSession.setActionHandler("play", () =>
-        dispatch(setIsPlaying(true))
-      );
-      navigator.mediaSession.setActionHandler("pause", () =>
-        dispatch(setIsPlaying(false))
-      );
-      navigator.mediaSession.setActionHandler("previoustrack", () =>
-        dispatch(prevTrack(tracks.length))
-      );
-      navigator.mediaSession.setActionHandler("nexttrack", () =>
-        dispatch(nextTrack(tracks.length))
-      );
+        const setSafeHandler = (action, handler) => {
+          try {
+            navigator.mediaSession.setActionHandler(action, handler);
+          } catch {
+            /* ignore unsupported mediaSession action */
+          }
+        };
+
+        setSafeHandler("play", () => dispatch(setIsPlaying(true)));
+        setSafeHandler("pause", () => dispatch(setIsPlaying(false)));
+        setSafeHandler("previoustrack", () => dispatch(prevTrack(tracks.length)));
+        setSafeHandler("nexttrack", () => dispatch(nextTrack(tracks.length)));
+        setSafeHandler("stop", () => dispatch(setIsPlaying(false)));
+      } catch (e) {
+        console.warn("[MediaSession] Setup notice:", e);
+      }
     }
   }, [currentTrackIndex, currentTrack, isPlaying, dispatch]);
 

@@ -165,7 +165,11 @@ function MobileBottomPlayer() {
                 value={isMuted ? 0 : volume}
                 onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
                 className="mobile-volume-slider flex-grow-1"
-                aria-label="Slider Volume"
+                aria-label="Regola volume audio"
+                aria-valuenow={Math.round((isMuted ? 0 : volume) * 100)}
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuetext={`${Math.round((isMuted ? 0 : volume) * 100)}%`}
               />
               <button
                 type="button"

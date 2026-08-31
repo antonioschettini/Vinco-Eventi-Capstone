@@ -50,7 +50,7 @@ public record QuoteRequestDTO(
         @Size(min = 4, max = 150, message = "La location deve contenere tra 4 e 150 caratteri")
         @Pattern(
                 regexp = "^[^,=<>;$%\\*|\\\\{}]{2,80},\\s*[^,=<>;$%\\*|\\\\{}]{2,50}$",
-                message = "Il luogo dell'evento deve contenere Nome Struttura e Città/Località validi separati da virgola (es. Villa Belvedere, Monopoli), senza simboli speciali o numeri di injection"
+                message = "Il luogo dell'evento deve contenere Nome Struttura e Città/Località validi separati da virgola (es. Villa Belvedere, Roma), senza simboli speciali o numeri di injection"
         )
         String location,
 

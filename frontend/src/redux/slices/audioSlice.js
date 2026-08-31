@@ -2,12 +2,13 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isPlaying: false,
-  volume: 0.20, // Default 20%
+  volume: 0.50, // Default 50%
   currentTrackIndex: 0,
   isModalOpen: false,
   autoplayBlocked: true,
   isMuted: false,
-  prevVolume: 0.20,
+  prevVolume: 0.50, // Memorizza sempre l'ultimo volume non nullo impostato dall'utente
+  videoVolume: 0.50, // Default 50% per video in galleria, memorizzato su Redux
   modalPosition: null, // { x: number, y: number } per persistere la posizione del modale trascinabile
 };
 
@@ -26,17 +27,23 @@ export const audioSlice = createSlice({
       state.volume = vol;
       if (vol > 0) {
         state.isMuted = false;
+        state.prevVolume = vol;
+      } else {
+        state.isMuted = true;
       }
     },
     toggleMute: (state) => {
-      if (state.isMuted) {
+      if (state.isMuted || state.volume === 0) {
         state.isMuted = false;
-        state.volume = state.prevVolume || 0.20;
+        state.volume = state.prevVolume > 0 ? state.prevVolume : 0.50;
       } else {
-        state.prevVolume = state.volume;
+        state.prevVolume = state.volume > 0 ? state.volume : (state.prevVolume || 0.50);
         state.isMuted = true;
         state.volume = 0;
       }
+    },
+    setVideoVolume: (state, action) => {
+      state.videoVolume = Math.max(0, Math.min(1, action.payload));
     },
     setCurrentTrackIndex: (state, action) => {
       state.currentTrackIndex = action.payload;
@@ -70,6 +77,7 @@ export const {
   togglePlay,
   setVolume,
   toggleMute,
+  setVideoVolume,
   setCurrentTrackIndex,
   nextTrack,
   prevTrack,
