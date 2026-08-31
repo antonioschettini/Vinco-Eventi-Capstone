@@ -1655,7 +1655,7 @@ export default function AdminAccounting() {
                   <div className="mb-4">
                     {editingEvent?.contrattoUrl ? (
                       <div className="pdf-badge-card p-3">
-                        <div className="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3">
+                        <div className="d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
                           <div className="d-flex align-items-center gap-3 min-w-0 flex-grow-1 overflow-hidden">
                             <div className="pdf-icon-wrapper flex-shrink-0 text-danger d-flex align-items-center justify-content-center">
                               <i className="bi bi-file-earmark-pdf-fill fs-3"></i>
