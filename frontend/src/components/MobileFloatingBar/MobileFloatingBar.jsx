@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { translations } from "../../utils/translations";
 import { handlePhoneClick } from "../../utils/contactHelpers";
 import { triggerHapticFeedback } from "../../utils/vibration";
 import "./MobileFloatingBar.css";
 
 function MobileFloatingBar() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
   const lang = useSelector((state) => state.ui.language);
   const t = translations[lang]?.footer || translations.it.footer;
   const [isVisible, setIsVisible] = useState(false);
@@ -54,7 +57,7 @@ function MobileFloatingBar() {
     setIsOpen(false);
   };
 
-  if (!isVisible) return null;
+  if (isAdminRoute || !isVisible) return null;
 
   return (
     <div

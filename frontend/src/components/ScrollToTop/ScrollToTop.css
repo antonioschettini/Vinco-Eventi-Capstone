@@ -100,3 +100,9 @@
   }
 }
 
+/* Offset dinamico anti-collisione con la barra batch selection admin */
+body:has(.quotes-batch-action-bar) .scroll-to-top-btn {
+  bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+  transition: bottom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

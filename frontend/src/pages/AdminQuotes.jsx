@@ -465,7 +465,7 @@ function AdminQuotes() {
   const remainingQuotesCount = filteredQuotes.length - visibleCount;
 
   return (
-    <div className="container admin-quotes-page">
+    <div className={`container admin-quotes-page ${selectedQuoteIds.size > 0 ? "quotes-batch-active" : ""}`}>
       {/* Sub-Navigazione Tab per passare tra Preventivi, Agenda ed Audit */}
       <AdminSubnav activeTab="preventivi" />
 
@@ -809,6 +809,31 @@ function AdminQuotes() {
 
           {/* 3. VISTA MOBILE / TABLET: Card Responsive Grid (< 992px) */}
           <div className="d-block d-lg-none">
+            {/* Toolbar di Selezione Multipla Rapida per Mobile & Tablet */}
+            <div className="mobile-selection-toolbar mb-3 p-2 px-3 rounded-3 border bg-body-tertiary shadow-sm d-flex align-items-center justify-content-between">
+              <div className="form-check mb-0 d-flex align-items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="form-check-input cursor-pointer"
+                  id="mobileSelectAllQuotes"
+                  checked={selectedQuoteIds.size === visibleQuotes.length && visibleQuotes.length > 0}
+                  onChange={handleSelectAllVisible}
+                />
+                <label htmlFor="mobileSelectAllQuotes" className="form-check-label small fw-bold text-body user-select-none cursor-pointer">
+                  Seleziona tutti ({visibleQuotes.length})
+                </label>
+              </div>
+              {selectedQuoteIds.size > 0 && (
+                <button
+                  type="button"
+                  onClick={handleClearSelection}
+                  className="btn btn-link btn-sm text-secondary text-decoration-none p-0 small fw-semibold"
+                >
+                  Deseleziona ({selectedQuoteIds.size})
+                </button>
+              )}
+            </div>
+
             <div className="row g-3">
               {visibleQuotes.map((q) => (
                 <div className="col-12 col-md-6" key={q.id}>
@@ -1191,8 +1216,7 @@ function AdminQuotes() {
                     <i className="bi bi-envelope-open me-1"></i> Letto
                   </button>
                   <button
-                    type="button"
-                    onClick={() => handleUpdateStatus(selectedQuote.id, "PROCESSED")}
+                    typ                    onClick={() => handleUpdateStatus(selectedQuote.id, "PROCESSED")}
                     className={`btn ${selectedQuote.stato === "PROCESSED" ? "btn-success" : "btn-outline-success"}`}
                   >
                     <i className="bi bi-check-circle me-1"></i> Gestito
@@ -1233,50 +1257,55 @@ function AdminQuotes() {
 
       {/* Floating Batch Action Bar per selezione multipla */}
       {selectedQuoteIds.size > 0 && (
-        <div className="quotes-batch-action-bar d-flex align-items-center justify-content-between flex-wrap gap-2">
-          <div className="d-flex align-items-center gap-2">
-            <span className="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-3 py-2 rounded-pill font-monospace fw-bold fs-6">
+        <div className="quotes-batch-action-bar d-flex align-items-center justify-content-between gap-2" role="region" aria-label="Azioni di massa preventivi">
+          <div className="d-flex align-items-center gap-1 min-w-0">
+            <span className="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 px-sm-3 py-1 py-sm-2 rounded-pill font-monospace fw-bold fs-6 text-nowrap">
               <i className="bi bi-check2-square me-1"></i>
-              {selectedQuoteIds.size} {selectedQuoteIds.size === 1 ? "selezionato" : "selezionati"}
+              <span>{selectedQuoteIds.size}</span>
+              <span className="d-none d-sm-inline ms-1">{selectedQuoteIds.size === 1 ? "selezionato" : "selezionati"}</span>
             </span>
           </div>
 
-          <div className="d-flex flex-wrap align-items-center gap-2">
+          <div className="d-flex align-items-center gap-1 gap-sm-2 flex-nowrap">
             <button
               type="button"
               onClick={() => handleBatchStatusUpdate("PROCESSED")}
-              className="btn btn-sm btn-success d-inline-flex align-items-center gap-1 rounded-pill px-3 fw-semibold shadow-sm"
+              className="btn btn-sm btn-success d-inline-flex align-items-center gap-1 rounded-pill px-2 px-sm-3 fw-semibold shadow-sm text-nowrap"
               title="Segna i preventivi selezionati come Gestiti / Confermati e inseriscili in Agenda"
             >
               <i className="bi bi-calendar-check-fill"></i>
-              <span>Segna Gestiti</span>
+              <span className="d-none d-sm-inline">Segna </span>
+              <span>Gestiti</span>
             </button>
 
             <button
               type="button"
               onClick={() => handleBatchStatusUpdate("READ")}
-              className="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1 rounded-pill px-3 fw-semibold"
+              className="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1 rounded-pill px-2 px-sm-3 fw-semibold text-nowrap"
               title="Segna come Letti"
             >
               <i className="bi bi-envelope-open"></i>
-              <span>Segna Letti</span>
+              <span className="d-none d-sm-inline">Segna </span>
+              <span>Letti</span>
             </button>
 
             <button
               type="button"
               onClick={handleBatchDelete}
-              className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 rounded-pill px-3 fw-semibold"
+              className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 rounded-pill px-2 px-sm-3 fw-semibold text-nowrap"
               title="Elimina definitivamente i preventivi selezionati"
             >
               <i className="bi bi-trash-fill"></i>
-              <span>Elimina</span>
+              <span className="d-none d-sm-inline">Elimina</span>
             </button>
 
             <button
               type="button"
               onClick={handleClearSelection}
-              className="btn btn-sm btn-outline-secondary rounded-pill px-3"
+              className="btn btn-sm btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-0 flex-shrink-0"
+              style={{ width: "32px", height: "32px" }}
               title="Annulla selezione"
+              aria-label="Annulla selezione"
             >
               <i className="bi bi-x-lg"></i>
             </button>
