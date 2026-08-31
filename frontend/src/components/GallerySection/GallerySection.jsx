@@ -7,6 +7,8 @@ import { getOptimizedCloudinaryUrl } from "../../utils/cloudinary";
 import API_BASE_URL from "../../config/api";
 import { authApiFetch } from "../../utils/apiClient";
 import MediaModal from "../MediaModal/MediaModal";
+import AdminConfirmModal from "../Admin/AdminConfirmModal";
+import { setGlobalError } from "../../redux/slices/uiSlice";
 import imageCompression from "browser-image-compression";
 import "./GallerySection.css";
 
@@ -165,6 +167,11 @@ function GallerySection() {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState({
+    isOpen: false,
+    mediaId: null,
+    mediaTitle: "",
+  });
 
   const [formData, setFormData] = useState({
     titleIta: "",
@@ -487,15 +494,38 @@ function GallerySection() {
 
       setShowAdminModal(false);
       setEditingItem(null);
+      dispatch(
+        setGlobalError({
+          message: editingItem
+            ? "Elemento multimediale aggiornato con successo!"
+            : "Nuovo elemento multimediale aggiunto alla galleria!",
+          type: "success",
+        })
+      );
       fetchGalleryItems();
     } catch (err) {
-      alert(err.message || "Errore nel salvataggio dell'elemento della galleria.");
+      dispatch(
+        setGlobalError({
+          message: err.message || "Errore nel salvataggio dell'elemento della galleria.",
+          type: "danger",
+        })
+      );
     }
   };
 
-  const handleDeleteItem = async (e, id) => {
+  const handleDeleteItemClick = (e, item) => {
     e.stopPropagation();
-    if (!window.confirm(t.confirmDeleteMedia)) return;
+    setDeleteConfirmModal({
+      isOpen: true,
+      mediaId: item.id,
+      mediaTitle: item.title || item.titleIta || item.titleEng || `Media #${item.id}`,
+    });
+  };
+
+  const handleConfirmDeleteMedia = async () => {
+    if (!deleteConfirmModal.mediaId) return;
+    const id = deleteConfirmModal.mediaId;
+    setDeleteConfirmModal({ isOpen: false, mediaId: null, mediaTitle: "" });
 
     try {
       await authApiFetch(
@@ -504,9 +534,20 @@ function GallerySection() {
         token,
         dispatch
       );
+      dispatch(
+        setGlobalError({
+          message: "Elemento multimediale eliminato con successo!",
+          type: "success",
+        })
+      );
       fetchGalleryItems();
     } catch (err) {
-      alert(err.message || "Errore di connessione durante l'eliminazione.");
+      dispatch(
+        setGlobalError({
+          message: err.message || "Errore durante l'eliminazione del media.",
+          type: "danger",
+        })
+      );
     }
   };
 
@@ -800,7 +841,7 @@ function GallerySection() {
                       <i className="bi bi-pencil-fill"></i>
                     </button>
                     <button
-                      onClick={(e) => handleDeleteItem(e, item.id)}
+                      onClick={(e) => handleDeleteItemClick(e, item)}
                       className="btn btn-danger btn-sm py-1 px-2 shadow-sm rounded-2"
                       title={t.deleteMedia}
                     >
@@ -1099,6 +1140,18 @@ function GallerySection() {
             </form>
           </Modal>
         )}
+        {/* Modale Custom di Conferma Eliminazione Media Galleria */}
+        <AdminConfirmModal
+          isOpen={deleteConfirmModal.isOpen}
+          title="Elimina Elemento Multimediale"
+          message={`Sei sicuro di voler eliminare definitivamente l'elemento "${deleteConfirmModal.mediaTitle}" dalla galleria? Questa azione non può essere annullata.`}
+          confirmText="Elimina Media"
+          cancelText="Annulla"
+          variant="danger"
+          icon="bi-trash3-fill"
+          onConfirm={handleConfirmDeleteMedia}
+          onCancel={() => setDeleteConfirmModal({ isOpen: false, mediaId: null, mediaTitle: "" })}
+        />
       </Container>
     </section>
   );

@@ -14,6 +14,7 @@ import { apiFetch, authApiFetch } from "../utils/apiClient";
 import { getOptimizedCloudinaryUrl } from "../utils/cloudinary";
 import ErrorBanner from "../components/ErrorBanner/ErrorBanner";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
+import AdminConfirmModal from "../components/Admin/AdminConfirmModal";
 import { handlePhoneClick, handleEmailClick } from "../utils/contactHelpers";
 import imageCompression from "browser-image-compression";
 import useScrollReveal from "../utils/useScrollReveal";
@@ -33,6 +34,11 @@ function Services() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState({
+    isOpen: false,
+    serviceId: null,
+    serviceTitle: "",
+  });
 
   // Form state per Modifica / Aggiunta Servizio da parte dell'Admin
   const [formData, setFormData] = useState({
@@ -217,8 +223,10 @@ function Services() {
     }
   };
 
-  const handleDeleteService = async (id) => {
-    if (!window.confirm(t.adminActions.confirmDelete)) return;
+  const handleConfirmDeleteService = async () => {
+    if (!deleteConfirmModal.serviceId) return;
+    const id = deleteConfirmModal.serviceId;
+    setDeleteConfirmModal({ isOpen: false, serviceId: null, serviceTitle: "" });
     setErrorMsg("");
     setSuccessMsg("");
     try {
@@ -389,7 +397,13 @@ function Services() {
                             <i className="bi bi-pencil-fill"></i> Modifica
                           </button>
                           <button
-                            onClick={() => handleDeleteService(pkg.id)}
+                            onClick={() =>
+                              setDeleteConfirmModal({
+                                isOpen: true,
+                                serviceId: pkg.id,
+                                serviceTitle: title || pkg.titleIta || "Pacchetto",
+                              })
+                            }
                             className="btn btn-danger btn-sm d-flex align-items-center gap-1"
                             title="Elimina pacchetto"
                           >
@@ -627,6 +641,18 @@ function Services() {
           </div>
         </div>
       )}
+      {/* Modale Custom di Conferma Eliminazione Pacchetto Servizio */}
+      <AdminConfirmModal
+        isOpen={deleteConfirmModal.isOpen}
+        title="Elimina Pacchetto Servizio"
+        message={`Sei sicuro di voler eliminare definitivamente il pacchetto "${deleteConfirmModal.serviceTitle}"? Questa azione non può essere annullata.`}
+        confirmText="Elimina Pacchetto"
+        cancelText="Annulla"
+        variant="danger"
+        icon="bi-trash3-fill"
+        onConfirm={handleConfirmDeleteService}
+        onCancel={() => setDeleteConfirmModal({ isOpen: false, serviceId: null, serviceTitle: "" })}
+      />
     </div>
   );
 }
