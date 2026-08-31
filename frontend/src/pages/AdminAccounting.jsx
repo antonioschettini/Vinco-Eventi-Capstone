@@ -6,6 +6,7 @@ import { setGlobalError, setTaxSettings } from "../redux/slices/uiSlice";
 import { handleEmailClick, handlePhoneClick } from "../utils/contactHelpers";
 import AdminConfirmModal from "../components/Admin/AdminConfirmModal";
 import AdminSubnav from "../components/Admin/AdminSubnav";
+import PdfViewerModal from "../components/Admin/PdfViewerModal";
 import "./AdminAccounting.css";
 
 const MONTH_NAMES = [
@@ -2166,89 +2167,16 @@ export default function AdminAccounting() {
         </div>
       )}
 
-      {/* MODALE VISUALIZZATORE PDF INLINE ENTERPRISE */}
-      {inlinePdfModal.open && (
-        <div
-          className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.8)", zIndex: 1065 }}
-          tabIndex="-1"
-          role="dialog"
-        >
-          <div className="modal-dialog modal-xl modal-dialog-centered" style={{ maxWidth: "95vw", height: "92vh" }}>
-            <div className="modal-content h-100 border-0 shadow-lg d-flex flex-column rounded-4 overflow-hidden">
-              <div className="modal-header bg-dark text-white border-bottom border-secondary border-opacity-25 py-2 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div className="d-flex align-items-center gap-2 min-w-0 overflow-hidden">
-                  <div className="bg-danger bg-opacity-25 p-1 rounded text-danger d-flex align-items-center justify-content-center">
-                    <i className="bi bi-file-earmark-pdf-fill fs-5"></i>
-                  </div>
-                  <div className="min-w-0">
-                    <h6 className="modal-title fw-bold text-truncate mb-0 fs-6 text-white" title={inlinePdfModal.title}>
-                      {inlinePdfModal.title}
-                    </h6>
-                    <small className="text-success d-flex align-items-center gap-1 font-monospace" style={{ fontSize: "0.75rem" }}>
-                      <i className="bi bi-shield-check"></i> Documento Verificato &amp; Archiviato
-                    </small>
-                  </div>
-                </div>
-
-                <div className="d-flex align-items-center gap-2">
-                  <a
-                    href={inlinePdfModal.url}
-                    download={inlinePdfModal.title || "Contratto.pdf"}
-                    className="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1"
-                    title="Scarica file PDF"
-                  >
-                    <i className="bi bi-download"></i>
-                    <span className="d-none d-sm-inline">Scarica</span>
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => window.open(inlinePdfModal.url, "_blank")}
-                    className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
-                    title="Apri in una nuova scheda"
-                  >
-                    <i className="bi bi-box-arrow-up-right"></i>
-                    <span className="d-none d-sm-inline">Nuova Scheda</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-close btn-close-white"
-                    onClick={() => {
-                      if (inlinePdfModal.url) URL.revokeObjectURL(inlinePdfModal.url);
-                      setInlinePdfModal({ open: false, url: null, title: "", eventId: null });
-                    }}
-                    aria-label="Chiudi"
-                  ></button>
-                </div>
-              </div>
-
-              <div className="modal-body p-0 flex-grow-1 bg-secondary bg-opacity-10 position-relative">
-                <iframe
-                  src={inlinePdfModal.url}
-                  className="w-100 h-100 border-0"
-                  title="Anteprima PDF Contratto"
-                />
-              </div>
-
-              <div className="modal-footer bg-dark border-top border-secondary border-opacity-25 py-2 px-3 d-flex justify-content-between align-items-center">
-                <small className="text-secondary d-none d-md-block">
-                  Vinco Eventi • Gestione Contabile e Contratti Ufficiali
-                </small>
-                <button
-                  type="button"
-                  className="btn btn-sm btn-secondary px-4 rounded-pill"
-                  onClick={() => {
-                    if (inlinePdfModal.url) URL.revokeObjectURL(inlinePdfModal.url);
-                    setInlinePdfModal({ open: false, url: null, title: "", eventId: null });
-                  }}
-                >
-                  Chiudi Anteprima
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* MODALE VISUALIZZATORE PDF CANVAS INLINE ENTERPRISE CROSS-DEVICE */}
+      <PdfViewerModal
+        isOpen={inlinePdfModal.open}
+        pdfBlobUrl={inlinePdfModal.url}
+        title={inlinePdfModal.title}
+        onClose={() => {
+          if (inlinePdfModal.url) URL.revokeObjectURL(inlinePdfModal.url);
+          setInlinePdfModal({ open: false, url: null, title: "", eventId: null });
+        }}
+      />
     </div>
   );
 }
