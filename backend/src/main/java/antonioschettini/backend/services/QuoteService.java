@@ -22,9 +22,6 @@ public class QuoteService {
     private EmailService emailService;
 
     @Autowired
-    private WhatsAppNotificationService whatsAppNotificationService;
-
-    @Autowired
     private AccountingService accountingService;
 
     public QuoteRequest createQuote(QuoteRequestDTO dto) {
@@ -47,10 +44,9 @@ public class QuoteService {
 
         QuoteRequest saved = quoteRepository.save(quote);
 
-        // Invio notifiche email e push WhatsApp in background/async
+        // Invio notifiche email trasparenti in background/async
         emailService.sendQuoteNotificationEmail(saved);
         emailService.sendConfirmationEmailToClient(saved);
-        whatsAppNotificationService.sendQuoteNotificationToAdmin(saved);
 
         return saved;
     }

@@ -8,7 +8,6 @@ import antonioschettini.backend.repositories.QuoteRequestRepository;
 import antonioschettini.backend.services.AccountingService;
 import antonioschettini.backend.services.EmailService;
 import antonioschettini.backend.services.QuoteService;
-import antonioschettini.backend.services.WhatsAppNotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,9 +29,6 @@ class QuoteServiceTest {
 
     @Mock
     private EmailService emailService;
-
-    @Mock
-    private WhatsAppNotificationService whatsAppNotificationService;
 
     @Mock
     private AccountingService accountingService;
@@ -79,7 +75,6 @@ class QuoteServiceTest {
 
         verify(emailService).sendQuoteNotificationEmail(any(QuoteRequest.class));
         verify(emailService).sendConfirmationEmailToClient(any(QuoteRequest.class));
-        verify(whatsAppNotificationService).sendQuoteNotificationToAdmin(any(QuoteRequest.class));
     }
 
     @Test
