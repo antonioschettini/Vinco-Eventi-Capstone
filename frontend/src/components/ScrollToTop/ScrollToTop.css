@@ -106,3 +106,9 @@ body:has(.quotes-batch-action-bar) .scroll-to-top-btn {
   transition: bottom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Offset dinamico anti-collisione con il Popover del Volume Mobile Audio */
+body:has(.mobile-volume-popover) .scroll-to-top-btn {
+  transform: translateY(-56px) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

@@ -457,11 +457,23 @@ export default function AdminAccounting() {
 
     const escapeCsv = (val) => {
       if (val === null || val === undefined) return '""';
-      const str = String(val).replace(/"/g, '""');
+      const str = String(val).replace(/\r\n|\r|\n/g, " ").replace(/"/g, '""').trim();
       return `"${str}"`;
     };
 
+    let totalLordo = 0;
+    let totalSpese = 0;
+    let totalNetto = 0;
+
     const rows = events.map((ev) => {
+      const lordo = Number(ev.importoLordo || 0);
+      const spese = Number(ev.totaleSpese || 0);
+      const netto = Number(ev.totaleNetto || 0);
+
+      totalLordo += lordo;
+      totalSpese += spese;
+      totalNetto += netto;
+
       let speseStr = "";
       try {
         if (ev.speseJson) {
@@ -485,9 +497,9 @@ export default function AdminAccounting() {
         escapeCsv(ev.clienteTelefono || ""),
         escapeCsv(ev.location || ""),
         escapeCsv(ev.tipoEvento || ""),
-        escapeCsv(Number(ev.importoLordo || 0).toFixed(2).replace(".", ",")),
-        escapeCsv(Number(ev.totaleSpese || 0).toFixed(2).replace(".", ",")),
-        escapeCsv(Number(ev.totaleNetto || 0).toFixed(2).replace(".", ",")),
+        escapeCsv(lordo.toFixed(2).replace(".", ",")),
+        escapeCsv(spese.toFixed(2).replace(".", ",")),
+        escapeCsv(netto.toFixed(2).replace(".", ",")),
         escapeCsv(speseStr),
         escapeCsv(ev.hasDjSet ? "Sì (Enzo Colaluca)" : "No"),
         escapeCsv(ev.contrattoNomeFile || "Nessun Contratto"),
@@ -495,7 +507,28 @@ export default function AdminAccounting() {
       ].join(";");
     });
 
-    const csvContent = "\uFEFF" + [headers.join(";"), ...rows].join("\r\n");
+    // Riga di riepilogo totali per commercialista e audit
+    const summaryRow = [
+      escapeCsv("TOTALI RIEPILOGO"),
+      escapeCsv(`Totale Eventi: ${events.length}`),
+      escapeCsv(""),
+      escapeCsv(""),
+      escapeCsv(""),
+      escapeCsv(""),
+      escapeCsv(""),
+      escapeCsv(""),
+      escapeCsv(""),
+      escapeCsv("BILANCIO"),
+      escapeCsv(totalLordo.toFixed(2).replace(".", ",")),
+      escapeCsv(totalSpese.toFixed(2).replace(".", ",")),
+      escapeCsv(totalNetto.toFixed(2).replace(".", ",")),
+      escapeCsv(""),
+      escapeCsv(""),
+      escapeCsv(""),
+      escapeCsv("")
+    ].join(";");
+
+    const csvContent = "\uFEFF" + [headers.join(";"), ...rows, summaryRow].join("\r\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
