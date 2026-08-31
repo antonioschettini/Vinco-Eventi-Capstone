@@ -524,6 +524,8 @@
   padding: 0.85rem 1rem;
   transition: all 0.2s ease;
   min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .pdf-icon-wrapper {
@@ -534,10 +536,24 @@
   border-radius: 8px;
 }
 
+.pdf-action-buttons {
+  gap: 0.5rem;
+}
+
 .pdf-action-buttons .btn {
   border-radius: 6px;
   font-size: 0.85rem;
   white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+  .pdf-action-buttons {
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+  .pdf-action-buttons .btn {
+    flex: 1 1 0;
+  }
 }
 
 .pdf-save-warning-alert {

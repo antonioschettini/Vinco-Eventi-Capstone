@@ -1398,7 +1398,7 @@ export default function AdminAccounting() {
               </div>
 
               <form onSubmit={handleSaveEvent} className="d-flex flex-column flex-grow-1 overflow-hidden" style={{ minHeight: 0 }}>
-                <div className="modal-body p-4 flex-grow-1 overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
+                <div className="modal-body p-4 flex-grow-1 overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: "thin" }}>
                   
                   {/* BOX PARTECIPAZIONE DJ SET ADMIN (ENZO) */}
                   <div className="dj-switch-box mb-4">
@@ -1425,9 +1425,11 @@ export default function AdminAccounting() {
                   <h6 className="fw-bold text-secondary mb-3 text-uppercase small border-bottom pb-2">
                     1. Informazioni Evento, Date & Cliente
                   </h6>
-                  <div className="row g-3 mb-4">
+                  <div className="row g-3 mb-4 align-items-end">
                     <div className="col-12 col-md-6">
-                      <label className="form-label small fw-bold">Titolo Evento *</label>
+                      <label className="form-label small fw-bold d-block mb-1 text-truncate" title="Titolo Evento">
+                        Titolo Evento *
+                      </label>
                       <input
                         type="text"
                         className="form-control rounded-3"
@@ -1438,8 +1440,10 @@ export default function AdminAccounting() {
                       />
                     </div>
 
-                    <div className="col-12 col-md-3">
-                      <label className="form-label small fw-bold">Data Inizio Evento *</label>
+                    <div className="col-12 col-sm-6 col-md-3">
+                      <label className="form-label small fw-bold d-block mb-1 text-truncate" title="Data Inizio Evento">
+                        Data Inizio Evento *
+                      </label>
                       <input
                         type="date"
                         className="form-control rounded-3"
@@ -1456,8 +1460,10 @@ export default function AdminAccounting() {
                       />
                     </div>
 
-                    <div className="col-12 col-md-3">
-                      <label className="form-label small fw-bold">Data Fine Evento (Multi-Giorno)</label>
+                    <div className="col-12 col-sm-6 col-md-3">
+                      <label className="form-label small fw-bold d-block mb-1 text-truncate" title="Data Fine Evento (Multi-Giorno)">
+                        Data Fine Evento
+                      </label>
                       <input
                         type="date"
                         className="form-control rounded-3"
@@ -1648,53 +1654,56 @@ export default function AdminAccounting() {
                   </h6>
                   <div className="mb-4">
                     {editingEvent?.contrattoUrl ? (
-                      <div className="pdf-badge-card d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 p-3">
-                        <div className="d-flex align-items-center gap-3 min-w-0 flex-grow-1 overflow-hidden">
-                          <div className="pdf-icon-wrapper flex-shrink-0 text-danger d-flex align-items-center justify-content-center">
-                            <i className="bi bi-file-earmark-pdf-fill fs-3"></i>
-                          </div>
-                          <div className="min-w-0 flex-grow-1 overflow-hidden">
-                            <div
-                              className="fw-bold text-body text-truncate"
-                              title={editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}
-                            >
-                              {editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}
+                      <div className="pdf-badge-card p-3">
+                        <div className="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3">
+                          <div className="d-flex align-items-center gap-3 min-w-0 flex-grow-1 overflow-hidden">
+                            <div className="pdf-icon-wrapper flex-shrink-0 text-danger d-flex align-items-center justify-content-center">
+                              <i className="bi bi-file-earmark-pdf-fill fs-3"></i>
                             </div>
-                            <small className="text-success fw-bold d-flex align-items-center gap-1 mt-1 text-truncate">
-                              <i className="bi bi-check-circle-fill flex-shrink-0"></i>
-                              <span>Contratto Persistente Caricato</span>
-                            </small>
+                            <div className="min-w-0 flex-grow-1 overflow-hidden" style={{ minWidth: 0 }}>
+                              <div
+                                className="fw-bold text-body text-truncate"
+                                title={editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}
+                                style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                              >
+                                {editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}
+                              </div>
+                              <small className="text-success fw-bold d-flex align-items-center gap-1 mt-1 text-truncate">
+                                <i className="bi bi-check-circle-fill flex-shrink-0"></i>
+                                <span>Contratto Persistente Caricato</span>
+                              </small>
+                            </div>
                           </div>
-                        </div>
-                        <div className="pdf-action-buttons d-flex align-items-center gap-2 flex-shrink-0 align-self-end align-self-sm-center">
-                          <button
-                            type="button"
-                            disabled={openingPdfId === editingEvent.id}
-                            onClick={() => handleOpenContractPdf(editingEvent)}
-                            className="btn btn-sm btn-success d-inline-flex align-items-center gap-1 px-3 py-1 fw-semibold text-nowrap shadow-sm"
-                            title="Apri e visualizza il contratto PDF"
-                          >
-                            {openingPdfId === editingEvent.id ? (
-                              <>
-                                <span className="spinner-border spinner-border-sm" role="status"></span>
-                                <span>Apertura...</span>
-                              </>
-                            ) : (
-                              <>
-                                <i className="bi bi-eye-fill"></i>
-                                <span>Apri PDF</span>
-                              </>
-                            )}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleDeleteContract}
-                            className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 px-3 py-1 fw-semibold text-nowrap"
-                            title="Elimina contratto"
-                          >
-                            <i className="bi bi-trash-fill"></i>
-                            <span>Elimina</span>
-                          </button>
+                          <div className="pdf-action-buttons d-flex align-items-center gap-2 flex-shrink-0 justify-content-end">
+                            <button
+                              type="button"
+                              disabled={openingPdfId === editingEvent.id}
+                              onClick={() => handleOpenContractPdf(editingEvent)}
+                              className="btn btn-sm btn-success d-inline-flex align-items-center justify-content-center gap-1 px-3 py-1 fw-semibold text-nowrap shadow-sm"
+                              title="Apri e visualizza il contratto PDF"
+                            >
+                              {openingPdfId === editingEvent.id ? (
+                                <>
+                                  <span className="spinner-border spinner-border-sm" role="status"></span>
+                                  <span>Apertura...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <i className="bi bi-eye-fill"></i>
+                                  <span>Apri PDF</span>
+                                </>
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleDeleteContract}
+                              className="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center gap-1 px-3 py-1 fw-semibold text-nowrap"
+                              title="Elimina contratto"
+                            >
+                              <i className="bi bi-trash-fill"></i>
+                              <span>Elimina</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ) : (
