@@ -1648,29 +1648,30 @@ export default function AdminAccounting() {
                   </h6>
                   <div className="mb-4">
                     {editingEvent?.contrattoUrl ? (
-                      <div className="pdf-badge-card d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 p-3">
-                        <div className="d-flex align-items-center gap-3 min-w-0 flex-grow-1 overflow-hidden">
+                      <div className="pdf-badge-card d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 p-3 w-100">
+                        <div className="pdf-info-container d-flex align-items-center gap-3 min-w-0 flex-grow-1 overflow-hidden w-100">
                           <div className="pdf-icon-wrapper flex-shrink-0 text-danger d-flex align-items-center justify-content-center">
                             <i className="bi bi-file-earmark-pdf-fill fs-3"></i>
                           </div>
-                          <div className="min-w-0 flex-grow-1 overflow-hidden">
+                          <div className="pdf-text-wrapper min-w-0 flex-grow-1 overflow-hidden">
                             <div
-                              className="fw-bold text-body text-truncate"
+                              className="pdf-filename fw-bold text-body text-truncate"
                               title={editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}
                             >
                               {editingEvent.contrattoNomeFile || "Contratto_Cliente.pdf"}
                             </div>
-                            <small className="text-success fw-bold d-flex align-items-center gap-1 mt-1">
-                              <i className="bi bi-check-circle-fill"></i> Contratto Persistente Caricato
+                            <small className="text-success fw-bold d-flex align-items-center gap-1 mt-1 text-truncate">
+                              <i className="bi bi-check-circle-fill flex-shrink-0"></i>
+                              <span className="text-truncate">Contratto Persistente Caricato</span>
                             </small>
                           </div>
                         </div>
-                        <div className="pdf-action-buttons d-flex align-items-center gap-2 flex-shrink-0 align-self-end align-self-sm-center">
+                        <div className="pdf-action-buttons d-flex align-items-center gap-2 flex-shrink-0 w-100 w-sm-auto justify-content-end">
                           <button
                             type="button"
                             disabled={openingPdfId === editingEvent.id}
                             onClick={() => handleOpenContractPdf(editingEvent)}
-                            className="btn btn-sm btn-success d-inline-flex align-items-center gap-1 px-3 py-1 fw-semibold text-nowrap"
+                            className="btn btn-sm btn-success d-inline-flex align-items-center justify-content-center gap-1 px-3 py-1 fw-semibold text-nowrap flex-grow-1 flex-sm-grow-0 shadow-sm"
                             title="Apri e visualizza il contratto PDF"
                           >
                             {openingPdfId === editingEvent.id ? (
@@ -1688,7 +1689,7 @@ export default function AdminAccounting() {
                           <button
                             type="button"
                             onClick={handleDeleteContract}
-                            className="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 px-3 py-1 fw-semibold text-nowrap"
+                            className="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center gap-1 px-3 py-1 fw-semibold text-nowrap flex-grow-1 flex-sm-grow-0"
                             title="Elimina contratto"
                           >
                             <i className="bi bi-trash-fill"></i>
