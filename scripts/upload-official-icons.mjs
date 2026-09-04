@@ -9,9 +9,9 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 
 cloudinary.config({
-  cloud_name: "fzdamrbc",
-  api_key: "872756552472583",
-  api_secret: "G4iDrYWiciby7uTGUDPE59ZPOU4",
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
   secure: true,
 });
 

@@ -13,15 +13,15 @@ const { Client } = pg;
 
 const BACKEND_URL = process.env.LIVE_BACKEND_URL || "http://localhost:8080";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "vincoeventi@gmail.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "RipBigVincoEventi!";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Configurazione PostgreSQL Locale
 const localPgConfig = {
-  host: "localhost",
-  port: 5432,
-  database: "vincoeventi",
-  user: "postgres",
-  password: "1234",
+  host: process.env.DB_HOST || "localhost",
+  port: Number(process.env.DB_PORT) || 5432,
+  database: process.env.DB_NAME || "vincoeventi",
+  user: process.env.DB_USER || "postgres",
+  password: process.env.DB_PASSWORD || "",
 };
 
 // 32 Elementi della Galleria 100% Verificati ed Allineati Visualmente

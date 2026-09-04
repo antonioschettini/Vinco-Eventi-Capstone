@@ -7,9 +7,9 @@
 
 import fetch from "node-fetch";
 
-const LIVE_URL = "https://vinco-eventi-backend.onrender.com";
-const ADMIN_EMAIL = "vincoeventi@gmail.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "RipBigVincoEventi!";
+const LIVE_URL = process.env.LIVE_BACKEND_URL || "https://vinco-eventi-backend.onrender.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "vincoeventi@gmail.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

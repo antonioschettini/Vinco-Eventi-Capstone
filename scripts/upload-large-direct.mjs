@@ -20,9 +20,9 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Credenziali Cloudinary
 cloudinary.config({
-  cloud_name: "y9rfpsut",
-  api_key: "712925246641983",
-  api_secret: "sUsI55biRKpJdV4187_q9Dasp0c",
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
   secure: true,
 });
 

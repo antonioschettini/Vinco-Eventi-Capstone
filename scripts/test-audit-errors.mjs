@@ -1,8 +1,7 @@
 import fetch from "node-fetch";
 
 const BASE = process.env.LIVE_BACKEND_URL || "http://localhost:8080";
-const EMAIL = "vincoeventi@gmail.com";
-const PASSWORD = process.env.ADMIN_PASSWORD || "RipBigVincoEventi!";
+const PASSWORD = process.env.ADMIN_PASSWORD;
 
 console.log("===============================================");
 console.log(`🚀 TEST GENERAZIONE ERRORI AUDIT (4xx & 5xx) SU: ${BASE}`);

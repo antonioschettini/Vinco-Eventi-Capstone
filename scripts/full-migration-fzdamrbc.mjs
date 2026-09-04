@@ -30,9 +30,9 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const FRONTEND_ASSETS = path.resolve(ROOT_DIR, "frontend/src/assets/Vinco Eventi assets");
 const BACKEND_DIR = path.resolve(ROOT_DIR, "backend");
 
-const CLOUD_NAME = "fzdamrbc";
-const API_KEY = "872756552472583";
-const API_SECRET = "G4iDrYWiciby7uTGUDPE59ZPOU4";
+const CLOUD_NAME = process.env.CLOUDINARY_NAME;
+const API_KEY = process.env.CLOUDINARY_API_KEY;
+const API_SECRET = process.env.CLOUDINARY_SECRET;
 
 cloudinary.config({
   cloud_name: CLOUD_NAME,
@@ -41,9 +41,9 @@ cloudinary.config({
   secure: true,
 });
 
-const LIVE_URL = "https://vinco-eventi-backend.onrender.com";
-const ADMIN_EMAIL = "vincoeventi@gmail.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "RipBigVincoEventi!";
+const LIVE_URL = process.env.LIVE_BACKEND_URL || "https://vinco-eventi-backend.onrender.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "vincoeventi@gmail.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

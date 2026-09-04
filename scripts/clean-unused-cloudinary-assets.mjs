@@ -11,9 +11,9 @@ import { v2 as cloudinary } from "cloudinary";
 import fetch from "node-fetch";
 
 cloudinary.config({
-  cloud_name: "oe1bztwb",
-  api_key: "282269152156915",
-  api_secret: "6_XTfKIbzd_nloCv1rCR1fIG9UU",
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
 });
 
 const BACKEND_URL = "http://localhost:8080";

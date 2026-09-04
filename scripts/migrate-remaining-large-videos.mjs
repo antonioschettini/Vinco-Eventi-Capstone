@@ -12,9 +12,9 @@ import path from "path";
 import fs from "fs";
 import os from "os";
 
-const NEW_CLOUD_NAME = "oe1bztwb";
-const NEW_API_KEY = "282269152156915";
-const NEW_API_SECRET = "6_XTfKIbzd_nloCv1rCR1fIG9UU";
+const NEW_CLOUD_NAME = process.env.CLOUDINARY_NAME;
+const NEW_API_KEY = process.env.CLOUDINARY_API_KEY;
+const NEW_API_SECRET = process.env.CLOUDINARY_SECRET;
 
 cloudinary.config({
   cloud_name: NEW_CLOUD_NAME,
@@ -23,9 +23,9 @@ cloudinary.config({
   secure: true,
 });
 
-const BACKEND_URL = "http://localhost:8080";
-const ADMIN_EMAIL = "vincoeventi@gmail.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "RipBigVincoEventi!";
+const BACKEND_URL = process.env.LIVE_BACKEND_URL || "http://localhost:8080";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "vincoeventi@gmail.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

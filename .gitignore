@@ -14,9 +14,17 @@ promemoria*
 tasks.md
 task_list.json
 
+# Node dependencies & builds
+node_modules/
+**/node_modules/
+dist/
+dist-ssr/
+*.local
+
 # Environment and sensitive configuration files
 *.env
 *.env.*
+*.properties.local
 env.properties
 backend/env.properties
 
@@ -24,4 +32,5 @@ backend/env.properties
 **/assets video/
 *.mp4
 *.mov
+
 

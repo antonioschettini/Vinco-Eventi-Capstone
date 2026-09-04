@@ -6,7 +6,7 @@ async function checkStats() {
   const loginRes = await fetch(`${BASE}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: "vincoeventi@gmail.com", password: process.env.ADMIN_PASSWORD || "RipBigVincoEventi!" }),
+    body: JSON.stringify({ email: process.env.ADMIN_EMAIL || "vincoeventi@gmail.com", password: process.env.ADMIN_PASSWORD }),
   });
   const data = await loginRes.json();
   const token = data.token || data.accessToken || data.jwt;
